@@ -7,7 +7,7 @@
 
 #define MAX_LINE 100
 
-const char* type2char (enum token_type t) {
+const char* type2char (enum TokenType t) {
     switch (t)
     {
         case Comma: return "Comma";
@@ -49,9 +49,9 @@ const char* type2char (enum token_type t) {
     }
 }
 
-void free_token(struct token* tok) {
+void free_Token(struct Token* tok) {
     // Free mem
-    struct token* current;
+    struct Token* current;
     while ((current = tok) != NULL) {
         tok = tok->next;
         free(current->lexeme);
@@ -59,14 +59,14 @@ void free_token(struct token* tok) {
     }
 }
 
-int alloc_failed(struct token* tok, char* tmp) {
+int alloc_failed(struct Token* tok, char* tmp) {
     printf("FAILED TO (RE)ALLOC");
-    free_token(tok);
+    free_Token(tok);
     free(tmp);
     return -1;
 }
 
-void print_token(struct token* p) {
+void print_Token(struct Token* p) {
     printf("<%s, %s>\n", p->lexeme, type2char(p->type));
 }
 
@@ -76,7 +76,7 @@ char consume(const char** p) {
     return c;
 }
 
-int match_ws(const char** p, struct token* tok) {
+int match_ws(const char** p, struct Token* tok) {
     if ( **p != ' ' &&
          **p != '\t' &&
          **p != '\r' &&
@@ -110,7 +110,7 @@ int match_ws(const char** p, struct token* tok) {
     return 0;
 }
 
-int match_template(const char** p, struct token* tok, char c, enum token_type type) {
+int match_template(const char** p, struct Token* tok, char c, enum TokenType type) {
     if (**p != c) {
         printf("Bad call to %c !!\n", c);
         return 1;
@@ -127,59 +127,59 @@ int match_template(const char** p, struct token* tok, char c, enum token_type ty
     return 0;
 }
 
-int match_lbrack(const char** p, struct token* tok) {
+int match_lbrack(const char** p, struct Token* tok) {
     return match_template(p, tok, '[', Lbrack);
 }
 
-int match_rbrack(const char** p, struct token* tok) {
+int match_rbrack(const char** p, struct Token* tok) {
     return match_template(p, tok, ']', Rbrack);
 }
 
-int match_plus(const char** p, struct token* tok) {
+int match_plus(const char** p, struct Token* tok) {
     return match_template(p, tok, '+', Plus);
 }
 
-int match_comma(const char** p, struct token* tok) {
+int match_comma(const char** p, struct Token* tok) {
     return match_template(p, tok, ',', Comma);
 }
 
-int match_minus(const char** p, struct token* tok) {
+int match_minus(const char** p, struct Token* tok) {
     return match_template(p, tok, '-', Minus);
 }
 
-int match_lpar(const char** p, struct token* tok) {
+int match_lpar(const char** p, struct Token* tok) {
     return match_template(p, tok, '(', Lpar);
 }
 
-int match_rpar(const char** p, struct token* tok) {
+int match_rpar(const char** p, struct Token* tok) {
     return match_template(p, tok, ')', Rpar);
 }
 
-int match_lcurly(const char** p, struct token* tok) {
+int match_lcurly(const char** p, struct Token* tok) {
     return match_template(p, tok, '{', Lcurly);
 }
 
-int match_rcurly(const char** p, struct token* tok) {
+int match_rcurly(const char** p, struct Token* tok) {
     return match_template(p, tok, '}', Rcurly);
 }
 
-int match_star(const char** p, struct token* tok) {
+int match_star(const char** p, struct Token* tok) {
     return match_template(p, tok, '*', Star);
 }
 
-int match_percent(const char** p, struct token* tok) {
+int match_percent(const char** p, struct Token* tok) {
     return match_template(p, tok, '%', Percent);
 }
 
-int match_pow(const char** p, struct token* tok) {
+int match_pow(const char** p, struct Token* tok) {
     return match_template(p, tok, '^', Pow);
 }
 
-int match_dot(const char** p, struct token* tok) {
+int match_dot(const char** p, struct Token* tok) {
     return match_template(p, tok, '.', Dot);
 }
 
-int match_equal(const char** p, struct token* tok) {
+int match_equal(const char** p, struct Token* tok) {
     if (**p != '=') {
         printf("Bad call to = !\n");
         return 1;
@@ -209,7 +209,7 @@ int match_equal(const char** p, struct token* tok) {
     return 0;
 }
 
-int match_lesser(const char** p, struct token* tok) {
+int match_lesser(const char** p, struct Token* tok) {
     if (**p != '<') {
         printf("Bad call to < !\n");
         return 1;
@@ -238,7 +238,7 @@ int match_lesser(const char** p, struct token* tok) {
     return 0;
 }
 
-int match_greater(const char** p, struct token* tok) {
+int match_greater(const char** p, struct Token* tok) {
     if (**p != '>') {
         printf("Bad call to > !\n");
         return 1;
@@ -267,7 +267,7 @@ int match_greater(const char** p, struct token* tok) {
     return 0;
 }
 
-int match_div(const char** p, struct token* tok) {
+int match_div(const char** p, struct Token* tok) {
     if (**p != '/') {
         printf("Bad call to / !\n");
         return 1;
@@ -296,7 +296,7 @@ int match_div(const char** p, struct token* tok) {
     return 0;
 }
 
-int match_two_template(const char** p, struct token* tok, char c1, char c2, enum token_type type) {
+int match_two_template(const char** p, struct Token* tok, char c1, char c2, enum TokenType type) {
     if (**p != c1) {
         printf("Bad call to %c !\n", c1);
         return 1;
@@ -304,7 +304,7 @@ int match_two_template(const char** p, struct token* tok, char c1, char c2, enum
     char* tmp;
     consume(p);
     if (**p != c2) {
-        printf("Unrecognized token. %c must be followed by %c\n", c1, c2);
+        printf("Unrecognized Token. %c must be followed by %c\n", c1, c2);
         return 1;
     }
     consume(p);
@@ -318,23 +318,23 @@ int match_two_template(const char** p, struct token* tok, char c1, char c2, enum
     return 0;
 }
 
-int match_noteq(const char** p, struct token* tok) {
+int match_noteq(const char** p, struct Token* tok) {
     match_two_template(p, tok, '!', '=', NotEq);
 }
 
-int match_or(const char** p, struct token* tok) {
+int match_or(const char** p, struct Token* tok) {
     match_two_template(p, tok, '|', '|', Or);
 }
 
-int match_and(const char** p, struct token* tok) {
+int match_and(const char** p, struct Token* tok) {
     match_two_template(p, tok, '&', '&', And);
 }
 
-int match_endline(const char** p, struct token* tok) {
+int match_endline(const char** p, struct Token* tok) {
     match_two_template(p, tok, ';', '\n', Endline);
 }
 
-int match_quote(const char** p, struct token* tok) {
+int match_quote(const char** p, struct Token* tok) {
     if (**p != '"') {
         printf("Bad call to \" !!\n");
         return 1;
@@ -380,7 +380,7 @@ int match_quote(const char** p, struct token* tok) {
     return 0;
 }
 
-int match_int(const char** p, struct token* tok) {
+int match_int(const char** p, struct Token* tok) {
     if (**p < 48 || **p > 57) {
         printf("Bad call to int !!\n");
         return 1;
@@ -416,7 +416,7 @@ int match_int(const char** p, struct token* tok) {
     return 0;
 }
 
-int match_id(const char** p, struct token* tok) {
+int match_id(const char** p, struct Token* tok) {
     if (**p < 65 || **p > 122 || (**p > 90 && **p < 97)) {
         printf("Bad call to ID !!\n");
         return 1;
@@ -468,9 +468,9 @@ int match_id(const char** p, struct token* tok) {
     return 0;
 }
 
-int next_token(const char** p, struct token* tok) {
+int next_Token(const char** p, struct Token* tok) {
     /*
-     * Process the next character(s) and store the token.
+     * Process the next character(s) and store the Token.
      * Return values:
      * 0      - STATUS OK
      * -1    - MEMORY ISSUE
@@ -524,21 +524,21 @@ int next_token(const char** p, struct token* tok) {
         }
 }
 
-struct token* build_token_list(const char* fp) {
+struct Token* build_Token_list(const char* fp) {
     // Prepare memory
-    struct token tok;
+    struct Token tok;
     tok.lexeme = malloc(16 * sizeof(char));
     tok.type = UNK;
     tok.next = NULL;
-    struct token* head = NULL;
-    struct token* current = head;
+    struct Token* head = NULL;
+    struct Token* current = head;
     // Iterate
     int i = 0;
     int exit;
-    while (*fp != '\0' && (exit = next_token(&fp, &tok)) == 0) {
+    while (*fp != '\0' && (exit = next_Token(&fp, &tok)) == 0) {
         i++;
         if (head == NULL) {
-            head = malloc(sizeof(struct token));
+            head = malloc(sizeof(struct Token));
             head->lexeme = malloc((1 + strlen(tok.lexeme)) * sizeof(char));
             memcpy(head->lexeme, tok.lexeme, 1 + strlen(tok.lexeme));
             head->type = tok.type;
@@ -546,7 +546,7 @@ struct token* build_token_list(const char* fp) {
             current = head;
         }
         else {
-            struct token* tail = malloc(sizeof(struct token));
+            struct Token* tail = malloc(sizeof(struct Token));
             tail->lexeme = malloc((1 + strlen(tok.lexeme)) * sizeof(char));
             memcpy(tail->lexeme, tok.lexeme, 1 + strlen(tok.lexeme));
             tail->type = tok.type;
@@ -558,12 +558,12 @@ struct token* build_token_list(const char* fp) {
     free(tok.lexeme);
     if (exit == 0) {
         // Was able to read the entire file
-        printf("Tot tokens = %d\n", i);
+        printf("Tot Tokens = %d\n", i);
         printf("===================================\n");
     }
     else{
         // Encountered some error
-        free_token(head);
+        free_Token(head);
         head = NULL;
     }
     return head;

@@ -1,4 +1,4 @@
-enum token_type {
+enum TokenType {
     Comma,
     Lpar, // (
     Rpar, // )
@@ -38,16 +38,16 @@ enum token_type {
     Eof
 };
 
-const char* type2char (enum token_type t);
+const char* type2char (enum TokenType t);
 
-struct token{
+struct Token{
     char* lexeme;
-    enum token_type type;
-    struct token* next;
+    enum TokenType type;
+    struct Token* next;
 };
 
-void print_token(struct token* p);
+void print_Token(struct Token* p);
 
-void free_token(struct token* tok);
+void free_Token(struct Token* tok);
 
-struct token* build_token_list(const char* fp);
+struct Token* build_Token_list(const char* fp);

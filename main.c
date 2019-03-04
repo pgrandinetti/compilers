@@ -7,11 +7,11 @@
 int main(int argc, char* argv[]) {
     /*
     const char* line = "+ >= continue<= - \"a  b !) c \"\"ah ahd\" ;\n == xyz != +0.53^-2 && a3c!=x + === [ Null)";
-    struct token tok;
+    struct Token tok;
     tok.lexeme = malloc(16 * sizeof(char));
     tok.type = UNK;
-    while (next_token(&line, &tok) > 0) {
-        print_token(&tok);
+    while (next_Token(&line, &tok) > 0) {
+        print_Token(&tok);
     }
     free(tok.lexeme);
     */
@@ -38,32 +38,32 @@ int main(int argc, char* argv[]) {
     const char* fp = vec;
 
     /*
-     * Build token list
+     * Build Token list
     */
     // Will also print total count
     clock_t begin = clock();
-    struct token* list = build_token_list(fp);
+    struct Token* list = build_Token_list(fp);
     clock_t end = clock();
 
     /*
-     * Diplay all tokens
+     * Diplay all Tokens
     */
     if (list == NULL) {
         printf("UNRECOGNIZED SEQUENCE OF CHARACTERS: NOT VALID TOKEN\n");
     }
     else {
         int j = 0;
-        struct token* current = list;
+        struct Token* current = list;
         while (current != NULL) {
-            print_token(current);
+            print_Token(current);
             j++;
             current = current->next;
         }
-        printf("Tot tokens = %d\n", j);
+        printf("Tot Tokens = %d\n", j);
         printf("===================================\n");
     }
-    free_token(list);
+    free_Token(list);
 
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("Total time spent building token list = %f\n", time_spent);
+    printf("Total time spent building Token list = %f\n", time_spent);
 }
