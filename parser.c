@@ -4,15 +4,8 @@
 
 #include "lexer.h"
 
-
-struct Construct {
-    // A syntactical construct of the grammar
-    char* text;
-    enum TokenType type;
-};
-
 struct ParseTree {
-    struct Construct* data;
+    struct Token* data;
     struct ParseTree* child;
     struct ParseTree* sibling;
 };
@@ -22,8 +15,7 @@ void free_ParseTree(struct ParseTree* tree) {
     struct ParseTree* child;
     sibling = tree->sibling;
     child = tree->child;
-    free(tree->data->text);
-    free(tree->data);
+    free_Token(tree->data);
     free(tree);
     if (sibling != NULL)
         free_ParseTree(sibling);
@@ -50,7 +42,7 @@ struct Construct* new_Construct(char* text, TokenType type) {
     return c;
 }
 
-struct ParseTree* new_ParseTree(struct Construct* c) {
+struct ParseTree* new_ParseTree(struct Token* c) {
     struct ParseTree* tree;
     tree = malloc(sizeof(struct ParseTree));
     if (tree == NULL)

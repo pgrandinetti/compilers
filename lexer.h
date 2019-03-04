@@ -1,5 +1,5 @@
 enum TokenType {
-    // Basic Token Types
+    // Basic Token Types in the Grammar
     Comma,
     Lpar, // (
     Rpar, // )
@@ -78,5 +78,9 @@ void print_TokenList(struct TokenList* p);
 void free_Token(struct Token* tok);
 
 void free_TokenList(struct TokenList* tok);
+
+struct Token* new_Token(char* lexeme, enum TokenType tok);
+
+struct TokenList* new_TokenList(struct Token* tok);
 
 struct TokenList* build_TokenList(const char* fp);

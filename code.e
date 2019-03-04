@@ -7,3 +7,4 @@ while (current < N)
     current = current + 1;
 ;
 writeOut "The @th number in Fibonacci series is @", N, fib[1];
+

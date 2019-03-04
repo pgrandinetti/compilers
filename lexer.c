@@ -537,29 +537,35 @@ int next_Token(const char** p, struct Token* tok) {
         }
 }
 
+struct Token* new_Token(char* lexeme, enum TokenType type) {
+    struct Token* new;
+    new = malloc(sizeof(struct Token));
+    if (new == NULL)
+        return NULL;
+    new->lexeme = malloc(sizeof(char) * (strlen(lexeme) + 1));
+    if (new->lexeme == NULL)
+        return NULL;
+    memcpy(new->lexeme, lexeme, strlen(lexeme) + 1);
+    new->type = type;
+    return new;
+}
+
 struct TokenList* new_TokenList(struct Token* tok) {
     struct TokenList* new;
     new = malloc(sizeof(struct TokenList));
     if (new == NULL)
         return NULL;
-    new->token = malloc(sizeof(struct Token) * sizeof(char));
+    new->token = new_Token(tok->lexeme, tok->type);
     if (new->token == NULL)
         return NULL;
-    new->token->lexeme = malloc(sizeof(char) * (strlen(tok->lexeme) + 1));
-    if (new->token->lexeme == NULL)
-        return NULL;
-    memcpy(new->token->lexeme, tok->lexeme, strlen(tok->lexeme) + 1);
-    new->token->type = tok->type;
     new->next = NULL;
     return new;
 }
 
 struct TokenList* build_TokenList(const char* fp) {
     // Prepare memory
-    struct Token* tok;
-    tok = malloc(sizeof(struct Token));
-    tok->lexeme = malloc(16 * sizeof(char));
-    tok->type = UNK;
+    char init[16] = {0};
+    struct Token* tok = new_Token(init, UNK);
     struct TokenList* head = NULL;
     struct TokenList* current = head;
     struct TokenList* tail;
