@@ -50,11 +50,16 @@ const char* type2char (enum TokenType t) {
 }
 
 void free_Token(struct Token* tok) {
+    free(tok->lexeme);
+    free(tok);
+}
+
+void free_TokenList(struct TokenList* tok) {
     // Free mem
-    struct Token* current;
+    struct TokenList* current;
     while ((current = tok) != NULL) {
         tok = tok->next;
-        free(current->lexeme);
+        free_Token(current->token);
         free(current);
     }
 }
@@ -68,6 +73,14 @@ int alloc_failed(struct Token* tok, char* tmp) {
 
 void print_Token(struct Token* p) {
     printf("<%s, %s>\n", p->lexeme, type2char(p->type));
+}
+
+void print_TokenList(struct TokenList* p) {
+    struct TokenList* current = p;
+    while (current != NULL) {
+        print_Token(current->token);
+        current = current->next;
+    }
 }
 
 char consume(const char** p) {
@@ -524,38 +537,57 @@ int next_Token(const char** p, struct Token* tok) {
         }
 }
 
-struct Token* build_Token_list(const char* fp) {
+struct TokenList* new_TokenList(struct Token* tok) {
+    struct TokenList* new;
+    new = malloc(sizeof(struct TokenList));
+    if (new == NULL)
+        return NULL;
+    new->token = malloc(sizeof(struct Token) * sizeof(char));
+    if (new->token == NULL)
+        return NULL;
+    new->token->lexeme = malloc(sizeof(char) * (strlen(tok->lexeme) + 1));
+    if (new->token->lexeme == NULL)
+        return NULL;
+    memcpy(new->token->lexeme, tok->lexeme, strlen(tok->lexeme) + 1);
+    new->token->type = tok->type;
+    new->next = NULL;
+    return new;
+}
+
+struct TokenList* build_TokenList(const char* fp) {
     // Prepare memory
-    struct Token tok;
-    tok.lexeme = malloc(16 * sizeof(char));
-    tok.type = UNK;
-    tok.next = NULL;
-    struct Token* head = NULL;
-    struct Token* current = head;
+    struct Token* tok;
+    tok = malloc(sizeof(struct Token));
+    tok->lexeme = malloc(16 * sizeof(char));
+    tok->type = UNK;
+    struct TokenList* head = NULL;
+    struct TokenList* current = head;
+    struct TokenList* tail;
     // Iterate
     int i = 0;
     int exit;
-    while (*fp != '\0' && (exit = next_Token(&fp, &tok)) == 0) {
+    while (*fp != '\0' && (exit = next_Token(&fp, tok)) == 0) {
         i++;
         if (head == NULL) {
-            head = malloc(sizeof(struct Token));
-            head->lexeme = malloc((1 + strlen(tok.lexeme)) * sizeof(char));
-            memcpy(head->lexeme, tok.lexeme, 1 + strlen(tok.lexeme));
-            head->type = tok.type;
-            head->next = NULL;
+            head = new_TokenList(tok);
+            if (head == NULL) {
+                free_Token(tok);
+                return NULL;
+            }
             current = head;
         }
         else {
-            struct Token* tail = malloc(sizeof(struct Token));
-            tail->lexeme = malloc((1 + strlen(tok.lexeme)) * sizeof(char));
-            memcpy(tail->lexeme, tok.lexeme, 1 + strlen(tok.lexeme));
-            tail->type = tok.type;
-            tail->next = NULL;
+            tail = new_TokenList(tok);
+            if (tail == NULL) {
+                free_TokenList(head);
+                free_Token(tok);
+                return NULL;
+            }
             current->next = tail;
             current = tail;
         }
     }
-    free(tok.lexeme);
+    free_Token(tok);
     if (exit == 0) {
         // Was able to read the entire file
         printf("Tot Tokens = %d\n", i);
@@ -563,7 +595,7 @@ struct Token* build_Token_list(const char* fp) {
     }
     else{
         // Encountered some error
-        free_Token(head);
+        free_TokenList(head);
         head = NULL;
     }
     return head;

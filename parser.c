@@ -2,68 +2,13 @@
 #include <string.h>
 #include <stdio.h>
 
-//#include "lexer.h"
+#include "lexer.h"
 
-
-enum ConstructType {
-    // A syntactical Construct of the Grammar
-    Comma,
-    Lpar, // (
-    Rpar, // )
-    Lbrack, // [
-    Rbrack, // ]
-    Lcurly, // {
-    Rcurly, // }
-    Plus,
-    Minus,
-    Equal,
-    EqEq, // ==
-    NotEq, // !=
-    Lesser, // <
-    Greater, // >
-    LesserEq,
-    GreaterEq,
-    Star, // *
-    Div, // /
-    FloatDiv, // /.
-    Percent, // %
-    Or,
-    And, // &
-    Int,
-    Float,
-    Pow,
-    Dot,
-    QuotedStr, // "
-    Bool,
-    Null,
-    Var,
-    Keyword,
-    Endline,
-/* -----=====----- */
-    Program,
-    Line,
-    Assign,
-    Input,
-    Output,
-    ifLine,
-    loopLine,
-    keywordLine,
-    Expr,
-    BaseExpr,
-    Operator,
-    CondOp,
-    IfConf,
-    IfBody,
-    OptElse,
-    LoopBody,
-    Obj,
-    Str,
-    Num
-};
 
 struct Construct {
+    // A syntactical construct of the grammar
     char* text;
-    enum ConstructType type;
+    enum TokenType type;
 };
 
 struct ParseTree {
@@ -93,7 +38,7 @@ struct ParseTree* build_tree (struct token* tok) {
 }
 */
 
-struct Construct* new_Construct(char* text, size_t len) {
+struct Construct* new_Construct(char* text, TokenType type) {
     struct Construct* c;
     c = malloc(sizeof(struct Construct));
     if (c == NULL)

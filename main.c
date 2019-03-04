@@ -42,27 +42,17 @@ int main(int argc, char* argv[]) {
     */
     // Will also print total count
     clock_t begin = clock();
-    struct Token* list = build_Token_list(fp);
+    struct TokenList* list = build_TokenList(fp);
     clock_t end = clock();
 
     /*
      * Diplay all Tokens
     */
-    if (list == NULL) {
+    if (list == NULL)
         printf("UNRECOGNIZED SEQUENCE OF CHARACTERS: NOT VALID TOKEN\n");
-    }
-    else {
-        int j = 0;
-        struct Token* current = list;
-        while (current != NULL) {
-            print_Token(current);
-            j++;
-            current = current->next;
-        }
-        printf("Tot Tokens = %d\n", j);
-        printf("===================================\n");
-    }
-    free_Token(list);
+    else
+        print_TokenList(list);
+    free_TokenList(list);
 
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
     printf("Total time spent building Token list = %f\n", time_spent);

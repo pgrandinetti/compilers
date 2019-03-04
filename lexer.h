@@ -1,4 +1,5 @@
 enum TokenType {
+    // Basic Token Types
     Comma,
     Lpar, // (
     Rpar, // )
@@ -12,7 +13,6 @@ enum TokenType {
     EqEq, // ==
     //Exclam, // !
     NotEq, // !=
-    //Question, // ?
     Lesser, // <
     Greater, // >
     LesserEq,
@@ -35,7 +35,28 @@ enum TokenType {
     Endline,
     WS, // white space(s)
     UNK,
-    Eof
+/* -----=====----- */
+    // Grammar Constructs
+    // used by the parser, not the lexer
+    Program,
+    Line,
+    Assign,
+    Input,
+    Output,
+    ifLine,
+    loopLine,
+    keywordLine,
+    Expr,
+    BaseExpr,
+    Operator,
+    CondOp,
+    IfConf,
+    IfBody,
+    OptElse,
+    LoopBody,
+    Obj,
+    Str,
+    Num
 };
 
 const char* type2char (enum TokenType t);
@@ -43,11 +64,19 @@ const char* type2char (enum TokenType t);
 struct Token{
     char* lexeme;
     enum TokenType type;
-    struct Token* next;
+};
+
+struct TokenList {
+    struct Token* token;
+    struct TokenList* next;
 };
 
 void print_Token(struct Token* p);
 
+void print_TokenList(struct TokenList* p);
+
 void free_Token(struct Token* tok);
 
-struct Token* build_Token_list(const char* fp);
+void free_TokenList(struct TokenList* tok);
+
+struct TokenList* build_TokenList(const char* fp);
