@@ -45,6 +45,25 @@ const char* type2char (enum TokenType t) {
         case Endline: return "Endline";
         case Keyword: return "Keyword";
         case WS: return "WS";
+        case Program: return "Program";
+        case Line: return "Line";
+        case Assign: return "Assign";
+        case Input: return "Input";
+        case Output: return "Output";
+        case ifLine: return "ifLine";
+        case loopLine: return "loopLine";
+        case keywordLine: return "keywordLine";
+        case Expr: return "Expr";
+        case BaseExpr: return "BaseExpr";
+        case Operator: return "Operator";
+        case CondOp: return "CondOp";
+        case IfConf: return "IfConf";
+        case IfBody: return "IfBody";
+        case OptElse: return "OptElse";
+        case LoopBody: return "LoopBody";
+        case Obj: return "Obj";
+        case Str: return "Str";
+        case Num: return "Num";
         default: return "UNK";
     }
 }
@@ -71,7 +90,10 @@ int alloc_failed(struct Token* tok, char* tmp) {
 }
 
 void print_Token(struct Token* p) {
-    printf("<%s, %s>\n", p->lexeme, type2char(p->type));
+    if (strlen(p->lexeme) == 0 || p->type == Endline)
+        printf("<%s>\n", type2char(p->type));
+    else
+        printf("<|%s|, %s>\n", p->lexeme, type2char(p->type));
 }
 
 void print_TokenList(struct TokenList* p) {
@@ -564,8 +586,10 @@ struct Token* new_Token(char* lexeme, enum TokenType type) {
     if (new == NULL)
         return NULL;
     new->lexeme = malloc(sizeof(char) * (strlen(lexeme) + 1));
-    if (new->lexeme == NULL)
+    if (new->lexeme == NULL) {
+        free(new);
         return NULL;
+    }
     memcpy(new->lexeme, lexeme, strlen(lexeme) + 1);
     new->type = type;
     return new;
@@ -577,8 +601,10 @@ struct TokenList* new_TokenList(struct Token* tok) {
     if (new == NULL)
         return NULL;
     new->token = new_Token(tok->lexeme, tok->type);
-    if (new->token == NULL)
+    if (new->token == NULL) {
+        free(new);
         return NULL;
+    }
     new->next = NULL;
     return new;
 }
