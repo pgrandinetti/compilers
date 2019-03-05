@@ -55,7 +55,6 @@ void free_Token(struct Token* tok) {
 }
 
 void free_TokenList(struct TokenList* tok) {
-    // Free mem
     struct TokenList* current;
     while ((current = tok) != NULL) {
         tok = tok->next;
@@ -76,20 +75,27 @@ void print_Token(struct Token* p) {
 }
 
 void print_TokenList(struct TokenList* p) {
+    int i = 0;
     struct TokenList* current = p;
     while (current != NULL) {
+        i++;
         print_Token(current->token);
         current = current->next;
     }
+    printf("====================\n");
+    printf("Found %d Tokens\n", i);
+    printf("====================\n");
 }
 
 char consume(const char** p) {
+    // Return the current char while advancing the pointer
     char c = **p;
     (*p)++;
     return c;
 }
 
 int match_ws(const char** p, struct Token* tok) {
+    // Build a Token with all consecutive blanks it can find
     if ( **p != ' ' &&
          **p != '\t' &&
          **p != '\r' &&
@@ -104,11 +110,10 @@ int match_ws(const char** p, struct Token* tok) {
     char ws[MAX_LINE] = "";
     do {
         if (i >= MAX_LINE - 1) {
-            printf("Found more than %d white spaces", MAX_LINE);
+            printf("Found more than %d white spaces\n", MAX_LINE);
             return 1;
         }
-        c = consume(p);
-        //printf("WHITESPACE : Current char is |%c|\n", c);
+        c = consume(p); // p is incremented here
         ws[i++] = c;
     }
     while (**p == ' ' || **p == '\t' || **p == '\r' || **p == '\n');
@@ -124,8 +129,9 @@ int match_ws(const char** p, struct Token* tok) {
 }
 
 int match_template(const char** p, struct Token* tok, char c, enum TokenType type) {
+    // Build a Token with the character in input and advances the stream pointer.
     if (**p != c) {
-        printf("Bad call to %c !!\n", c);
+        printf("Bad call to |%c| !!\n", c);
         return 1;
     }
     char* tmp;
@@ -310,14 +316,15 @@ int match_div(const char** p, struct Token* tok) {
 }
 
 int match_two_template(const char** p, struct Token* tok, char c1, char c2, enum TokenType type) {
+    // Builds a Token with the two given char (c1, c2) as lexeme. Advances the stream pointer.
     if (**p != c1) {
-        printf("Bad call to %c !\n", c1);
+        printf("Bad call to |%c| !\n", c1);
         return 1;
     }
     char* tmp;
     consume(p);
     if (**p != c2) {
-        printf("Unrecognized Token. %c must be followed by %c\n", c1, c2);
+        printf("Unrecognized Token. |%c| must be followed by |%c|\n", c1, c2);
         return 1;
     }
     consume(p);
@@ -348,6 +355,8 @@ int match_endline(const char** p, struct Token* tok) {
 }
 
 int match_quote(const char** p, struct Token* tok) {
+    // Build a Token with the QuotedStr object found in the stream from
+    // the current pointer location.
     if (**p != '"') {
         printf("Bad call to \" !!\n");
         return 1;
@@ -394,19 +403,31 @@ int match_quote(const char** p, struct Token* tok) {
 }
 
 int match_int(const char** p, struct Token* tok) {
+    // Build Token matching integer number (sequence of digits)
     if (**p < 48 || **p > 57) {
         printf("Bad call to int !!\n");
         return 1;
     }
     char* tmp;
     size_t curr_size = 8;
+    char c;
+    int totchar = 0;
+    // Handle unique case when the INT is 0
+    if (**p == '0') {
+        c = consume(p);
+        if (**p >= 48 && **p <= 57) {
+            printf("Cannot have INT starting with 0\n");
+            return 1;
+        }
+        memcpy(tok->lexeme, (char[2]) {'0', '\0'}, 2);
+        tok->type = Int;
+        return 0;
+    }
     tmp = realloc(tok->lexeme, curr_size);
     if (tmp == NULL)
         return alloc_failed(tok, tmp);
     else
         tok->lexeme = tmp;
-    char c;
-    int totchar = 0;
     while (**p >= 48 && **p <= 57) {
         c = consume(p);
         tok->lexeme[totchar++] = c;
@@ -430,12 +451,12 @@ int match_int(const char** p, struct Token* tok) {
 }
 
 int match_id(const char** p, struct Token* tok) {
+    // Build Token matching all possible variable identifiers, or keyword.
     if (**p < 65 || **p > 122 || (**p > 90 && **p < 97)) {
         printf("Bad call to ID !!\n");
         return 1;
     }
     char* tmp;
-    // Will match keywords and variable names.
     size_t curr_size = 16;
     int totchar = 0;
     tmp = realloc(tok->lexeme, curr_size);

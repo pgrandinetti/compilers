@@ -59,6 +59,7 @@ enum TokenType {
     Num
 };
 
+// Generate readable string instead of int
 const char* type2char (enum TokenType t);
 
 struct Token{
@@ -83,4 +84,9 @@ struct Token* new_Token(char* lexeme, enum TokenType tok);
 
 struct TokenList* new_TokenList(struct Token* tok);
 
+/*
+ * Create a TokenList from the characters stream
+ * (typically a file with source code).
+ * Return NULL if the characters sequence is not valid in the Grammar.
+*/
 struct TokenList* build_TokenList(const char* fp);

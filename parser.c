@@ -10,6 +10,18 @@ struct ParseTree {
     struct ParseTree* sibling;
 };
 
+struct ParseTree* new_ParseTree(struct Token* c) {
+    struct ParseTree* tree;
+    tree = malloc(sizeof(struct ParseTree));
+    if (tree == NULL)
+        return NULL;
+    tree->data = c;
+    tree->child = NULL;
+    tree->sibling = NULL;
+    return tree;
+}
+
+
 void free_ParseTree(struct ParseTree* tree) {
     struct ParseTree* sibling;
     struct ParseTree* child;
@@ -23,46 +35,26 @@ void free_ParseTree(struct ParseTree* tree) {
         free_ParseTree(child);
 }
 
-/*
-struct ParseTree* build_tree (struct token* tok) {
+
+struct ParseTree* build_ParseTree (struct TokenList* head) {
     // Do not modify head of token list
-    struct token* current = tok;
-}
-*/
-
-struct Construct* new_Construct(char* text, TokenType type) {
-    struct Construct* c;
-    c = malloc(sizeof(struct Construct));
-    if (c == NULL)
-        return NULL;
-    c->text = malloc(len * sizeof(char));
-    if (c->text == NULL)
-        return NULL;
-    memcpy(c->text, text, len);
-    return c;
+    struct TokenList* current = head;
 }
 
-struct ParseTree* new_ParseTree(struct Token* c) {
-    struct ParseTree* tree;
-    tree = malloc(sizeof(struct ParseTree));
-    if (tree == NULL)
-        return NULL;
-    tree->data = c;
-    tree->child = NULL;
-    tree->sibling = NULL;
-    return tree;
-}
 
 int main() {
 
-    struct Construct* c1 = new_Construct((char[4]) {'h', 'i', '!', '\0'}, 4);
-    struct ParseTree* p1 = new_ParseTree(c1);
+    char c1[4] = {'h', 'i', '!', '\0'};
+    struct Token* t1 = new_Token(c1, UNK);
+    struct ParseTree* p1 = new_ParseTree(t1);
 
-    struct Construct* c2 = new_Construct((char[5]) {'h', 'i', '!', '!', '\0'}, 5);
-    struct ParseTree* p2 = new_ParseTree(c2);
+    char c2[5] = {'h', 'i', '!', '!', '\0'};
+    struct Token* t2 = new_Token(c2, UNK);
+    struct ParseTree* p2 = new_ParseTree(t2);
 
-    struct Construct* c3 = new_Construct((char[3]) {'h', 'i', '\0'}, 3);
-    struct ParseTree* p3 = new_ParseTree(c3);
+    char c3[3] = {'h', 'i', '\0'};
+    struct Token* t3 = new_Token(c3, UNK);
+    struct ParseTree* p3 = new_ParseTree(t3);
 
     p1->child = p2;
     p1->sibling = p3;
