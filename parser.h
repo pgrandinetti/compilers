@@ -10,11 +10,12 @@ struct ParseTree {
 /*
  * Create a new ParseTree from a given Token.
  * The Token is COPIED with all its internal data into a new memory loc.
+ * Therefore when the ParseTree created by this function will be freed, Token* c will not.
  * Return NULL if a memory error happens.
 */
 struct ParseTree* new_ParseTree(struct Token* c);
 
-void print_ParseTree(struct ParseTree* tree, int indent);
+void print_ParseTree(struct ParseTree* tree);
 
 /*
  * Free memory for the ParseTree and all its internal data, including children and siblings.

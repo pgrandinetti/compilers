@@ -90,10 +90,13 @@ int alloc_failed(struct Token* tok, char* tmp) {
 }
 
 void print_Token(struct Token* p) {
-    if (strlen(p->lexeme) == 0 || p->type == Endline)
-        printf("<%s>\n", type2char(p->type));
+    if (p == NULL)
+        printf("Token is NULL");
     else
-        printf("<|%s|, %s>\n", p->lexeme, type2char(p->type));
+        if (strlen(p->lexeme) == 0 || p->type == Endline)
+            printf("<%s>\n", type2char(p->type));
+        else
+            printf("<|%s|, %s>\n", p->lexeme, type2char(p->type));
 }
 
 void print_TokenList(struct TokenList* p) {

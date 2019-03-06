@@ -22,10 +22,10 @@ struct ParseTree* new_ParseTree(struct Token* c) {
 }
 
 
-void print_ParseTree(struct ParseTree* tree, int indent) {
-    // This is a Depth-First print
+void print_PT(struct ParseTree* tree, int indent) {
     if (tree == NULL)
         return;
+    // This is a Depth-First print
     if (indent > 0) {
         char space[indent + 1];
         memset(space, ' ', indent * sizeof(char));
@@ -37,8 +37,13 @@ void print_ParseTree(struct ParseTree* tree, int indent) {
     struct ParseTree* child;
     sibling = tree->sibling;
     child = tree->child;
-    print_ParseTree(child, indent + 2);
-    print_ParseTree(sibling, indent);
+    print_PT(child, indent + 2);
+    print_PT(sibling, indent);
+}
+
+
+void print_ParseTree(struct ParseTree* tree) {
+    print_PT(tree, 0);
 }
 
 
@@ -56,6 +61,26 @@ void free_ParseTree(struct ParseTree* tree) {
 }
 
 
+/*
+ * Each function `is_<TokenType>` is defined as
+
+ * int is_<TokenType> (struct TokenList** tok, struct ParseTree** new)
+
+ * - tok points to the current token in the sequence. The function moves it ahead CHANGING the pointer location.
+ * - new points to a already-ALLOCATED ParseTree. It will contain the resulting subtree, or stay empty.
+
+ * Therefore:
+ * - The caller must alloc the ParseTree** new
+ * - The called must assign *new->data, child and sibling
+
+ * Return a integer flag with the operation final status (see #define below).
+*/
+
+#define PARSING_ERROR -1
+#define SUBTREE_OK 0
+#define MEMORY_ERROR 1
+
+
 void skip_WS(struct TokenList** list) {
     struct TokenList* current = *list;
     while (current != NULL && current->token->type == WS)
@@ -64,44 +89,206 @@ void skip_WS(struct TokenList** list) {
 }
 
 
-struct ParseTree* is_endline(struct TokenList** tok) {
+/*
+ * Template function for easy-to-check Tokens
+ *
+ * Match the current Token in the TokenList** tok, with the given TokenType type.
+ * If char* lexeme != NULL, then also checks that the current Token's lexeme matches it.
+*/
+int _single_Token_template(struct TokenList** tok, struct ParseTree** new, enum TokenType type, char* lexeme) {
     if (*tok == NULL)
-        return NULL;
+        return PARSING_ERROR;
+
+    skip_WS(tok);
     struct TokenList* current = *tok;
-    if (current->token->type != Endline)
-        return NULL;
-    struct ParseTree* new = new_ParseTree(current->token);
-    current = current->next;
-    *tok = current;
-    return new;
+    if (current->token->type != type)
+        return PARSING_ERROR;
+    if (lexeme != NULL)
+        if(strcmp(current->token->lexeme, lexeme) != 0)
+            return PARSING_ERROR;
+    // As by definition above, new is already allocated
+    struct Token* newTok = new_Token(current->token->lexeme, current->token->type);
+    if (newTok == NULL)
+        return MEMORY_ERROR;
+    (*new)->data = newTok;
+    (*new)->child = NULL;
+    (*new)->sibling = NULL;
+    *tok = current->next;
+    return SUBTREE_OK;
 }
 
 
-struct ParseTree* is_Int(struct TokenList** tok) {
-    if (*tok == NULL)
-        return NULL;
-    struct TokenList* current = *tok;
-    if (current->token->type != Int)
-        return NULL;
-    struct ParseTree* new = new_ParseTree(current->token);
-    current = current->next;
-    *tok = current;
-    return new;
-}
-
-struct ParseTree* is_Dot(struct TokenList** tok) {
-    if (*tok == NULL)
-        return NULL;
-    struct TokenList* current = *tok;
-    if (current->token->type != Dot)
-        return NULL;
-    struct ParseTree* new = new_ParseTree(current->token);
-    current = current->next;
-    *tok = current;
-    return new;
+int is_endline(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Endline, NULL);
 }
 
 
+int is_Int(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Int, NULL);
+}
+
+
+int is_Dot(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Dot, NULL);
+}
+
+
+int is_QuotedStr(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, QuotedStr, NULL);
+}
+
+
+int is_Var(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Var, NULL);
+}
+
+
+int is_readIn(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Keyword, "readIn");
+}
+
+
+int is_writeOut(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Keyword, "writeOut");
+}
+
+
+int is_If(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Keyword, "if");
+}
+
+
+int is_While(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Keyword, "while");
+}
+
+
+int is_Break(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Keyword, "break");
+}
+
+
+int is_Continue(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Keyword, "Continue");
+}
+
+
+int is_Lbrack(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Lbrack, NULL);
+}
+
+
+int is_Rbrack(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Rbrack, NULL);
+}
+
+
+int is_Lpar(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Lpar, NULL);
+}
+
+
+int is_Rpar(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Rpar, NULL);
+}
+
+
+int is_Comma(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Comma, NULL);
+}
+
+
+int is_EqEq(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, EqEq, NULL);
+}
+
+
+int is_Equal(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Equal, NULL);
+}
+
+
+int is_Plus(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Plus, NULL);
+}
+
+
+int is_Minus(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Minus, NULL);
+}
+
+
+int is_NotEq(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, NotEq, NULL);
+}
+
+
+int is_Greater(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Greater, NULL);
+}
+
+
+int is_GreaterEq(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, GreaterEq, NULL);
+}
+
+
+int is_Lesser(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Lesser, NULL);
+}
+
+
+int is_LesserEq(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, LesserEq, NULL);
+}
+
+
+int is_Star(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Star, NULL);
+}
+
+
+int is_Div(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Div, NULL);
+}
+
+
+int is_FloatDiv(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, FloatDiv, NULL);
+}
+
+
+int is_Percent(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Percent, NULL);
+}
+
+
+int is_Or(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Or, NULL);
+}
+
+
+int is_And(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, And, NULL);
+}
+
+
+int is_Pow(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Pow, NULL);
+}
+
+
+int is_Null(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Null, NULL);
+}
+
+
+int is_Bool(struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Bool, NULL);
+}
+
+
+/*
 struct ParseTree* is_OptFrac(struct TokenList** tok) {
     if (*tok == NULL)
         return NULL;
@@ -180,29 +367,6 @@ struct ParseTree* is_Float(struct TokenList** tok) {
 }
 
 
-struct ParseTree* is_Var(struct TokenList** tok) {
-    struct TokenList* current = *tok;
-    skip_WS(&current);
-    if(current->token->type != Var)
-        return NULL;
-    struct ParseTree* new = new_ParseTree(current->token);
-    *tok = current->next;
-    return new;
-}
-
-
-struct ParseTree* is_readIn(struct TokenList** tok) {
-    struct TokenList* current = *tok;
-    skip_WS(&current);
-    if(current->token->type != Keyword ||
-       strcmp(current->token->lexeme, "readIn") != 0)
-        return NULL;
-    struct ParseTree* new = new_ParseTree(current->token);
-    *tok = current->next;
-    return new;
-}
-
-
 struct ParseTree* is_writeOut(struct TokenList** tok) {
     struct TokenList* current = *tok;
     skip_WS(&current);
@@ -213,10 +377,10 @@ struct ParseTree* is_writeOut(struct TokenList** tok) {
     *tok = current->next;
     return new;
 }
+*/
 
-
-struct ParseTree* is_Obj(struct TokenList** tok) {
-    return NULL;
+int is_Obj(struct TokenList** tok, struct ParseTree** new) {
+    return -1;
 /*
     // Create root of the subtree
     struct Token* newTok = new_Token((char[1]){'\0'}, Obj);
@@ -265,105 +429,106 @@ int is_assign(struct TokenList* tok, struct ParseTree* tree) {
 */
 
 
-struct ParseTree* is_input(struct TokenList** tok) {
-    // Create root of the subtree
-    struct Token* newTok = new_Token((char[1]){'\0'}, Input);
-    if (newTok == NULL)
-        return NULL;
-    struct ParseTree* new = new_ParseTree(newTok);
-    free_Token(newTok);
-    if (new == NULL)
-        return NULL;
+int is_input(struct TokenList** tok, struct ParseTree** new) {
     // Create subtree
-    struct ParseTree* readin = is_readIn(tok);
-    if (readin == NULL) {
-        free_ParseTree(new);
-        return NULL;
-    }
-    struct ParseTree* var = is_Var(tok);
-    if (var == NULL) {
-        free_ParseTree(new);
-        free_ParseTree(readin);
-        return NULL;
-    }
-    // Link it
+    struct ParseTree* readin, *var;
+    int status;
+    readin = malloc(sizeof(struct ParseTree));
+    var = malloc(sizeof(struct ParseTree));
+    if (readin == NULL || var == NULL)
+        return MEMORY_ERROR;
+    status = is_readIn(tok, &readin);
+    if (status != SUBTREE_OK)
+        return status;
+    status = is_Var(tok, &var);
+    if (status != SUBTREE_OK)
+        return status;
     readin->sibling = var;
-    new->child = readin;
-    return new;
+    struct Token* newTok;
+    newTok = new_Token((char[1]){'\0'}, Input);
+    if (newTok == NULL)
+        return MEMORY_ERROR;
+    (*new)->data = newTok;
+    (*new)->child = readin;
+    (*new)->sibling = NULL;
+    return SUBTREE_OK;
 }
 
 
-struct ParseTree* is_output(struct TokenList** tok) {
+int is_output(struct TokenList** tok, struct ParseTree** new) {
+    return 1;
+/*
     // Create root of the subtree
     struct Token* newTok = new_Token((char[1]){'\0'}, Output);
     if (newTok == NULL)
-        return NULL;
+        return -1;
     struct ParseTree* new = new_ParseTree(newTok);
     free_Token(newTok);
     if (new == NULL)
-        return NULL;
+        return -1;
     // Create subtree
-    struct ParseTree* writeOut = is_writeOut(tok);
+    struct ParseTree* writeOut;
+    is_writeOut(tok, &writeOut);
     if (writeOut == NULL) {
         free_ParseTree(new);
-        return NULL;
+        return -1;
     }
-    struct ParseTree* obj = is_Obj(tok);
+    struct ParseTree* obj = NULL;
+    is_Obj(tok, &obj);
     if (obj == NULL) {
         free_ParseTree(new);
         free_ParseTree(writeOut);
-        return NULL;
+        return -1;
     }
     // Link it
     writeOut->sibling = obj;
     new->child = writeOut;
     return new;
+*/
 }
 
 
-struct ParseTree* is_line(struct TokenList** tok) {
-    // Create root of the subtree
-    struct Token* newTok = new_Token((char[1]){'\0'}, Line);
-    if (newTok == NULL)
-        return NULL;
-    struct ParseTree* new = new_ParseTree(newTok);
-    free_Token(newTok);
-    if (new == NULL)
-        return NULL;
+int is_line(struct TokenList** tok, struct ParseTree** line) {
     // Create subtree
     struct TokenList* state = *tok;
     struct ParseTree* subtree;
-    if ((subtree = is_output(tok)) == NULL) {
-        *tok = state;
-        subtree = is_input(tok);
+    int status;
+    subtree = malloc(sizeof(struct ParseTree));
+    if (subtree == NULL)
+        return MEMORY_ERROR;
+    if ((status = is_output(tok, &subtree)) != SUBTREE_OK) {
+        //*tok = state;
+        status = is_input(tok, &subtree);
     }
-    if (subtree != NULL)
-        new->child = subtree;
-    else {
-        free_ParseTree(new);
-        new = NULL;
-    }
-    return new;
+    struct Token* newTok;
+    newTok = new_Token((char[1]){'\0'}, Line);
+    if (newTok == NULL)
+        return MEMORY_ERROR;
+    (*line)->data = newTok;
+    (*line)->child = subtree;
+    (*line)->sibling = NULL;
+    return status;
 }
 
 
-struct ParseTree* is_program(struct TokenList* head) {
-    // Entry point of any valid tokens sequence for this grammar.
-    int status; // boolean
-    struct ParseTree* tree; // Used in nested function
-    struct ParseTree* ret; // return value
-    struct ParseTree* subtree; // incremental subtree
-
-    struct Token* tok; // the root token (program)
+int is_program(struct TokenList* head, struct ParseTree** tree) {
+    struct Token* tok;
     tok = new_Token((char[1]){'\0'}, Program);
     if (tok == NULL)
-        return NULL;
-    tree = new_ParseTree(tok);
-    free_Token(tok);
-    if (tree == NULL)
-        return NULL;
+        return MEMORY_ERROR;
+    (*tree)->data = tok;
+    (*tree)->child = NULL;
+    (*tree)->sibling = NULL;
 
-    ret = tree; // save pointer to root
+    // Entry point of any valid tokens sequence for this grammar.
+    struct ParseTree* current;
+    struct ParseTree* line, *endline;
+    line = malloc(sizeof(struct ParseTree));
+    endline = malloc(sizeof(struct ParseTree));
+    if (line == NULL || endline == NULL)
+        return MEMORY_ERROR;
+
+    current = *tree; // save pointer to root
 
     /*
      * Nested call to identify grammar tokens return pointer to subtree(s)
@@ -374,42 +539,55 @@ struct ParseTree* is_program(struct TokenList* head) {
     skip_WS(&head);
 
     int child = 1; // true - the first Line is always a child of Program
-
+    int status;
     // A program is a (possibly empty) sequence of 'line' 'endline'
     while (head != NULL) {
         // Match Line
-        subtree = is_line(&head);
-        if (subtree == NULL) // TODO can be NULL for good exit or for error
-            break;
+        status = is_line(&head, &line);
+        if (status != SUBTREE_OK) {
+            printf("ERROR PARSING LINE: %d\n", status);
+            return status;
+        }
         if (child) {
-            tree->child = subtree;
+            current->child = line;
             child = !child;
         }
         else
-            tree->sibling = subtree;
-        tree = subtree;
+            current->sibling = line;
+        current = line;
+        line = malloc(sizeof(struct ParseTree));
 
         skip_WS(&head);
-
         // Match Endline
-        subtree = is_endline(&head);
-        if (subtree == NULL) {
+        status = is_endline(&head, &endline);
+        if (status != SUBTREE_OK) {
             printf("Missing ENDLINE\n");
-            free_ParseTree(ret);
-            return NULL;
+            return status;
         }
-        tree->sibling = subtree;
-        tree = subtree;
+        current->sibling = endline;
+        current = endline;
+        endline = malloc(sizeof(struct ParseTree));
 
         skip_WS(&head);
     }
-    return ret;
+    free(line);
+    free(endline);
+
+    return SUBTREE_OK;
 }
 
 
 struct ParseTree* build_ParseTree (struct TokenList* head) {
+    struct ParseTree* tree;
+    tree = malloc(sizeof(struct ParseTree));
     // Always match the start symbol of this grammar: program.
-    return is_program(head);
+    int status;
+    status = is_program(head, &tree);
+    if (status != SUBTREE_OK) {
+        free_ParseTree(tree);
+        tree = NULL;
+    }
+    return tree;
 }
 
 int main(int argc, char* argv[]) {
@@ -469,11 +647,11 @@ int main(int argc, char* argv[]) {
     print_TokenList(list);
 
     struct ParseTree* tree = build_ParseTree(list);
-    free_TokenList(list);
     if (tree != NULL) {
-        print_ParseTree(tree, 0);
+        print_ParseTree(tree);
         free_ParseTree(tree);
     }
     else
         printf("PARSING ERROR\n");
+    free_TokenList(list);
 }
