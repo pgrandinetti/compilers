@@ -69,6 +69,8 @@ const char* type2char (enum TokenType t) {
 }
 
 void free_Token(struct Token* tok) {
+    if (tok == NULL)
+        return;
     free(tok->lexeme);
     free(tok);
 }
@@ -364,19 +366,19 @@ int match_two_template(const char** p, struct Token* tok, char c1, char c2, enum
 }
 
 int match_noteq(const char** p, struct Token* tok) {
-    match_two_template(p, tok, '!', '=', NotEq);
+    return match_two_template(p, tok, '!', '=', NotEq);
 }
 
 int match_or(const char** p, struct Token* tok) {
-    match_two_template(p, tok, '|', '|', Or);
+    return match_two_template(p, tok, '|', '|', Or);
 }
 
 int match_and(const char** p, struct Token* tok) {
-    match_two_template(p, tok, '&', '&', And);
+    return match_two_template(p, tok, '&', '&', And);
 }
 
 int match_endline(const char** p, struct Token* tok) {
-    match_two_template(p, tok, ';', '\n', Endline);
+    return match_two_template(p, tok, ';', '\n', Endline);
 }
 
 int match_quote(const char** p, struct Token* tok) {
