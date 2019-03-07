@@ -538,7 +538,6 @@ int match_id(const char** p, struct Token* tok) {
         tok->type = Continue;
     else
         tok->type = Var;
-    printf("asda: |%c|, %s\n", **p, tok->lexeme); fflush(stdout);
     return 0;
 }
 
@@ -555,7 +554,7 @@ int next_Token(const char** p, struct Token* tok) {
         printf("Reached end of input\n");
         return 0;
     }
-    printf("NEXT-TOKEN : Current char is |%c|\n", c);fflush(stdout);
+    //printf("NEXT-TOKEN : Current char is |%c|\n", c);fflush(stdout);
     if (c == ' ' || c == '\t' || c == '\r' || c == '\n')
         return match_ws(p, tok);
     else if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122))
@@ -651,7 +650,6 @@ struct TokenList* build_TokenList(const char* fp) {
     int i = 0;
     int exit;
     while (*fp != '\0' && (exit = next_Token(&fp, tok)) == 0) {
-        printf("asda: %c - %s\n", *fp, tok->lexeme); fflush(stdout);
         i++;
         if (head == NULL) {
             head = new_TokenList(tok);

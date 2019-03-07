@@ -8,15 +8,15 @@ otherChar   :   -ascii-
 
 char        :   letter | otherChar
 
-num         :   ('+' | '-')? (int | float)
+num         :   ('+' | '-')? float
+
+float       :   (frac exp?) | (int frac? exp?)
 
 int         :   '0' | digit+ digit0*
 
-float       :   int? optFrac optExp
+frac        :   '.' int
 
-optFrac     :   ('.' int)?
-
-optExp      :   ('^' ('+' | '-')? int)?
+exp         :   '^' ('+' | '-')? int
 
 str         :   quotedStr ('+' quotedStr)*
 
@@ -26,15 +26,14 @@ bool        :   'True' | 'False'
 
 null        :   'NULL'
 
-base        :   num | str | bool | null
-
 var         :   letter (digit | letter)*
 
 list        :   '[' (listExpr)? ']'
 
 listElem    :   var '[' int ']'
 
-obj         :   var | base | list | listElem
+obj         :   var | num | str | bool | null | list // listElem // with listElem the grammar is LL(2) because
+                                                                //"writeOut obj", obj can start with Var in 2 cases.
 
 listExpr    :   obj (',' obj)*  # limit to obj. In Python (e.g.) can be a whole expression
 
