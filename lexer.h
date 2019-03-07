@@ -31,7 +31,13 @@ enum TokenType {
     Bool,
     Null,
     Var,
-    Keyword,
+    ReadIn,
+    WriteOut,
+    If,
+    While,
+    Break,
+    Continue,
+    Else,
     Endline,
     WS, // white space(s)
     UNK,
@@ -90,3 +96,6 @@ struct TokenList* new_TokenList(struct Token* tok);
  * Return NULL if the characters sequence is not valid in the Grammar.
 */
 struct TokenList* build_TokenList(const char* fp);
+
+
+struct TokenList* strip_WS(struct TokenList* list);

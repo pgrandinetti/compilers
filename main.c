@@ -45,15 +45,21 @@ int main(int argc, char* argv[]) {
     struct TokenList* list = build_TokenList(fp);
     clock_t end = clock();
 
+
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("Total time spent building Token list = %f\n", time_spent);
+
+    struct TokenList* no_ws = NULL;
     /*
      * Diplay all Tokens
     */
     if (list == NULL)
         printf("UNRECOGNIZED SEQUENCE OF CHARACTERS: NOT VALID TOKEN\n");
-    else
+    else {
         print_TokenList(list);
+        no_ws = strip_WS(list);
+        print_TokenList(no_ws);
+    }
     free_TokenList(list);
-
-    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("Total time spent building Token list = %f\n", time_spent);
+    free_TokenList(no_ws);
 }

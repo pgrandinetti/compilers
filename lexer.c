@@ -43,7 +43,13 @@ const char* type2char (enum TokenType t) {
         case Null: return "Null";
         case Var: return "Var";
         case Endline: return "Endline";
-        case Keyword: return "Keyword";
+        case ReadIn: return "ReadIn";
+        case WriteOut: return "WriteOut";
+        case If: return "If";
+        case While: return "While";
+        case Break: return "Break";
+        case Continue: return "Continue";
+        case Else: return "Else";
         case WS: return "WS";
         case Program: return "Program";
         case Line: return "Line";
@@ -516,16 +522,23 @@ int match_id(const char** p, struct Token* tok) {
     else if (strcmp(tok->lexeme, "True") == 0 ||
              strcmp(tok->lexeme, "False") == 0)
         tok->type = Bool;
-    else if (strcmp(tok->lexeme, "break") == 0 ||
-            strcmp(tok->lexeme, "if") == 0 ||
-            strcmp(tok->lexeme, "else") == 0 ||
-            strcmp(tok->lexeme, "while") == 0 ||
-            strcmp(tok->lexeme, "readIn") == 0 ||
-            strcmp(tok->lexeme, "writeOut") == 0 ||
-            strcmp(tok->lexeme, "continue") == 0 )
-        tok->type = Keyword;
+    else if (strcmp(tok->lexeme, "break") == 0)
+        tok->type = Break;
+    else if (strcmp(tok->lexeme, "if") == 0)
+        tok->type = If;
+    else if (strcmp(tok->lexeme, "else") == 0)
+        tok->type = Else;
+    else if (strcmp(tok->lexeme, "while") == 0)
+        tok->type = While;
+    else if (strcmp(tok->lexeme, "readIn") == 0)
+        tok->type = ReadIn;
+    else if (strcmp(tok->lexeme, "writeOut") == 0)
+        tok->type = WriteOut;
+    else if (strcmp(tok->lexeme, "continue") == 0)
+        tok->type = Continue;
     else
         tok->type = Var;
+    printf("asda: |%c|, %s\n", **p, tok->lexeme); fflush(stdout);
     return 0;
 }
 
@@ -542,7 +555,7 @@ int next_Token(const char** p, struct Token* tok) {
         printf("Reached end of input\n");
         return 0;
     }
-    //printf("NEXT-TOKEN : Current char is |%c|\n", c);
+    printf("NEXT-TOKEN : Current char is |%c|\n", c);fflush(stdout);
     if (c == ' ' || c == '\t' || c == '\r' || c == '\n')
         return match_ws(p, tok);
     else if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122))
@@ -600,16 +613,29 @@ struct Token* new_Token(char* lexeme, enum TokenType type) {
     return new;
 }
 
-struct TokenList* new_TokenList(struct Token* tok) {
+
+struct TokenList* alloc_TokenList() {
     struct TokenList* new;
     new = malloc(sizeof(struct TokenList));
     if (new == NULL)
         return NULL;
-    new->token = new_Token(tok->lexeme, tok->type);
-    if (new->token == NULL) {
-        free(new);
+    new->token = NULL;
+    new->next = NULL;
+    return new;
+}
+
+struct TokenList* new_TokenList(struct Token* tok) {
+    struct TokenList* new;
+    struct Token* newTok;
+    new = alloc_TokenList();
+    if (new == NULL)
+        return NULL;
+    newTok = new_Token(tok->lexeme, tok->type);
+    if (newTok == NULL) {
+        free_TokenList(new);
         return NULL;
     }
+    new->token = newTok;
     new->next = NULL;
     return new;
 }
@@ -625,6 +651,7 @@ struct TokenList* build_TokenList(const char* fp) {
     int i = 0;
     int exit;
     while (*fp != '\0' && (exit = next_Token(&fp, tok)) == 0) {
+        printf("asda: %c - %s\n", *fp, tok->lexeme); fflush(stdout);
         i++;
         if (head == NULL) {
             head = new_TokenList(tok);
@@ -655,6 +682,36 @@ struct TokenList* build_TokenList(const char* fp) {
         // Encountered some error
         free_TokenList(head);
         head = NULL;
+    }
+    return head;
+}
+
+
+struct TokenList* strip_WS(struct TokenList* list) {
+    if (list == NULL)
+        return NULL;
+    struct TokenList *head, *curr, *prev, *new;
+
+    curr = list;
+    head = NULL;
+    new = NULL;
+    while (curr != NULL) {
+        if (curr->token->type != WS) {
+            new = new_TokenList(curr->token);
+            if (new == NULL) {
+                free_TokenList(head);
+                return NULL;
+            }
+            if (head == NULL) {
+                head = new;
+                prev = head;
+            }
+            else {
+                prev->next = new;
+                prev = prev->next;
+            }
+        }
+        curr = curr->next;
     }
     return head;
 }

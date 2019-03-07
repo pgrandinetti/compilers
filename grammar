@@ -49,13 +49,12 @@ line        :   assign
             |   output
             |   ifLine
             |   loopLine
-            |   keywordLine
+            |   breakLine
+            |   contLine
 
-input       :   'readIn' var
+input       :   readIn var
 
-output      :   'writeOut' obj
-
-keywordLine :   'break' | 'continue'
+output      :   writeOut obj
 
 assign      :   var '=' expr
 
@@ -68,26 +67,33 @@ operator    :   '+' | '-' | '*' | '/' | '/.' | '%' | condOp
 
 condOp      :   '&&' | '||' | '!=' | '==' | '<=' | '>='
 
-ifLine      :   'if' ifCond ifBody
+ifLine      :   if ifCond ifBody
 
 ifCond      :   '(' baseExpr condOp baseExpr ')'
 
 ifBody      :   program (optElse)?
 
-optElse     :   'else' program
+optElse     :   else program
 
-loopLine    :   'while' ifCond loopBody
+loopLine    :   while ifCond loopBody
 
 loopBody    :   program
 
 #-------- ================ --------#
 
-keyword     :   'readIn'
-            |   'writeOut'
-            |   'if'
-            |   'while'
-            |   'break'
-            |   'continue'
+readIn      :   'readIn'
+
+writeOut    :   'writeOut'
+
+breakLine   :   'break'
+
+contLine    :   'continue'
+
+if          :   'if'
+
+while       :   'while'
+
+else        :   'else'
 
 
 #######################################################
