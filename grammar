@@ -60,11 +60,11 @@ assign      :   var '=' expr
 expr        :   baseExpr
             |   '(' expr ')' (operator expr)?
 
-baseExpr    :   obj (operator obj)?
+baseExpr    :   obj (operator expr)?
 
 operator    :   '+' | '-' | '*' | '/' | '/.' | '%' | condOp
 
-condOp      :   '&&' | '||' | '!=' | '==' | '<=' | '>='
+condOp      :   '&&' | '||' | '!=' | '==' | '<=' | '>=' | > | <
 
 ifLine      :   if ifCond ifBody
 

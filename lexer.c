@@ -70,6 +70,9 @@ const char* type2char (enum TokenType t) {
         case Obj: return "Obj";
         case Str: return "Str";
         case Num: return "Num";
+        case Frac: return "Frac";
+        case List: return "List";
+        case ListExpr: return "ListExpr";
         default: return "UNK";
     }
 }
@@ -99,7 +102,7 @@ int alloc_failed(struct Token* tok, char* tmp) {
 
 void print_Token(struct Token* p) {
     if (p == NULL)
-        printf("Token is NULL");
+        printf("Token is NULL\n");
     else
         if (strlen(p->lexeme) == 0 || p->type == Endline)
             printf("<%s>\n", type2char(p->type));

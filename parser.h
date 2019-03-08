@@ -22,3 +22,10 @@ void print_ParseTree(struct ParseTree* tree);
  * ParseTrees are built by *cloning* Tokens, so only the clones are freed.
 */
 void free_ParseTree(struct ParseTree* tree);
+
+
+int is_Obj (struct TokenList** tok, struct ParseTree** new);
+
+int is_List (struct TokenList** tok, struct ParseTree** new);
+
+int is_ListExpr (struct TokenList** tok, struct ParseTree** new);

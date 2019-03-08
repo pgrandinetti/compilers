@@ -62,7 +62,10 @@ enum TokenType {
     LoopBody,
     Obj,
     Str,
-    Num
+    Num,
+    Frac,
+    List,
+    ListExpr
 };
 
 // Generate readable string instead of int
