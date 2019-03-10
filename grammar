@@ -68,11 +68,11 @@ condOp      :   '&&' | '||' | '!=' | '==' | '<=' | '>=' | > | <
 
 ifLine      :   if ifCond ifBody
 
-ifCond      :   '(' baseExpr condOp baseExpr ')'
+ifCond      :   '(' obj condOp obj ')'
 
-ifBody      :   program (optElse)?
+ifBody      :   (line ENDLINE)+ (optElse)?
 
-optElse     :   else program
+optElse     :   else (line ENDLINE)+
 
 loopLine    :   while ifCond loopBody
 

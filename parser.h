@@ -29,3 +29,5 @@ int is_Obj (struct TokenList** tok, struct ParseTree** new);
 int is_List (struct TokenList** tok, struct ParseTree** new);
 
 int is_ListExpr (struct TokenList** tok, struct ParseTree** new);
+
+int is_Line(struct TokenList** tok, struct ParseTree** line);

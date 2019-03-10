@@ -176,6 +176,11 @@ int is_If (struct TokenList** tok, struct ParseTree** new) {
 }
 
 
+int is_Else (struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, Else, "else");
+}
+
+
 int is_While (struct TokenList** tok, struct ParseTree** new) {
     return _single_Token_template(tok, new, While, "while");
 }
@@ -1113,8 +1118,226 @@ int is_Output(struct TokenList** tok, struct ParseTree** new) {
 }
 
 
-int is_IfLine(struct TokenList** tok, struct ParseTree** line) {
-    return PARSING_ERROR;
+int is_OptElse (struct TokenList** tok, struct ParseTree** new) {
+    struct ParseTree *elsetok, *line, *endline, *last;
+    int status;
+    struct Token* newTok;
+
+    status = SUBTREE_OK;
+
+    newTok = new_Token((char[1]){'\0'}, OptElse);
+    if (newTok == NULL)
+        return MEMORY_ERROR;
+    (*new)->data = newTok;
+
+    elsetok = alloc_ParseTree();
+    if (elsetok == NULL)
+        return MEMORY_ERROR;
+    status = is_Else(tok, &elsetok);
+    if (status != SUBTREE_OK) {
+        free_ParseTree(elsetok);
+        return status;
+    }
+    (*new)->child = elsetok;
+    last = elsetok;
+    do{
+        // else cannot be empty
+        line = alloc_ParseTree();
+        if (line == NULL)
+            return MEMORY_ERROR;
+        status = is_Line(tok, &line);
+        if (status != SUBTREE_OK) {
+            free_ParseTree(line);
+            return status;
+        }
+        last->sibling = line;
+        last = line;
+        endline = alloc_ParseTree();
+        if (endline == NULL)
+            return MEMORY_ERROR;
+        status = is_Endline(tok, &endline);
+        if (status != SUBTREE_OK) {
+            free_ParseTree(endline);
+            return status;
+        }
+        last->sibling = endline;
+        last = endline;
+    }
+    while ( (*tok) != NULL && (*tok)->token->type != Endline);
+    printf("asd\n"); fflush(stdout);
+    return status;
+}
+
+
+int is_IfBody (struct TokenList** tok, struct ParseTree** new) {
+    struct ParseTree *line, *endline, *optelse, *last;
+    int status;
+    struct Token* newTok;
+
+    status = SUBTREE_OK;
+
+    newTok = new_Token((char[1]){'\0'}, IfBody);
+    if (newTok == NULL)
+        return MEMORY_ERROR;
+    (*new)->data = newTok;
+    last = NULL;
+
+    while ( (*tok) != NULL &&
+            (*tok)->token->type != Endline &&
+            (*tok)->token->type != Else) {
+        line = alloc_ParseTree();
+        if (line == NULL)
+            return MEMORY_ERROR;
+        status = is_Line(tok, &line);
+        if (status != SUBTREE_OK) {
+            free_ParseTree(line);
+            return status;
+        }
+        if (last == NULL)
+            (*new)->child = line;
+        else
+            last->sibling = line;
+        last = line;
+
+        endline = alloc_ParseTree();
+        if (endline == NULL)
+            return MEMORY_ERROR;
+        status = is_Endline(tok, &endline);
+        if (status != SUBTREE_OK) {
+            free_ParseTree(endline);
+            return status;
+        }
+        last->sibling = endline;
+        last = endline;
+    }
+
+    if ((*tok) != NULL &&
+        (*tok)->token->type == Else) {
+        // must be the Else branch
+        optelse = alloc_ParseTree();
+        if (optelse == NULL)
+            return MEMORY_ERROR;
+        status = is_OptElse(tok, &optelse);
+        if (status != SUBTREE_OK) {
+            free_ParseTree(optelse);
+            return status;
+        }
+        if (last == NULL)
+            (*new)->child = optelse;
+        else
+            last->sibling = optelse;
+    }
+    return status;
+}
+
+int is_IfCond (struct TokenList** tok, struct ParseTree** new) {
+    struct ParseTree *lpar, *obj1, *op, *obj2, *rpar;
+    int status;
+    struct Token* newTok;
+
+    status = SUBTREE_OK;
+
+    newTok = new_Token((char[1]){'\0'}, IfCond);
+    if (newTok == NULL)
+        return MEMORY_ERROR;
+    (*new)->data = newTok;
+
+    lpar = alloc_ParseTree();
+    if (lpar == NULL)
+        return MEMORY_ERROR;
+    status = is_Lpar(tok, &lpar);
+    if (status != SUBTREE_OK) {
+        free_ParseTree(lpar);
+        return status;
+    }
+    (*new)->child = lpar;
+
+    obj1 = alloc_ParseTree();
+    if (obj1 == NULL)
+        return MEMORY_ERROR;
+    status = is_Obj(tok, &obj1);
+    if (status != SUBTREE_OK) {
+        free_ParseTree(obj1);
+        return status;
+    }
+    lpar->sibling = obj1;
+
+    op = alloc_ParseTree();
+    if (op == NULL)
+        return MEMORY_ERROR;
+    status = is_CondOp(tok, &op);
+    if (status != SUBTREE_OK) {
+        free_ParseTree(op);
+        return status;
+    }
+    obj1->sibling = op;
+
+    obj2 = alloc_ParseTree();
+    if (obj2 == NULL)
+        return MEMORY_ERROR;
+    status = is_Obj(tok, &obj2);
+    if (status != SUBTREE_OK) {
+        free_ParseTree(obj2);
+        return status;
+    }
+    op->sibling = obj2;
+
+    rpar = alloc_ParseTree();
+    if (rpar == NULL)
+        return MEMORY_ERROR;
+    status = is_Rpar(tok, &rpar);
+    if (status != SUBTREE_OK) {
+        free_ParseTree(rpar);
+        return status;
+    }
+    obj2->sibling = rpar;
+
+    return status;
+}
+
+
+int is_IfLine (struct TokenList** tok, struct ParseTree** new) {
+    struct ParseTree *iftok, *ifcond, *ifbody;
+    int status;
+    struct Token* newTok;
+
+    newTok = new_Token((char[1]){'\0'}, IfLine);
+    if (newTok == NULL)
+        return MEMORY_ERROR;
+    (*new)->data = newTok;
+
+    status = SUBTREE_OK;
+
+    iftok = alloc_ParseTree();
+    if (iftok == NULL)
+        return MEMORY_ERROR;
+    status = is_If(tok, &iftok);
+    if (status != SUBTREE_OK) {
+        free_ParseTree(iftok);
+        return status;
+    }
+    (*new)->child = iftok;
+
+    ifcond = alloc_ParseTree();
+    if (ifcond == NULL)
+        return MEMORY_ERROR;
+    status = is_IfCond(tok, &ifcond);
+    if (status != SUBTREE_OK) {
+        free_ParseTree(ifcond);
+        return status;
+    }
+    iftok->sibling = ifcond;
+
+    ifbody = alloc_ParseTree();
+    if (ifbody == NULL)
+        return MEMORY_ERROR;
+    status = is_IfBody(tok, &ifbody);
+    if (status != SUBTREE_OK) {
+        free_ParseTree(ifbody);
+        return status;
+    }
+    ifcond->sibling = ifbody;
+    return status;
 }
 
 
