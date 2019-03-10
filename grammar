@@ -70,7 +70,7 @@ ifLine      :   if ifCond ifBody
 
 ifCond      :   '(' obj condOp obj ')'
 
-ifBody      :   (line ENDLINE)+ (optElse)?
+ifBody      :   (line ENDLINE)+ (optElse)?  // cannot use program, must be (line ENDLINE)+
 
 optElse     :   else (line ENDLINE)+
 

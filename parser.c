@@ -1164,17 +1164,17 @@ int is_OptElse (struct TokenList** tok, struct ParseTree** new) {
         last = endline;
     }
     while ( (*tok) != NULL && (*tok)->token->type != Endline);
-    printf("asd\n"); fflush(stdout);
     return status;
 }
 
 
 int is_IfBody (struct TokenList** tok, struct ParseTree** new) {
     struct ParseTree *line, *endline, *optelse, *last;
-    int status;
+    int status, count;
     struct Token* newTok;
 
     status = SUBTREE_OK;
+    count = 0;
 
     newTok = new_Token((char[1]){'\0'}, IfBody);
     if (newTok == NULL)
@@ -1185,6 +1185,7 @@ int is_IfBody (struct TokenList** tok, struct ParseTree** new) {
     while ( (*tok) != NULL &&
             (*tok)->token->type != Endline &&
             (*tok)->token->type != Else) {
+        count++;
         line = alloc_ParseTree();
         if (line == NULL)
             return MEMORY_ERROR;
@@ -1209,6 +1210,11 @@ int is_IfBody (struct TokenList** tok, struct ParseTree** new) {
         }
         last->sibling = endline;
         last = endline;
+    }
+
+    if (count == 0) {
+        printf("IfBody cannot be empty\n");
+        return PARSING_ERROR;
     }
 
     if ((*tok) != NULL &&
@@ -1341,8 +1347,49 @@ int is_IfLine (struct TokenList** tok, struct ParseTree** new) {
 }
 
 
-int is_LoopLine(struct TokenList** tok, struct ParseTree** line) {
-    return PARSING_ERROR;
+int is_LoopLine(struct TokenList** tok, struct ParseTree** new) {
+    struct ParseTree *whilekey, *ifcond, *loopbody;
+    int status;
+    struct Token* newTok;
+
+    status = SUBTREE_OK;
+    newTok = new_Token((char[1]){'\0'}, LoopLine);
+    if (newTok == NULL)
+        return MEMORY_ERROR;
+    (*new)->data = newTok;
+
+    whilekey = alloc_ParseTree();
+    if (whilekey == NULL)
+        return MEMORY_ERROR;
+    status = is_While(tok, &whilekey);
+    if (status != SUBTREE_OK) {
+        free_ParseTree(whilekey);
+        return status;
+    }
+    (*new)->child = whilekey;
+
+    ifcond = alloc_ParseTree();
+    if (ifcond == NULL)
+        return MEMORY_ERROR;
+    status = is_IfCond(tok, &ifcond);
+    if (status != SUBTREE_OK) {
+        free_ParseTree(ifcond);
+        return status;
+    }
+    whilekey->sibling = ifcond;
+
+    loopbody = alloc_ParseTree();
+    if (loopbody == NULL)
+        return MEMORY_ERROR;
+    print_Token((*tok)->token); fflush(stdout);
+    status = is_Program(tok, &loopbody);
+    if (status != SUBTREE_OK) {
+        free_ParseTree(loopbody);
+        return status;
+    }
+    ifcond->sibling = loopbody;
+
+    return status;
 }
 
 
@@ -1392,7 +1439,7 @@ int is_Line(struct TokenList** tok, struct ParseTree** line) {
 }
 
 
-int is_Program(struct TokenList* head, struct ParseTree** tree) {
+int is_Program(struct TokenList** head, struct ParseTree** tree) {
     struct Token* tok;
     tok = new_Token((char[1]){'\0'}, Program);
     if (tok == NULL)
@@ -1419,15 +1466,14 @@ int is_Program(struct TokenList* head, struct ParseTree** tree) {
      * or NULL is parsing/memory error happened.
     */
     
-    // Start by skipping all white spaces
-    skip_WS(&head);
-
     int child = 1; // true - the first Line is always a child of Program
     int status;
     // A program is a (possibly empty) sequence of 'line' 'endline'
-    while (head != NULL) {
+    while ((*head) != NULL &&
+           (*head)->token->type != Endline) {
         // Match Line
-        status = is_Line(&head, &line);
+        print_Token((*head)->token); fflush(stdout);
+        status = is_Line(head, &line);
         if (status != SUBTREE_OK) {
             printf("ERROR PARSING LINE: %d\n", status);
             break;
@@ -1441,9 +1487,8 @@ int is_Program(struct TokenList* head, struct ParseTree** tree) {
         current = line;
         line = alloc_ParseTree();
 
-        skip_WS(&head);
         // Match Endline
-        status = is_Endline(&head, &endline);
+        status = is_Endline(head, &endline);
         if (status != SUBTREE_OK) {
             printf("Missing ENDLINE\n");
             break;
@@ -1451,11 +1496,6 @@ int is_Program(struct TokenList* head, struct ParseTree** tree) {
         current->sibling = endline;
         current = endline;
         endline = alloc_ParseTree();
-
-        skip_WS(&head);
-
-        //print_ParseTree(*tree);fflush(stdout);
-        //print_Token(head->token);fflush(stdout);
     }
     free(line);
     free(endline);
@@ -1469,7 +1509,7 @@ struct ParseTree* build_ParseTree (struct TokenList* head) {
     tree = alloc_ParseTree();
     // Always match the start symbol of this grammar: program.
     int status;
-    status = is_Program(head, &tree);
+    status = is_Program(&head, &tree);
     if (status != SUBTREE_OK) {
         free_ParseTree(tree);
         tree = NULL;
