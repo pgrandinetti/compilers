@@ -24,12 +24,14 @@ void print_ParseTree(struct ParseTree* tree);
 void free_ParseTree(struct ParseTree* tree);
 
 
-int is_Obj (struct TokenList** tok, struct ParseTree** new);
+int build_ParseTree (struct TokenList* head, struct ParseTree** tree);
 
-int is_List (struct TokenList** tok, struct ParseTree** new);
+int is_Obj (struct TokenList** tok, struct ParseTree** tree);
 
-int is_ListExpr (struct TokenList** tok, struct ParseTree** new);
+int is_List (struct TokenList** tok, struct ParseTree** tree);
 
-int is_Line(struct TokenList** tok, struct ParseTree** line);
+int is_ListExpr (struct TokenList** tok, struct ParseTree** tree);
+
+int is_Line(struct TokenList** tok, struct ParseTree** tree);
 
 int is_Program(struct TokenList** head, struct ParseTree** tree);

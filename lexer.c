@@ -715,3 +715,12 @@ struct TokenList* strip_WS(struct TokenList* list) {
     }
     return head;
 }
+
+
+void skip_WS(struct TokenList** list) {
+    // jump ahead of all whitespaces
+    struct TokenList* current = *list;
+    while (current != NULL && current->token->type == WS)
+        current = current->next;
+    *list = current;
+}

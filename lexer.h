@@ -101,3 +101,5 @@ struct TokenList* build_TokenList(const char* fp);
 
 
 struct TokenList* strip_WS(struct TokenList* list);
+
+void skip_WS(struct TokenList** list);

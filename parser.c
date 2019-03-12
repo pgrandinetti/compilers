@@ -79,11 +79,12 @@ void free_ParseTree(struct ParseTree* tree) {
  * int is_<TokenType> (struct TokenList** tok, struct ParseTree** new)
 
  * - **tok points to the current token in the sequence. The function moves it ahead CHANGING the pointer location.
- * - **new points to a already-ALLOCATED ParseTree. It will contain the resulting subtree, or stay empty.
+ * - **new points to a ALREADY-ALLOCATED ParseTree. It will contain the resulting subtree, or stays empty.
 
  * Therefore:
  * - The caller must alloc the ParseTree** new
  * - The called must assign *new->data, child and sibling
+ * - The caller is responsible for freeing memory
 
  * Return a integer flag with the operation final status (see #define below).
 */
@@ -93,15 +94,6 @@ void free_ParseTree(struct ParseTree* tree) {
 #define MEMORY_ERROR 1
 
 
-void skip_WS(struct TokenList** list) {
-    // jump ahead of all whitespaces
-    struct TokenList* current = *list;
-    while (current != NULL && current->token->type == WS)
-        current = current->next;
-    *list = current;
-}
-
-
 /*
  * Template function for easy-to-check Tokens
  *
@@ -109,11 +101,12 @@ void skip_WS(struct TokenList** list) {
  * If char* lexeme != NULL, then also checks that the current Token's lexeme matches it.
  *
  * First, all WS are skipped. Then, if the check fails *tok unchanged. Otherwise it's advanced.
+ *
+ * It ASSUMES WS are already removed
 */
 int _single_Token_template(struct TokenList** tok, struct ParseTree** new, enum TokenType type, char* lexeme) {
     if (*tok == NULL)
         return PARSING_ERROR;
-    skip_WS(tok);
     struct TokenList* current = *tok;
     if (current->token->type != type) {
         printf("Expecting <%s>, Found <%s>\n", type2char(type), type2char(current->token->type));
@@ -148,11 +141,6 @@ int is_Int (struct TokenList** tok, struct ParseTree** new) {
 
 int is_Dot (struct TokenList** tok, struct ParseTree** new) {
     return _single_Token_template(tok, new, Dot, NULL);
-}
-
-
-int is_QuotedStr (struct TokenList** tok, struct ParseTree** new) {
-    return _single_Token_template(tok, new, QuotedStr, NULL);
 }
 
 
@@ -311,6 +299,62 @@ int is_Bool (struct TokenList** tok, struct ParseTree** new) {
 }
 
 
+int is_CharSeq (struct TokenList** tok, struct ParseTree** new) {
+    return _single_Token_template(tok, new, QuotedStr, NULL);
+}
+
+
+int is_QuotedStr (struct TokenList** tok, struct ParseTree** new) {
+    struct ParseTree *charseq, *comma, *obj, *last;
+    int status;
+    struct Token *newTok;
+
+    status = SUBTREE_OK;
+
+    newTok = new_Token((char[1]){'\0'}, QuotedStr);
+    if (newTok == NULL)
+        return MEMORY_ERROR;
+    (*new)->data = newTok;
+
+    charseq = alloc_ParseTree();
+    if (charseq == NULL)
+        return MEMORY_ERROR;
+    status = is_CharSeq(tok, &charseq);
+    if (status != SUBTREE_OK) {
+        free_ParseTree(charseq);
+        return status;
+    }
+    (*new)->child = charseq;
+    last = charseq;
+
+    while ( (*tok)->token->type == Comma) {
+        comma = alloc_ParseTree();
+        if (comma == NULL)
+            return MEMORY_ERROR;
+        status = is_Comma(tok, &comma);
+        if (status != SUBTREE_OK) {
+            free_ParseTree(comma);
+            break;
+        }
+        last->sibling = comma;
+        last = comma;
+        // Now there must be a Obj
+        obj = alloc_ParseTree();
+        if (obj == NULL)
+            return MEMORY_ERROR;
+        status = is_Obj(tok, &obj);
+        if (status != SUBTREE_OK) {
+            free_ParseTree(obj);
+            break;
+        }
+        last->sibling = obj;
+        last = obj;
+    }
+
+    return status;
+}
+
+
 int is_CondOp (struct TokenList** tok, struct ParseTree** new) {
     enum TokenType type;
 
@@ -400,8 +444,8 @@ int is_Expr (struct TokenList** tok, struct ParseTree** new) {
         }
         (*new)->child = obj1;
 
+        // The remainder of the Expr is optional
         if (match_operator_type((*tok)->token->type)) {
-            // operator is optional
             op = alloc_ParseTree();
             if (op == NULL)
                 return MEMORY_ERROR;
@@ -456,8 +500,8 @@ int is_Expr (struct TokenList** tok, struct ParseTree** new) {
         }
         expr1->sibling = rpar;
 
+        // Here too, next operator is optional
         if (match_operator_type((*tok)->token->type)) {
-            // operator is optional
             op = alloc_ParseTree();
             if (op == NULL)
                 return MEMORY_ERROR;
@@ -505,41 +549,32 @@ int is_List (struct TokenList** tok, struct ParseTree** new) {
         free_ParseTree(open);
         return status;
     }
+    (*new)->child = open;
 
     if ((*tok)->token->type != Rbrack) {
         listexpr = alloc_ParseTree();
-        if (listexpr == NULL) {
-            free_ParseTree(open);
+        if (listexpr == NULL)
             return MEMORY_ERROR;
-        }
         status = is_ListExpr(tok, &listexpr);
         if (status != SUBTREE_OK) {
-            free_ParseTree(open);
             free_ParseTree(listexpr);
             return status;
         }
         has_expr = 1;
+        open->sibling = listexpr;
     }
 
     close = alloc_ParseTree();
-    if (close == NULL) {
-        free_ParseTree(open);
-        free_ParseTree(listexpr);
+    if (close == NULL)
         return MEMORY_ERROR;
-    }
     status = is_Rbrack(tok, &close);
     if (status != SUBTREE_OK) {
-        free_ParseTree(open);
-        free_ParseTree(listexpr);
         free_ParseTree(close);
         return status;
     }
 
-    (*new)->child = open;
-    if (has_expr) {
-        open->sibling = listexpr;
+    if (has_expr)
         listexpr->sibling = close;
-    }
     else
         open->sibling = close;
     return status;
@@ -552,6 +587,13 @@ int is_ListExpr(struct TokenList** tok, struct ParseTree** new) {
     struct Token* newTok;
 
     status = SUBTREE_OK;
+    newTok = new_Token((char[1]){'\0'}, ListExpr);
+    if (newTok == NULL) {
+        free_ParseTree(obj);
+        return MEMORY_ERROR;
+    }
+    (*new)->data = newTok;
+
     obj = alloc_ParseTree();
     if (obj == NULL)
         return MEMORY_ERROR;
@@ -561,14 +603,6 @@ int is_ListExpr(struct TokenList** tok, struct ParseTree** new) {
         free_ParseTree(obj);
         return status;
     }
-
-    newTok = new_Token((char[1]){'\0'}, ListExpr);
-    if (newTok == NULL) {
-        free_ParseTree(obj);
-        return MEMORY_ERROR;
-    }
-
-    (*new)->data = newTok;
     (*new)->child = obj;
     last = obj;
 
@@ -604,6 +638,13 @@ int is_Str (struct TokenList** tok, struct ParseTree** new) {
     int status;
     struct Token* newTok;
 
+    newTok = new_Token((char[1]){'\0'}, Str);
+    if (newTok == NULL) {
+        free_ParseTree(quotedstr);
+        return MEMORY_ERROR;
+    }
+    (*new)->data = newTok;
+
     status = SUBTREE_OK;
     quotedstr = alloc_ParseTree();
     if (quotedstr == NULL)
@@ -614,14 +655,6 @@ int is_Str (struct TokenList** tok, struct ParseTree** new) {
         free_ParseTree(quotedstr);
         return status;
     }
-
-    newTok = new_Token((char[1]){'\0'}, Str);
-    if (newTok == NULL) {
-        free_ParseTree(quotedstr);
-        return MEMORY_ERROR;
-    }
-
-    (*new)->data = newTok;
     (*new)->child = quotedstr;
     last = quotedstr;
 
@@ -658,38 +691,32 @@ int is_Frac (struct TokenList** tok, struct ParseTree** new) {
     int status;
     struct Token* newTok;
 
+    newTok = new_Token((char[1]){'\0'}, Frac);
+    if (newTok == NULL)
+        return MEMORY_ERROR;
+    (*new)->data = newTok;
+
     status = SUBTREE_OK;
     dot = alloc_ParseTree();
-    integer = alloc_ParseTree();
-    if (dot == NULL || integer == NULL) {
-        free_ParseTree(dot);
-        free_ParseTree(integer);
+    if (dot == NULL)
         return MEMORY_ERROR;
-    }
 
     status = is_Dot(tok, &dot);
     if (status != SUBTREE_OK) {
         free_ParseTree(dot);
-        free_ParseTree(integer);
         return status;
     }
+    (*new)->child = dot;
+
+    integer = alloc_ParseTree();
+    if (integer == NULL)
+        return MEMORY_ERROR;
 
     status = is_Int(tok, &integer);
     if (status != SUBTREE_OK) {
-        free_ParseTree(dot);
         free_ParseTree(integer);
         return status;
     }
-
-    newTok = new_Token((char[1]){'\0'}, Frac);
-    if (newTok == NULL) {
-        free_ParseTree(dot);
-        free_ParseTree(integer);
-        return MEMORY_ERROR;
-    }
-
-    (*new)->data = newTok;
-    (*new)->child = dot;
     dot->sibling = integer;
     return status;
 }
@@ -700,24 +727,28 @@ int is_Exp (struct TokenList** tok, struct ParseTree** new) {
     struct ParseTree *pow, *sign, *integer;
     struct Token* newTok;
 
+    newTok = new_Token((char[1]){'\0'}, Pow);
+    if (newTok == NULL)
+        return MEMORY_ERROR;
+    (*new)->data = newTok;
+
     status = SUBTREE_OK;
     has_sign = 0;
     pow = alloc_ParseTree();
-    sign = alloc_ParseTree();
-    integer = alloc_ParseTree();
 
-    if (pow == NULL || sign == NULL || integer == NULL) {
-        free_ParseTree(pow);
-        free_ParseTree(sign);
-        free_ParseTree(integer);
+    if (pow == NULL)
         return MEMORY_ERROR;
-    }
 
     status = is_Pow(tok, &pow);
     if (status != SUBTREE_OK) {
         free_ParseTree(pow);
         return status;
     }
+    (*new)->child = pow;
+
+    sign = alloc_ParseTree();
+    if (sign == NULL)
+        return MEMORY_ERROR;
 
     if ((*tok)->token->type == Plus) {
         status = is_Plus(tok, &sign);
@@ -727,150 +758,106 @@ int is_Exp (struct TokenList** tok, struct ParseTree** new) {
         status = is_Minus(tok, &sign);
         has_sign = 1;
     }
+
     if (has_sign && (status != SUBTREE_OK)) {
-        free_ParseTree(pow);
         free_ParseTree(sign);
         return status;
     }
+    if (has_sign)
+        (*new)->child->sibling = sign;
+
+    integer = alloc_ParseTree();
+    if (integer == NULL)
+        return MEMORY_ERROR;
 
     status = is_Int(tok, &integer);
     if (status != SUBTREE_OK) {
-        free_ParseTree(pow);
-        free_ParseTree(sign);
         free_ParseTree(integer);
         return status;
     }
 
-    newTok = new_Token((char[1]){'\0'}, Pow);
-    if (newTok == NULL) {
-        free_ParseTree(pow);
-        free_ParseTree(sign);
-        free_ParseTree(integer);
-        return MEMORY_ERROR;
-    }
-    (*new)->data = newTok;
-    (*new)->child = pow;
-    if (has_sign) {
-        (*new)->child->sibling = sign;
+    if (has_sign)
         sign->sibling = integer;
-    }
-    else {
-        free_ParseTree(sign);
+    else
         (*new)->child->sibling = integer;
-    }
     return status;
 }
 
 
 int is_Float(struct TokenList** tok, struct ParseTree** new) {
-    struct ParseTree *integer, *frac, *pow;
+    struct ParseTree *integer, *frac, *pow, *last;
     int status;
-    int has_int, has_frac, has_pow;
     struct Token* newTok;
 
     newTok = new_Token((char[1]){'\0'}, Float);
     if (newTok == NULL)
         return MEMORY_ERROR;
+    (*new)->data = newTok;
 
     status = SUBTREE_OK;
-    has_int = has_frac = has_pow = 0;
-    frac = alloc_ParseTree();
-    pow = alloc_ParseTree();
-    integer = alloc_ParseTree();
-
-    if (pow == NULL || frac == NULL || integer == NULL) {
-        free_ParseTree(pow);
-        free_ParseTree(frac);
-        free_ParseTree(integer);
-        return MEMORY_ERROR;
-    }
 
     if ((*tok)->token->type == Dot) {
-        has_frac = 1;
+        frac = alloc_ParseTree();
+        if (frac == NULL)
+            return MEMORY_ERROR;
         status = is_Frac(tok, &frac);
         if (status != SUBTREE_OK) {
-            free_Token(newTok);
             free_ParseTree(frac);
-            free_ParseTree(pow);
-            free_ParseTree(integer);
             return status;
         }
+        (*new)->child = frac;
+        last = frac;
         if ((*tok)->token->type == Pow) {
-            has_pow = 1;
+            pow = alloc_ParseTree();
+            if (pow == NULL)
+                return MEMORY_ERROR;
             status = is_Exp(tok, &pow);
             if (status != SUBTREE_OK) {
-                free_Token(newTok);
-                free_ParseTree(frac);
                 free_ParseTree(pow);
-                free_ParseTree(integer);
                 return status;
             }
+            last->sibling = pow;
+            last = pow;
         }
     }
     else if ((*tok)->token->type == Int) {
-        has_int = 1;
+        integer = alloc_ParseTree();
+        if (integer == NULL)
+            return MEMORY_ERROR;
         status = is_Int(tok, &integer);
         if (status != SUBTREE_OK) {
-            free_Token(newTok);
-            free_ParseTree(frac);
-            free_ParseTree(pow);
             free_ParseTree(integer);
             return status;
         }
+        (*new)->child = integer;
+        last = integer;
         if ((*tok)->token->type == Dot) {
-            has_frac = 1;
+            frac = alloc_ParseTree();
+            if (frac == NULL)
+                return MEMORY_ERROR;
             status = is_Frac(tok, &frac);
             if (status != SUBTREE_OK) {
-                free_Token(newTok);
                 free_ParseTree(frac);
-                free_ParseTree(pow);
-                free_ParseTree(integer);
                 return status;
             }
+            last->sibling = frac;
+            last = frac;
         }
         if ((*tok)->token->type == Pow) {
-            has_pow = 1;
+            pow = alloc_ParseTree();
+            if (pow == NULL)
+                return MEMORY_ERROR;
             status = is_Exp(tok, &pow);
             if (status != SUBTREE_OK) {
-                free_Token(newTok);
-                free_ParseTree(frac);
                 free_ParseTree(pow);
-                free_ParseTree(integer);
                 return status;
             }
+            last->sibling = pow;
+            last = pow;
         }
     }
     else
         status = PARSING_ERROR;
-
-    if (status != SUBTREE_OK) {
-        free_Token(newTok);
-        free_ParseTree(frac);
-        free_ParseTree(pow);
-        free_ParseTree(integer);
-        return status;
-    }
-
-    (*new)->data = newTok;
-    if (has_int)
-        (*new)->child = integer;
-    else // must have frac
-        (*new)->child = frac;
-
-    if (has_int && has_frac) {
-        (*new)->child->sibling = frac;
-        if (has_pow)
-            frac->sibling = pow;
-    }
-    else if (has_pow)
-        (*new)->child->sibling = pow;
-
-    if (! has_int)
-        free_ParseTree(integer);
-    if (! has_frac)
-        free_ParseTree(frac);
-    if (! has_pow)
-        free_ParseTree(pow);
 
     return status;
 }
@@ -879,7 +866,12 @@ int is_Float(struct TokenList** tok, struct ParseTree** new) {
 int is_Num(struct TokenList** tok, struct ParseTree** new) {
     struct ParseTree *sign, *numeric;
     int status, has_sign;
-    struct Token* newTok; 
+    struct Token* newTok;
+
+    newTok = new_Token((char[1]){'\0'}, Num);
+    if (newTok == NULL)
+        return MEMORY_ERROR;
+    (*new)->data = newTok;
 
     status = SUBTREE_OK;
     has_sign = 1;
@@ -899,39 +891,22 @@ int is_Num(struct TokenList** tok, struct ParseTree** new) {
         free_ParseTree(sign);
         return status;
     }
+    if (has_sign)
+        (*new)->child = sign;
 
     numeric = alloc_ParseTree();
-    if (numeric == NULL) {
-        free_ParseTree(sign);
+    if (numeric == NULL)
         return MEMORY_ERROR;
-    }
 
     status = is_Float(tok, &numeric);
 
-    newTok = new_Token((char[1]){'\0'}, Num);
-    if (newTok == NULL) {
-        free_ParseTree(sign);
+    if (status != SUBTREE_OK)
         free_ParseTree(numeric);
-        return MEMORY_ERROR;
-    }
-
-    if (status != SUBTREE_OK) {
-        free_ParseTree(sign);
-        free_Token(newTok);
-        free_ParseTree(numeric);
-    }
     else {
-        (*new)->data = newTok;
-        if (has_sign) {
-            (*new)->child = sign;
+        if (has_sign)
             sign->sibling = numeric;
-            (*new)->sibling = NULL;
-        }
-        else {
-            free_ParseTree(sign);
+        else
             (*new)->child = numeric;
-            (*new)->sibling = NULL;
-        }
     }
     return status;
 }
@@ -945,12 +920,11 @@ int is_Obj(struct TokenList** tok, struct ParseTree** new) {
     newTok = new_Token((char[1]){'\0'}, Obj);
     if (newTok == NULL)
         return MEMORY_ERROR;
+    (*new)->data = newTok;
 
     subtree = alloc_ParseTree();
-    if (subtree == NULL){
-        free_Token(newTok);
+    if (subtree == NULL)
         return MEMORY_ERROR;
-    }
 
     // use LL(1) FOLLOW Sets
     struct TokenList* curr;
@@ -973,21 +947,16 @@ int is_Obj(struct TokenList** tok, struct ParseTree** new) {
     else
         status = PARSING_ERROR;
 
-    if (status == SUBTREE_OK) {
-        (*new)->data = newTok;
+    if (status == SUBTREE_OK)
         (*new)->child = subtree;
-        (*new)->sibling = NULL;
-    }
-    else {
-        free_Token(newTok);
+    else
         free_ParseTree(subtree);
-    }
     return status;
 }
 
 
 
-int is_Assign(struct TokenList** tok, struct ParseTree** tree) {
+int is_Assign(struct TokenList** tok, struct ParseTree** new) {
     struct ParseTree *var1, *eq, *var2;
     int status;
     struct Token *newTok;
@@ -995,7 +964,7 @@ int is_Assign(struct TokenList** tok, struct ParseTree** tree) {
     newTok = new_Token((char[1]) {'\0'}, Assign);
     if (newTok == NULL)
         return MEMORY_ERROR;
-    (*tree)->data = newTok;
+    (*new)->data = newTok;
 
     var1 = alloc_ParseTree();
     if (var1 == NULL)
@@ -1005,46 +974,42 @@ int is_Assign(struct TokenList** tok, struct ParseTree** tree) {
         free_ParseTree(var1);
         return PARSING_ERROR;
     }
+    (*new)->child = var1;
 
     eq = alloc_ParseTree();
-    if (eq == NULL) {
-        free_ParseTree(var1);
+    if (eq == NULL)
         return MEMORY_ERROR;
-    }
     status = is_Equal(tok, &eq);
     if (status != SUBTREE_OK) {
-        free_ParseTree(var1);
         free_ParseTree(eq);
         return PARSING_ERROR;
     }
+    var1->sibling = eq;
 
     var2 = alloc_ParseTree();
-    if (var2 == NULL) {
-        free_ParseTree(var1);
-        free_ParseTree(eq);
+    if (var2 == NULL)
         return MEMORY_ERROR;
-    }
+
     status = is_Expr(tok, &var2);
     if (status != SUBTREE_OK) {
-        free_ParseTree(var1);
-        free_ParseTree(eq);
         free_ParseTree(var2);
         return PARSING_ERROR;
     }
-
-    var1->sibling = eq;
     eq->sibling = var2;
-    (*tree)->child = var1;
     return SUBTREE_OK;
 }
 
 
-
 int is_Input(struct TokenList** tok, struct ParseTree** new) {
     // Create subtree
-    struct ParseTree* readin, *var;
+    struct ParseTree *readin, *var;
     int status;
     struct Token* newTok;
+
+    newTok = new_Token((char[1]){'\0'}, Input);
+    if (newTok == NULL)
+        return MEMORY_ERROR;
+    (*new)->data = newTok;
 
     readin = alloc_ParseTree();
     if (readin == NULL)
@@ -1054,25 +1019,18 @@ int is_Input(struct TokenList** tok, struct ParseTree** new) {
         free_ParseTree(readin);
         return status;
     }
+    (*new)->child = readin;
+
     var = alloc_ParseTree();
     if (var == NULL)
         return MEMORY_ERROR;
     status = is_Var(tok, &var);
     if (status != SUBTREE_OK) {
-        free_ParseTree(readin);
         free_ParseTree(var);
         return status;
     }
     readin->sibling = var;
-    newTok = new_Token((char[1]){'\0'}, Input);
-    if (newTok == NULL) {
-        free_ParseTree(var);
-        free_ParseTree(readin);
-        return MEMORY_ERROR;
-    }
-    (*new)->data = newTok;
-    (*new)->child = readin;
-    (*new)->sibling = NULL;
+
     return SUBTREE_OK;
 }
 
@@ -1081,7 +1039,12 @@ int is_Output(struct TokenList** tok, struct ParseTree** new) {
     // Create subtree
     struct ParseTree *writeOut, *obj;
     int status;
-    struct Token* newTok;// = new_Token((char[1]){'\0'}, Output);
+    struct Token* newTok;
+
+    newTok = new_Token((char[1]){'\0'}, Output);
+    if (newTok == NULL)
+        return MEMORY_ERROR;
+    (*new)->data = newTok;
 
     writeOut = alloc_ParseTree();
     if (writeOut == NULL)
@@ -1091,30 +1054,19 @@ int is_Output(struct TokenList** tok, struct ParseTree** new) {
         free_ParseTree(writeOut);
         return status;
     }
+    (*new)->child = writeOut;
+
     obj = alloc_ParseTree();
-    if (obj == NULL) {
-        free_ParseTree(writeOut);
+    if (obj == NULL)
         return MEMORY_ERROR;
-    }
     status = is_Obj(tok, &obj);
     if (status != SUBTREE_OK) {
-        free_ParseTree(writeOut);
         free_ParseTree(obj);
         return status;
     }
     writeOut->sibling = obj;
 
-    // Link it
-    newTok = new_Token((char[1]){'\0'}, Output);
-    if (newTok == NULL) {
-        free_ParseTree(writeOut);
-        free_ParseTree(obj);
-        return MEMORY_ERROR;
-    }
-    (*new)->data = newTok;
-    (*new)->child = writeOut;
-    (*new)->sibling = NULL;
-    return SUBTREE_OK;
+    return status;
 }
 
 
@@ -1403,6 +1355,7 @@ int is_Line(struct TokenList** tok, struct ParseTree** line) {
     newTok = new_Token((char[1]){'\0'}, Line);
     if (newTok == NULL)
         return MEMORY_ERROR;
+    (*line)->data = newTok;
 
     subtree = alloc_ParseTree();
     if (subtree == NULL)
@@ -1426,15 +1379,10 @@ int is_Line(struct TokenList** tok, struct ParseTree** line) {
     else
         status = PARSING_ERROR;
 
-    if (status != SUBTREE_OK) {
+    if (status == SUBTREE_OK)
+        (*line)->child = subtree;
+    else
         free_ParseTree(subtree);
-        free_Token(newTok);
-        return status;
-    }
-
-    (*line)->data = newTok;
-    (*line)->child = subtree;
-    (*line)->sibling = NULL;
     return status;
 }
 
@@ -1445,8 +1393,6 @@ int is_Program(struct TokenList** head, struct ParseTree** tree) {
     if (tok == NULL)
         return MEMORY_ERROR;
     (*tree)->data = tok;
-    (*tree)->child = NULL;
-    (*tree)->sibling = NULL;
 
     // Entry point of any valid tokens sequence for this grammar.
     struct ParseTree* current;
@@ -1504,86 +1450,62 @@ int is_Program(struct TokenList** head, struct ParseTree** tree) {
 }
 
 
-struct ParseTree* build_ParseTree (struct TokenList* head) {
-    struct ParseTree* tree;
-    tree = alloc_ParseTree();
-    // Always match the start symbol of this grammar: program.
+int build_ParseTree (struct TokenList* head, struct ParseTree** tree) {
+    // Always match the start symbol of this grammar: Program.
     int status;
-    status = is_Program(&head, &tree);
-    if (status != SUBTREE_OK) {
-        free_ParseTree(tree);
-        tree = NULL;
-    }
-    return tree;
+
+    status = is_Program(&head, tree);
+    return status;
 }
 
 int main(int argc, char* argv[]) {
-    /*
-    char c1[4] = {'h', 'i', '!', '\0'};
-    struct Token* t1 = new_Token(c1, UNK);
-    struct ParseTree* p1 = new_ParseTree(t1);
-
-    char c2[5] = {'h', 'i', '!', '!', '\0'};
-    struct Token* t2 = new_Token(c2, UNK);
-    struct ParseTree* p2 = new_ParseTree(t2);
-
-    char c3[3] = {'h', 'i', '\0'};
-    struct Token* t3 = new_Token(c3, UNK);
-    struct ParseTree* p3 = new_ParseTree(t3);
-
-    p1->child = p2;
-    p1->sibling = p3;
-
-    char c4[3] = {'h', 'i', '\0'};
-    struct Token* t4 = new_Token(c4, UNK);
-    struct ParseTree* p4 = new_ParseTree(t4);
-
-    p2->child = p4;
-
-    print_ParseTree(p1, 0);
-
-    free_ParseTree(p1);
-    */
     if (argc < 2) {
         printf("Expecting exactly 1 argument: file path.\n");
         return 1;
     }
     char const* const fileName = argv[1];
 
+    struct ParseTree *tree;
+    int status;
+    struct stat buffer; // file statistics
+    FILE* file; // source code
+    const char* fp; // file content
+    struct TokenList *list, *list2; // original list and blanks-stripped
+
     /*
      * Load the file in memory and return a char* to it
     */
-    FILE* file = fopen(fileName, "r");
+    file = fopen(fileName, "r");
     if (file == NULL) {
         printf("Cannot read the given file path.\n");
         return -1;
     }
-    struct stat buffer;
+
     stat(fileName, &buffer);
     char vec[buffer.st_size + 1];
     fread(vec, sizeof(char), buffer.st_size, file);
     fclose(file);
     vec[buffer.st_size] = '\0';
-    const char* fp = vec;
+    fp = vec;
 
     /*
      * Build Token list
     */
     // Will also print total count
-    struct TokenList* list = build_TokenList(fp);
+    list = build_TokenList(fp);
     if (list == NULL)
         return 1;
     //print_TokenList(list);
-    struct TokenList* list2 = strip_WS(list);
+    list2 = strip_WS(list);
     free_TokenList(list);
 
-    struct ParseTree* tree = build_ParseTree(list2);
-    if (tree != NULL) {
+    tree = alloc_ParseTree();
+    status = build_ParseTree(list2, &tree);
+    if (status == SUBTREE_OK)
         print_ParseTree(tree);
-        free_ParseTree(tree);
-    }
     else
         printf("PARSING ERROR\n");
+    free_ParseTree(tree);
     free_TokenList(list2);
     return 0;
 }
