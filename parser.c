@@ -89,9 +89,6 @@ void free_ParseTree(struct ParseTree* tree) {
  * Return a integer flag with the operation final status (see #define below).
 */
 
-#define PARSING_ERROR -1
-#define SUBTREE_OK 0
-#define MEMORY_ERROR 1
 
 
 /*
@@ -1461,7 +1458,7 @@ int build_ParseTree_FromFile (const char *fileName, struct ParseTree **tree) {
     return status;
 }
 
-
+/*
 int main(int argc, char* argv[]) {
     struct ParseTree *tree;
     int status;
@@ -1487,3 +1484,4 @@ int main(int argc, char* argv[]) {
 
     return status;
 }
+*/

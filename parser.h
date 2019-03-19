@@ -7,6 +7,11 @@ struct ParseTree {
 };
 
 
+#define PARSING_ERROR -1
+#define SUBTREE_OK 0
+#define MEMORY_ERROR 1
+
+
 /*
  * Create a new ParseTree from a given Token.
  * The Token is COPIED with all its internal data into a new memory loc.
@@ -14,6 +19,10 @@ struct ParseTree {
  * Return NULL if a memory error happens.
 */
 struct ParseTree* new_ParseTree(struct Token* c);
+
+
+struct ParseTree* alloc_ParseTree();
+
 
 void print_ParseTree(struct ParseTree* tree);
 
@@ -25,6 +34,8 @@ void free_ParseTree(struct ParseTree* tree);
 
 
 int build_ParseTree (struct TokenList* head, struct ParseTree** tree);
+
+int build_ParseTree_FromFile (const char *fileName, struct ParseTree **tree);
 
 int is_Obj (struct TokenList** tok, struct ParseTree** tree);
 

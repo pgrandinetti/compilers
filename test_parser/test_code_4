@@ -1,0 +1,5 @@
+x = "st1 %d", 5 + "st2 %s + %d", var2, 7;
+if (x == 5)
+    readIn y;
+    z = x + y;
+;
