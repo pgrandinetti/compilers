@@ -2,9 +2,48 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
-#include "lexer.h"
+#include "parser.h"
+
+// gcc main.c parser.c lexer.c
+
+
+int main_parser(int argc, char* argv[]);
+int main_lexer(int argc, char* argv[]);
+
 
 int main(int argc, char* argv[]) {
+    main_parser(argc, argv);
+}
+
+
+int main_parser(int argc, char* argv[]) {
+    struct ParseTree *tree;
+    int status;
+
+    if (argc < 2) {
+        printf("Expecting exactly 1 argument: file path.\n");
+        return 1;
+    }
+    char const* const fileName = argv[1];
+
+    tree = alloc_ParseTree();
+    if (tree == NULL)
+        return MEMORY_ERROR;
+
+    status = build_ParseTree_FromFile(fileName, &tree);
+
+    if (status == SUBTREE_OK)
+        print_ParseTree(tree);
+    else
+        printf("PARSING ERROR\n");
+    print_ParseTree(tree);
+    free_ParseTree(tree);
+
+    return status;
+}
+
+
+int main_lexer(int argc, char* argv[]) {
     /*
     const char* line = "+ >= continue<= - \"a  b !) c \"\"ah ahd\" ;\n == xyz != +0.53^-2 && a3c!=x + === [ Null)";
     struct Token tok;

@@ -5,6 +5,35 @@
 
 #include "parser.h"
 
+/* Preliminary Definitions
+
+ * Each function `is_<TokenType>` is defined as
+
+ * int is_<TokenType> (struct TokenList** tok, struct ParseTree** new)
+
+ * - **tok points to the current token in the sequence. The function moves it ahead CHANGING the pointer location.
+ * - **new points to a ALREADY-ALLOCATED ParseTree. It will contain the resulting subtree, or stays empty.
+
+ * Therefore:
+ * - The caller must alloc the ParseTree** new
+ * - The called must assign *new->data, child and sibling
+ * - The caller is responsible for freeing memory
+
+ * Return a integer flag with the operation final status (see parser.h).
+*/
+
+int is_Obj (struct TokenList** tok, struct ParseTree** tree);
+
+int is_List (struct TokenList** tok, struct ParseTree** tree);
+
+int is_ListExpr (struct TokenList** tok, struct ParseTree** tree);
+
+int is_Line(struct TokenList** tok, struct ParseTree** tree);
+
+int is_Program(struct TokenList** head, struct ParseTree** tree);
+
+/* */
+
 
 struct ParseTree* alloc_ParseTree() {
     struct ParseTree* tree;
@@ -71,25 +100,6 @@ void free_ParseTree(struct ParseTree* tree) {
     if (child != NULL)
         free_ParseTree(child);
 }
-
-
-/*
- * Each function `is_<TokenType>` is defined as
-
- * int is_<TokenType> (struct TokenList** tok, struct ParseTree** new)
-
- * - **tok points to the current token in the sequence. The function moves it ahead CHANGING the pointer location.
- * - **new points to a ALREADY-ALLOCATED ParseTree. It will contain the resulting subtree, or stays empty.
-
- * Therefore:
- * - The caller must alloc the ParseTree** new
- * - The called must assign *new->data, child and sibling
- * - The caller is responsible for freeing memory
-
- * Return a integer flag with the operation final status (see #define below).
-*/
-
-
 
 /*
  * Template function for easy-to-check Tokens
@@ -1457,31 +1467,3 @@ int build_ParseTree_FromFile (const char *fileName, struct ParseTree **tree) {
     free(vec);
     return status;
 }
-
-/*
-int main(int argc, char* argv[]) {
-    struct ParseTree *tree;
-    int status;
-
-    if (argc < 2) {
-        printf("Expecting exactly 1 argument: file path.\n");
-        return 1;
-    }
-    char const* const fileName = argv[1];
-
-    tree = alloc_ParseTree();
-    if (tree == NULL)
-        return MEMORY_ERROR;
-
-    status = build_ParseTree_FromFile(fileName, &tree);
-
-    if (status == SUBTREE_OK)
-        print_ParseTree(tree);
-    else
-        printf("PARSING ERROR\n");
-    print_ParseTree(tree);
-    free_ParseTree(tree);
-
-    return status;
-}
-*/

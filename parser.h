@@ -36,13 +36,3 @@ void free_ParseTree(struct ParseTree* tree);
 int build_ParseTree (struct TokenList* head, struct ParseTree** tree);
 
 int build_ParseTree_FromFile (const char *fileName, struct ParseTree **tree);
-
-int is_Obj (struct TokenList** tok, struct ParseTree** tree);
-
-int is_List (struct TokenList** tok, struct ParseTree** tree);
-
-int is_ListExpr (struct TokenList** tok, struct ParseTree** tree);
-
-int is_Line(struct TokenList** tok, struct ParseTree** tree);
-
-int is_Program(struct TokenList** head, struct ParseTree** tree);

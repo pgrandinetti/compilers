@@ -7,6 +7,13 @@
 
 #define MAX_LINE 100
 
+/* Preliminary definitions */
+
+void skip_WS(struct TokenList** list);
+
+/* */
+
+
 const char* type2char (enum TokenType t) {
     switch (t)
     {
