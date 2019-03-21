@@ -1,0 +1,11 @@
+while (y < x)
+    z = y % 3;
+    if (z == 1)
+        writeOut "ok";
+    else
+        readIn z;
+    ;
+;
+if (y == 7)
+    j = y;
+;
