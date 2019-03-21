@@ -420,7 +420,9 @@ int match_operator_type (enum TokenType type) {
             type == Greater ||
             type == GreaterEq ||
             type == Lesser ||
-            type == LesserEq);
+            type == LesserEq ||
+            type == And ||
+            type == Or);
 }
 
 
