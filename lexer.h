@@ -52,6 +52,7 @@ enum TokenType {
     IfLine,
     LoopLine,
     Expr,
+    Term,
     BaseExpr,
     Operator,
     CondOp,

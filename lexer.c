@@ -66,6 +66,7 @@ const char* type2char (enum TokenType t) {
         case IfLine: return "ifLine";
         case LoopLine: return "loopLine";
         case Expr: return "Expr";
+        case Term: return "Term";
         case BaseExpr: return "BaseExpr";
         case Operator: return "Operator";
         case CondOp: return "CondOp";
@@ -343,7 +344,7 @@ int match_div(const char** p, struct Token* tok) {
         else
             tok->lexeme = tmp;
         memcpy(tok->lexeme, (char[3]) {'/', '.', '\0'}, 3 * sizeof(char));
-        tok->type = LesserEq;
+        tok->type = FloatDiv;
     }
     else {
         tmp = realloc(tok->lexeme, 2 * sizeof(char));
@@ -352,7 +353,7 @@ int match_div(const char** p, struct Token* tok) {
         else
             tok->lexeme = tmp;
         memcpy(tok->lexeme, (char[2]) {'/', '\0'}, 2 * sizeof(char));
-        tok->type = Lesser;
+        tok->type = Div;
     }
     return 0;
 }
