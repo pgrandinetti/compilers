@@ -32,6 +32,12 @@ int is_Line(struct TokenList** tok, struct ParseTree** tree);
 
 int is_Program(struct TokenList** head, struct ParseTree** tree);
 
+int is_Expr(struct TokenList** head, struct ParseTree** tree);
+
+int is_BaseExpr(struct TokenList** head, struct ParseTree** tree);
+
+int is_Term(struct TokenList** head, struct ParseTree** tree);
+
 /* */
 
 
@@ -408,14 +414,8 @@ int is_Operator (struct TokenList** tok, struct ParseTree** new) {
 }
 
 
-int match_operator_type (enum TokenType type) {
-    return (type == Plus ||
-            type == Minus ||
-            type == Star ||
-            type == Div ||
-            type == FloatDiv ||
-            type == Percent ||
-            type == EqEq ||
+int match_CondOp_type (enum TokenType type) {
+    return (type == EqEq ||
             type == NotEq ||
             type == Greater ||
             type == GreaterEq ||
@@ -426,12 +426,141 @@ int match_operator_type (enum TokenType type) {
 }
 
 
-int is_Expr (struct TokenList** tok, struct ParseTree** new) {
+int match_AritmOp_type (enum TokenType type) {
+    return (type == Plus ||
+            type == Minus ||
+            type == Star ||
+            type == Div ||
+            type == FloatDiv ||
+            type == Percent);
+}
+
+int match_TermOp_type (enum TokenType type) {
+    return (type == Star ||
+            type == Div ||
+            type == FloatDiv ||
+            type == Percent);
+}
+
+
+int match_operator_type (enum TokenType type) {
+    return (match_AritmOp_type(type) ||
+            match_CondOp_type(type));
+}
+
+
+int is_BaseExpr (struct TokenList** tok, struct ParseTree** new) {
+    int status;
+    struct ParseTree *lpar, *rpar, *subexpr, *obj;
+    struct Token *newTok;
+
+    status = SUBTREE_OK;
+
+    newTok = new_Token((char[1]){'\0'}, BaseExpr);
+    if (newTok == NULL)
+        return MEMORY_ERROR;
+    (*new)->data = newTok;
+
+    if ((*tok)->token->type == Lpar) {
+        // is a sub expression
+        lpar = alloc_ParseTree();
+        if (lpar == NULL)
+            return MEMORY_ERROR;
+        status = is_Lpar(tok, &lpar);
+        if (status != SUBTREE_OK){
+            free_ParseTree(lpar);
+            return status;
+        }
+        (*new)->child = lpar;
+
+        subexpr = alloc_ParseTree();
+        if (subexpr == NULL)
+            return MEMORY_ERROR;
+        status = is_Expr(tok, &subexpr);
+        if (status != SUBTREE_OK){
+            free_ParseTree(subexpr);
+            return status;
+        }
+        lpar->sibling = subexpr;
+
+        rpar = alloc_ParseTree();
+        if (rpar == NULL)
+            return MEMORY_ERROR;
+        status = is_Rpar(tok, &rpar);
+        if (status != SUBTREE_OK){
+            free_ParseTree(rpar);
+            return status;
+        }
+        subexpr->sibling = rpar;
+    }
+    else {
+        // just a Obj
+        obj = alloc_ParseTree();
+        if (obj == NULL)
+            return MEMORY_ERROR;
+        status = is_Obj(tok, &obj);
+        if (status != SUBTREE_OK) {
+            free_ParseTree(obj);
+            return status;
+        }
+        (*new)->child = obj;
+    }
+    return status;
+}
+
+int is_Term (struct TokenList** tok, struct ParseTree** new) {
+    int status;
     enum TokenType type;
-    struct ParseTree *lpar, *expr1, *rpar, *expr2; // for nested Expr
-    struct ParseTree *obj1; // for BaseExpr
-    struct ParseTree *op; // the optional Operator
-    struct Token* newTok;
+    struct ParseTree *base, *op, *term;
+    struct Token *newTok;
+
+    status = SUBTREE_OK;
+
+    newTok = new_Token((char[1]){'\0'}, Term);
+    if (newTok == NULL)
+        return MEMORY_ERROR;
+    (*new)->data = newTok;
+
+    base = alloc_ParseTree();
+    if (base == NULL)
+        return MEMORY_ERROR;
+    status = is_BaseExpr(tok, &base);
+    if (status != SUBTREE_OK){
+        free_ParseTree(base);
+        return status;
+    }
+    (*new)->child = base;
+
+    // The remainder of a Term is optional
+    type = (*tok)->token->type;
+    if (match_TermOp_type(type)){
+        op = alloc_ParseTree();
+        if (op == NULL)
+            return MEMORY_ERROR;
+        status = is_Operator(tok, &op);
+        if (status != SUBTREE_OK){
+            free_ParseTree(op);
+            return status;
+        }
+        base->sibling = op;
+
+        term = alloc_ParseTree();
+        if (term == NULL)
+            return MEMORY_ERROR;
+        status = is_Term(tok, &term);
+        if (status != SUBTREE_OK){
+            free_ParseTree(term);
+            return status;
+        }
+        op->sibling = term;
+    }
+    return status;
+}
+
+int is_Expr (struct TokenList** tok, struct ParseTree** new) {
+    struct ParseTree *term, *op, *expr;
+    struct Token *newTok;
+    enum TokenType type;
     int status;
 
     status = SUBTREE_OK;
@@ -440,98 +569,39 @@ int is_Expr (struct TokenList** tok, struct ParseTree** new) {
         return MEMORY_ERROR;
     (*new)->data = newTok;
 
-    type = (*tok)->token->type;
-    if (type != Lpar) {
-        // must be base expression
-        obj1 = alloc_ParseTree();
-        if (obj1 == NULL)
-            return MEMORY_ERROR;
-        status = is_Obj(tok, &obj1);
-        if (status != SUBTREE_OK) {
-            free_ParseTree(obj1);
-            return status;
-        }
-        (*new)->child = obj1;
-
-        // The remainder of the Expr is optional
-        if (match_operator_type((*tok)->token->type)) {
-            op = alloc_ParseTree();
-            if (op == NULL)
-                return MEMORY_ERROR;
-            status = is_Operator(tok, &op);
-            if (status != SUBTREE_OK) {
-                free_ParseTree(op);
-                return status;
-            }
-            obj1->sibling = op;
-
-            // Now there must be another Expr
-            expr2 = alloc_ParseTree();
-            if (expr2 == NULL)
-                return MEMORY_ERROR;
-            status = is_Expr(tok, &expr2);
-            if (status != SUBTREE_OK) {
-                free_ParseTree(expr2);
-                return status;
-            }
-            op->sibling = expr2;
-        }
+    term = alloc_ParseTree();
+    if (term == NULL)
+        return MEMORY_ERROR;
+    status = is_Term(tok, &term);
+    if (status != SUBTREE_OK){
+        free_ParseTree(term);
+        return status;
     }
-    else {
-        // Must be a nested expression
-        lpar = alloc_ParseTree();
-        if (lpar == NULL)
+    (*new)->child = term;
+
+    // The remainder of Expr is optional (only if '+' | '-')
+    type = (*tok)->token->type;
+    if (match_AritmOp_type(type) &&
+        !match_TermOp_type(type)){
+        op = alloc_ParseTree();
+        if (op == NULL)
             return MEMORY_ERROR;
-        status = is_Lpar(tok, &lpar);
-        if (status != SUBTREE_OK) {
-            free_ParseTree(lpar);
+        status = is_Operator(tok, &op);
+        if (status != SUBTREE_OK){
+            free_ParseTree(op);
             return status;
         }
-        (*new)->child = lpar;
+        term->sibling = op;
 
-        expr1 = alloc_ParseTree();
-        if (expr1 == NULL)
+        expr = alloc_ParseTree();
+        if (expr == NULL)
             return MEMORY_ERROR;
-        status = is_Expr(tok, &expr1);
-        if (status != SUBTREE_OK) {
-            free_ParseTree(expr1);
+        status = is_Expr(tok, &expr);
+        if (status != SUBTREE_OK){
+            free_ParseTree(expr);
             return status;
         }
-        lpar->sibling = expr1;
-
-        rpar = alloc_ParseTree();
-        if (rpar == NULL)
-            return MEMORY_ERROR;
-        status = is_Rpar(tok, &rpar);
-        if (status != SUBTREE_OK) {
-            free(rpar);
-            return status;
-        }
-        expr1->sibling = rpar;
-
-        // Here too, next operator is optional
-        if (match_operator_type((*tok)->token->type)) {
-            op = alloc_ParseTree();
-            if (op == NULL)
-                return MEMORY_ERROR;
-            status = is_Operator(tok, &op);
-            if (status != SUBTREE_OK) {
-                free_ParseTree(op);
-                return status;
-            }
-            rpar->sibling = op;
-
-            // Now there must be another Expr
-            expr2 = alloc_ParseTree();
-            if (expr2 == NULL)
-                return MEMORY_ERROR;
-            status = is_Expr(tok, &expr2);
-            if (status != SUBTREE_OK) {
-                free_ParseTree(expr2);
-                return status;
-            }
-            op->sibling = expr2;
-        }
+        op->sibling = expr;
     }
     return status;
 }
@@ -1186,7 +1256,7 @@ int is_IfBody (struct TokenList** tok, struct ParseTree** new) {
 }
 
 int is_IfCond (struct TokenList** tok, struct ParseTree** new) {
-    struct ParseTree *lpar, *obj1, *op, *obj2, *rpar;
+    struct ParseTree *lpar, *expr1, *op, *expr2, *rpar;
     int status;
     struct Token* newTok;
 
@@ -1205,11 +1275,11 @@ int is_IfCond (struct TokenList** tok, struct ParseTree** new) {
     if (status != SUBTREE_OK)
         return status;
 
-    obj1 = alloc_ParseTree();
-    if (obj1 == NULL)
+    expr1 = alloc_ParseTree();
+    if (expr1 == NULL)
         return MEMORY_ERROR;
-    status = is_Obj(tok, &obj1);
-    lpar->sibling = obj1;
+    status = is_Expr(tok, &expr1);
+    lpar->sibling = expr1;
     if (status != SUBTREE_OK)
         return status;
 
@@ -1217,15 +1287,15 @@ int is_IfCond (struct TokenList** tok, struct ParseTree** new) {
     if (op == NULL)
         return MEMORY_ERROR;
     status = is_CondOp(tok, &op);
-    obj1->sibling = op;
+    expr1->sibling = op;
     if (status != SUBTREE_OK)
         return status;
 
-    obj2 = alloc_ParseTree();
-    if (obj2 == NULL)
+    expr2 = alloc_ParseTree();
+    if (expr2 == NULL)
         return MEMORY_ERROR;
-    status = is_Obj(tok, &obj2);
-    op->sibling = obj2;
+    status = is_Expr(tok, &expr2);
+    op->sibling = expr2;
     if (status != SUBTREE_OK)
         return status;
 
@@ -1233,7 +1303,7 @@ int is_IfCond (struct TokenList** tok, struct ParseTree** new) {
     if (rpar == NULL)
         return MEMORY_ERROR;
     status = is_Rpar(tok, &rpar);
-    obj2->sibling = rpar;
+    expr2->sibling = rpar;
     if (status != SUBTREE_OK)
         return status;
 

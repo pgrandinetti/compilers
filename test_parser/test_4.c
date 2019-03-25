@@ -8,7 +8,7 @@
 
 int main() {
     struct ParseTree *tree, *walk, *lev1, *line1, *line2;
-    struct ParseTree *ifcond, *ifbody, *ifline1, *ifline2;
+    struct ParseTree *ifcond, *ifbody, *expr1, *expr2;
     int status;
 
     char const* const fileName = "./test_code_4";
@@ -54,6 +54,12 @@ int main() {
     assert(line1->data->type == Expr);
     assert(line1->sibling == NULL);
     line1 = line1->child;
+    assert(line1->data->type == Term);
+    assert(line1->sibling == NULL);
+    line1 = line1->child;
+    assert(line1->data->type == BaseExpr);
+    assert(line1->sibling == NULL);
+    line1 = line1->child;
     assert(line1->data->type == Obj);
     assert(line1->sibling == NULL);
     line1 = line1->child;
@@ -87,29 +93,46 @@ int main() {
     // Check ifcondition
     assert(ifcond->data->type == Lpar);
     assert(ifcond->child == NULL);
-    ifcond = ifcond->sibling;
-    assert(ifcond->data->type == Obj);
-    assert(ifcond->child->data->type == Var);
-    assert(ifcond->child->child == NULL);
-    assert(ifcond->child->sibling == NULL);
-    ifcond = ifcond->sibling;
+    expr1 = ifcond->sibling;
+    assert(expr1->data->type == Expr);
+    ifcond = expr1->sibling;
     assert(ifcond->data->type == EqEq);
     assert(ifcond->child == NULL);
     ifcond = ifcond->sibling;
-    assert(ifcond->data->type == Obj);
+    expr2 = ifcond;
+    assert(expr2->data->type == Expr);
     assert(ifcond->sibling->data->type == Rpar);
     assert(ifcond->sibling->child == NULL);
     assert(ifcond->sibling->sibling == NULL);
-    ifcond = ifcond->child;
-    assert(ifcond->data->type == Num);
-    assert(ifcond->sibling == NULL);
-    ifcond = ifcond->child;
-    assert(ifcond->data->type == Float);
-    assert(ifcond->sibling == NULL);
-    ifcond = ifcond->child;
-    assert(ifcond->data->type == Int);
-    assert(ifcond->sibling == NULL);
-    assert(ifcond->child == NULL);
+
+    expr1 = expr1->child;
+    assert(expr1->data->type == Term);
+    assert(expr1->sibling == NULL);
+    expr1 = expr1->child;
+    assert(expr1->data->type = BaseExpr);
+    assert(expr1->sibling == NULL);
+    expr1 = expr1->child;
+    assert(expr1->data->type == Obj);
+    assert(expr1->sibling == NULL);
+    expr1 = expr1->child;
+    assert(expr1->data->type == Var);
+    assert(expr1->sibling == NULL);
+    assert(expr1->child == NULL);
+
+    expr2 = expr2->child;
+    assert(expr2->data->type == Term);
+    assert(expr2->sibling == NULL);
+    expr2 = expr2->child;
+    assert(expr2->data->type = BaseExpr);
+    assert(expr2->sibling == NULL);
+    expr2 = expr2->child;
+    assert(expr2->data->type == Obj);
+    assert(expr2->sibling == NULL);
+    expr2 = expr2->child;
+    assert(expr2->data->type == Num);
+    assert(expr2->sibling == NULL);
+    assert(expr2->child != NULL);
+
 
     // Check ifbody
     assert(ifbody->data->type == Line);

@@ -57,10 +57,19 @@ output      :   writeOut obj
 
 assign      :   var '=' expr
 
-expr        :   baseExpr
-            |   '(' expr ')' (operator expr)?
+#### BEFORE ####
+#expr        :   baseExpr
+#            |   '(' expr ')' (operator expr)?
+#
+#baseExpr    :   obj (operator expr)?
+########
 
-baseExpr    :   obj (operator expr)?
+expr        :   term ( ('+' | '-') expr)?  // adding here condOp makes the ifCond much more complex
+
+term        :   baseExpr ( ('*' | '/' | '/.' | '%') term)?
+
+baseExpr    :   obj
+            |   '(' expr ')'
 
 operator    :   '+' | '-' | '*' | '/' | '/.' | '%' | condOp
 
@@ -68,7 +77,7 @@ condOp      :   '&&' | '||' | '!=' | '==' | '<=' | '>=' | > | <
 
 ifLine      :   if ifCond ifBody
 
-ifCond      :   '(' obj condOp obj ')'
+ifCond      :   '(' expr condOp expr ')'  // Initially did '(' obj condOp obj ')' but it's too restricted
 
 ifBody      :   (line ENDLINE)+ (optElse)?  // cannot use program, must be (line ENDLINE)+
 

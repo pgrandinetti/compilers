@@ -7,7 +7,7 @@
 
 
 int main() {
-    struct ParseTree *tree, *walk;
+    struct ParseTree *tree, *walk, *ifcond, *basexpr;
     int status;
 
     char const* const fileName = "./test_code_5";
@@ -44,11 +44,33 @@ int main() {
 
     assert(walk->data->type == IfCond);
     assert(walk->child != NULL);
+    ifcond = walk; // to check later
     walk = walk->sibling;
 
     assert(walk->data->type == Program);
     assert(walk->sibling == NULL);
     walk = walk->child;
+
+    // Check the loop condition
+    ifcond = ifcond->child;
+    assert(ifcond->data->type == Lpar);
+    assert(ifcond->child == NULL);
+    ifcond = ifcond->sibling;
+    assert(ifcond->data->type == Expr);
+    assert(ifcond->child->data->type == Term);
+    assert(ifcond->child->child->data->type == BaseExpr);
+    basexpr = ifcond->child->child;
+    assert(basexpr->child->data->type == Obj);
+    assert(basexpr->child->child->data->type == Var);
+    ifcond = ifcond->sibling;
+    assert(ifcond->data->type == Lesser);
+    ifcond = ifcond->sibling;
+    assert(ifcond->data->type == Expr);
+    assert(ifcond->child->data->type == Term);
+    assert(ifcond->child->child->data->type == BaseExpr);
+    basexpr = ifcond->child->child;
+    assert(basexpr->child->data->type == Obj);
+    assert(basexpr->child->child->data->type == Num);
 
     // Check that there are 3 Lines and 3 Endlines
     assert(walk->data->type == Line);
