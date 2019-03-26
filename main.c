@@ -32,9 +32,7 @@ int main_parser(int argc, char* argv[]) {
 
     status = build_ParseTree_FromFile(fileName, &tree);
 
-    if (status == SUBTREE_OK)
-        print_ParseTree(tree);
-    else
+    if (status != SUBTREE_OK)
         printf("PARSING ERROR\n");
     print_ParseTree(tree);
     free_ParseTree(tree);

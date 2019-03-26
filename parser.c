@@ -1259,7 +1259,6 @@ int is_IfCond (struct TokenList** tok, struct ParseTree** new) {
     struct ParseTree *lpar, *expr1, *op, *expr2, *rpar;
     int status;
     struct Token* newTok;
-
     status = SUBTREE_OK;
 
     newTok = new_Token((char[1]){'\0'}, IfCond);

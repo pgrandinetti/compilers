@@ -57,13 +57,6 @@ output      :   writeOut obj
 
 assign      :   var '=' expr
 
-#### BEFORE ####
-#expr        :   baseExpr
-#            |   '(' expr ')' (operator expr)?
-#
-#baseExpr    :   obj (operator expr)?
-########
-
 expr        :   term ( ('+' | '-') expr)?  // adding here condOp makes the ifCond much more complex
 
 term        :   baseExpr ( ('*' | '/' | '/.' | '%') term)?
