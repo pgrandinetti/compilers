@@ -6,9 +6,13 @@
 // gcc test_4.c ../parser.c ../lexer.c -o test_4.out
 
 
+int assert_SimplePred(struct ParseTree *subtree, enum TokenType terminal);
+int assert_SimpleExpr(struct ParseTree *subtree, enum TokenType terminal);
+
+
 int main() {
     struct ParseTree *tree, *walk, *lev1, *line1, *line2;
-    struct ParseTree *ifcond, *ifbody, *expr1, *expr2;
+    struct ParseTree *ifcond, *ifbody, *expr1;
     int status;
 
     char const* const fileName = "./test_code_4";
@@ -54,6 +58,9 @@ int main() {
     assert(line1->data->type == Expr);
     assert(line1->sibling == NULL);
     line1 = line1->child;
+    assert(line1->data->type == Pred);
+    assert(line1->sibling == NULL);
+    line1 = line1->child;
     assert(line1->data->type == Term);
     assert(line1->sibling == NULL);
     line1 = line1->child;
@@ -96,43 +103,16 @@ int main() {
     expr1 = ifcond->sibling;
     assert(expr1->data->type == Expr);
     ifcond = expr1->sibling;
-    assert(ifcond->data->type == EqEq);
+    assert(ifcond->data->type == Rpar);
     assert(ifcond->child == NULL);
-    ifcond = ifcond->sibling;
-    expr2 = ifcond;
-    assert(expr2->data->type == Expr);
-    assert(ifcond->sibling->data->type == Rpar);
-    assert(ifcond->sibling->child == NULL);
-    assert(ifcond->sibling->sibling == NULL);
+    assert(ifcond->sibling == NULL);
 
     expr1 = expr1->child;
-    assert(expr1->data->type == Term);
-    assert(expr1->sibling == NULL);
-    expr1 = expr1->child;
-    assert(expr1->data->type = BaseExpr);
-    assert(expr1->sibling == NULL);
-    expr1 = expr1->child;
-    assert(expr1->data->type == Obj);
-    assert(expr1->sibling == NULL);
-    expr1 = expr1->child;
-    assert(expr1->data->type == Var);
-    assert(expr1->sibling == NULL);
-    assert(expr1->child == NULL);
-
-    expr2 = expr2->child;
-    assert(expr2->data->type == Term);
-    assert(expr2->sibling == NULL);
-    expr2 = expr2->child;
-    assert(expr2->data->type = BaseExpr);
-    assert(expr2->sibling == NULL);
-    expr2 = expr2->child;
-    assert(expr2->data->type == Obj);
-    assert(expr2->sibling == NULL);
-    expr2 = expr2->child;
-    assert(expr2->data->type == Num);
-    assert(expr2->sibling == NULL);
-    assert(expr2->child != NULL);
-
+    assert_SimplePred(expr1, Var);
+    expr1 = expr1->sibling;
+    assert(expr1->data->type = EqEq);
+    expr1 = expr1->sibling;
+    assert_SimpleExpr(expr1, Num);
 
     // Check ifbody
     assert(ifbody->data->type == Line);
@@ -156,4 +136,33 @@ int main() {
 
     free_ParseTree(tree);
     return status;
+}
+
+
+int assert_SimplePred(struct ParseTree *subtree, enum TokenType terminal) {
+    assert(subtree->data->type == Pred);
+    assert(subtree->child->data->type == Term);
+    assert(subtree->child->child->data->type == BaseExpr);
+    assert(subtree->child->child->child->data->type == Obj);
+    assert(subtree->child->child->child->child->data->type == terminal);
+    if (terminal != Num){
+        assert(subtree->child->child->child->child->child == NULL);
+        assert(subtree->child->child->child->child->sibling == NULL);
+    }
+    return 0;
+}
+
+
+int assert_SimpleExpr(struct ParseTree *subtree, enum TokenType terminal) {
+    assert(subtree->data->type == Expr);
+    assert(subtree->child->data->type == Pred);
+    assert(subtree->child->child->data->type == Term);
+    assert(subtree->child->child->child->data->type == BaseExpr);
+    assert(subtree->child->child->child->child->data->type == Obj);
+    assert(subtree->child->child->child->child->child->data->type == terminal);
+    if (terminal != Num){
+        assert(subtree->child->child->child->child->child->child == NULL);
+        assert(subtree->child->child->child->child->child->sibling == NULL);
+    }
+    return 0;
 }

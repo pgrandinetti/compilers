@@ -10,6 +10,8 @@ int assert_SimpleTerm(struct ParseTree *subtree, enum TokenType terminal);
 int assert_SimpleExpr(struct ParseTree *subtree, enum TokenType terminal);
 int assert_SimpleBase(struct ParseTree *subtree, enum TokenType terminal);
 int assert_ComplExpr(struct ParseTree *subtree);
+int assert_SimplePred(struct ParseTree *subtree, enum TokenType terminal);
+
 
 int main() {
     struct ParseTree *tree, *walk, *tmp;
@@ -44,14 +46,14 @@ int main() {
 
     // Now check the Expr
     tmp = walk->child;
-    assert_SimpleTerm(tmp, Var);
-    tmp = tmp->child->sibling;
+    assert_SimplePred(tmp, Var);
+    tmp = tmp->child->child->sibling;
     assert(tmp->data->type == FloatDiv);
     tmp = tmp->sibling;
     assert_SimpleTerm(tmp, Var);
 
     tmp = walk->child->sibling;
-    assert(tmp->data->type == Plus);
+    assert(tmp->data->type == GreaterEq);
     assert(tmp->child == NULL);
 
     tmp = tmp->sibling; // big branch
@@ -60,8 +62,8 @@ int main() {
     walk = tmp;
 
     tmp = tmp->child;
-    assert_SimpleTerm(tmp, Var);
-    tmp = tmp->child; // base expr
+    assert_SimplePred(tmp, Var);
+    tmp = tmp->child->child; // base expr
     tmp = tmp->sibling;
     assert(tmp->data->type == Star);
     tmp = tmp->sibling;
@@ -71,16 +73,16 @@ int main() {
     assert_ComplExpr(tmp);
     tmp = tmp->child->sibling; // the expr
     tmp = tmp->child;
-    assert_SimpleTerm(tmp, Var);
-    tmp = tmp->sibling;
+    assert_SimplePred(tmp, Var);
+    tmp = tmp->child->sibling;
     assert(tmp->data->type == Plus);
     tmp = tmp->sibling;
-    assert_SimpleExpr(tmp, Var);
+    assert_SimplePred(tmp, Var);
 
-    tmp = walk->child->sibling;
+    tmp = walk->child->child->sibling; // !!
     assert(tmp->data->type == Minus);
     tmp = tmp->sibling;
-    assert(tmp->data->type == Expr);
+    assert(tmp->data->type == Pred);
     tmp = tmp->child;
     assert(tmp->data->type == Term);
     tmp = tmp->child;
@@ -101,9 +103,33 @@ int main() {
     return status;
 }
 
+
+int assert_SimplePred(struct ParseTree *subtree, enum TokenType terminal) {
+    assert(subtree->data->type == Pred);
+    assert(subtree->child->data->type == Term);
+    assert(subtree->child->child->data->type == BaseExpr);
+    assert(subtree->child->child->child->data->type == Obj);
+    assert(subtree->child->child->child->child->data->type == terminal);
+    if (terminal != Num){
+        assert(subtree->child->child->child->child->child == NULL);
+        assert(subtree->child->child->child->child->sibling == NULL);
+    }
+    return 0;
+}
+
+
 int assert_SimpleExpr(struct ParseTree *subtree, enum TokenType terminal) {
     assert(subtree->data->type == Expr);
-    assert(assert_SimpleTerm(subtree->child, terminal) == 0);
+    assert(subtree->child->data->type == Pred);
+    assert(subtree->child->child->data->type == Term);
+    assert(subtree->child->child->child->data->type == BaseExpr);
+    assert(subtree->child->child->child->child->data->type == Obj);
+    assert(subtree->child->child->child->child->child->data->type == terminal);
+    if (terminal != Num){
+        assert(subtree->child->child->child->child->child->child == NULL);
+        assert(subtree->child->child->child->child->child->sibling == NULL);
+    }
+    return 0;
 }
 
 int assert_ComplExpr(struct ParseTree *subtree) {

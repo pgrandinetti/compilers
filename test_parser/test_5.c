@@ -57,18 +57,20 @@ int main() {
     assert(ifcond->child == NULL);
     ifcond = ifcond->sibling;
     assert(ifcond->data->type == Expr);
-    assert(ifcond->child->data->type == Term);
-    assert(ifcond->child->child->data->type == BaseExpr);
-    basexpr = ifcond->child->child;
+    assert(ifcond->child->data->type == Pred);
+    assert(ifcond->child->child->data->type == Term);
+    assert(ifcond->child->child->child->data->type == BaseExpr);
+    basexpr = ifcond->child->child->child;
     assert(basexpr->child->data->type == Obj);
     assert(basexpr->child->child->data->type == Var);
-    ifcond = ifcond->sibling;
+    ifcond = ifcond->child->sibling;
     assert(ifcond->data->type == Lesser);
     ifcond = ifcond->sibling;
     assert(ifcond->data->type == Expr);
-    assert(ifcond->child->data->type == Term);
-    assert(ifcond->child->child->data->type == BaseExpr);
-    basexpr = ifcond->child->child;
+    assert(ifcond->child->data->type == Pred);
+    assert(ifcond->child->child->data->type == Term);
+    assert(ifcond->child->child->child->data->type == BaseExpr);
+    basexpr = ifcond->child->child->child;
     assert(basexpr->child->data->type == Obj);
     assert(basexpr->child->child->data->type == Num);
 

@@ -53,6 +53,7 @@ enum TokenType {
     LoopLine,
     Expr,
     Term,
+    Pred,
     BaseExpr,
     Operator,
     CondOp,

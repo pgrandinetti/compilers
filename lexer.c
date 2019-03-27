@@ -67,6 +67,7 @@ const char* type2char (enum TokenType t) {
         case LoopLine: return "loopLine";
         case Expr: return "Expr";
         case Term: return "Term";
+        case Pred: return "Pred";
         case BaseExpr: return "BaseExpr";
         case Operator: return "Operator";
         case CondOp: return "CondOp";

@@ -557,14 +557,14 @@ int is_Term (struct TokenList** tok, struct ParseTree** new) {
     return status;
 }
 
-int is_Expr (struct TokenList** tok, struct ParseTree** new) {
-    struct ParseTree *term, *op, *expr;
+int is_Pred (struct TokenList** tok, struct ParseTree** new) {
+    struct ParseTree *term, *op, *pred;
     struct Token *newTok;
     enum TokenType type;
     int status;
 
     status = SUBTREE_OK;
-    newTok = new_Token((char[1]){'\0'}, Expr);
+    newTok = new_Token((char[1]){'\0'}, Pred);
     if (newTok == NULL)
         return MEMORY_ERROR;
     (*new)->data = newTok;
@@ -579,7 +579,8 @@ int is_Expr (struct TokenList** tok, struct ParseTree** new) {
     }
     (*new)->child = term;
 
-    // The remainder of Expr is optional (only if '+' | '-')
+    // The remainder of Pred is optional
+    // (only if there is '+' | '-')
     type = (*tok)->token->type;
     if (match_AritmOp_type(type) &&
         !match_TermOp_type(type)){
@@ -592,6 +593,55 @@ int is_Expr (struct TokenList** tok, struct ParseTree** new) {
             return status;
         }
         term->sibling = op;
+
+        pred = alloc_ParseTree();
+        if (pred == NULL)
+            return MEMORY_ERROR;
+        status = is_Pred(tok, &pred);
+        if (status != SUBTREE_OK){
+            free_ParseTree(pred);
+            return status;
+        }
+        op->sibling = pred;
+    }
+    return status;
+}
+
+int is_Expr (struct TokenList** tok, struct ParseTree** new) {
+    struct ParseTree *pred, *op, *expr;
+    struct Token *newTok;
+    enum TokenType type;
+    int status;
+
+    status = SUBTREE_OK;
+    newTok = new_Token((char[1]){'\0'}, Expr);
+    if (newTok == NULL)
+        return MEMORY_ERROR;
+    (*new)->data = newTok;
+
+    pred = alloc_ParseTree();
+    if (pred == NULL)
+        return MEMORY_ERROR;
+    status = is_Pred(tok, &pred);
+    if (status != SUBTREE_OK){
+        free_ParseTree(pred);
+        return status;
+    }
+    (*new)->child = pred;
+
+    // The remainder of Expr is optional
+    // (only if there is a conditional operator)
+    type = (*tok)->token->type;
+    if (match_CondOp_type(type)){
+        op = alloc_ParseTree();
+        if (op == NULL)
+            return MEMORY_ERROR;
+        status = is_Operator(tok, &op);
+        if (status != SUBTREE_OK){
+            free_ParseTree(op);
+            return status;
+        }
+        pred->sibling = op;
 
         expr = alloc_ParseTree();
         if (expr == NULL)
@@ -1256,7 +1306,7 @@ int is_IfBody (struct TokenList** tok, struct ParseTree** new) {
 }
 
 int is_IfCond (struct TokenList** tok, struct ParseTree** new) {
-    struct ParseTree *lpar, *expr1, *op, *expr2, *rpar;
+    struct ParseTree *lpar, *expr, *rpar;
     int status;
     struct Token* newTok;
     status = SUBTREE_OK;
@@ -1274,27 +1324,11 @@ int is_IfCond (struct TokenList** tok, struct ParseTree** new) {
     if (status != SUBTREE_OK)
         return status;
 
-    expr1 = alloc_ParseTree();
-    if (expr1 == NULL)
+    expr = alloc_ParseTree();
+    if (expr == NULL)
         return MEMORY_ERROR;
-    status = is_Expr(tok, &expr1);
-    lpar->sibling = expr1;
-    if (status != SUBTREE_OK)
-        return status;
-
-    op = alloc_ParseTree();
-    if (op == NULL)
-        return MEMORY_ERROR;
-    status = is_CondOp(tok, &op);
-    expr1->sibling = op;
-    if (status != SUBTREE_OK)
-        return status;
-
-    expr2 = alloc_ParseTree();
-    if (expr2 == NULL)
-        return MEMORY_ERROR;
-    status = is_Expr(tok, &expr2);
-    op->sibling = expr2;
+    status = is_Expr(tok, &expr);
+    lpar->sibling = expr;
     if (status != SUBTREE_OK)
         return status;
 
@@ -1302,7 +1336,7 @@ int is_IfCond (struct TokenList** tok, struct ParseTree** new) {
     if (rpar == NULL)
         return MEMORY_ERROR;
     status = is_Rpar(tok, &rpar);
-    expr2->sibling = rpar;
+    expr->sibling = rpar;
     if (status != SUBTREE_OK)
         return status;
 
