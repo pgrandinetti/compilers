@@ -32,10 +32,9 @@ list        :   '[' (listExpr)? ']'
 
 listElem    :   var '[' int ']'
 
-obj         :   var | num | str | bool | null | list // listElem // with listElem the grammar is LL(2) because
-                                                                //"writeOut obj", obj can start with Var in 2 cases.
+obj         :   var | num | str | bool | null | list
 
-listExpr    :   obj (',' obj)*  # limit to obj. In Python (e.g.) can be a whole expression
+listExpr    :   obj (',' obj)*
 
 #-------- ================ --------#
 
@@ -72,9 +71,9 @@ condOp      :   '&&' | '||' | '!=' | '==' | '<=' | '>=' | > | <
 
 ifLine      :   if ifCond ifBody
 
-ifCond      :   '(' expr ')'  // Initially did '(' obj condOp obj ')' but it's too restricted, then did '(' expr condOp expr ')' but that does not allow stuff like x + y == 1 && x == True
+ifCond      :   '(' expr ')'
 
-ifBody      :   (line ENDLINE)+ (optElse)?  // cannot use program, must be (line ENDLINE)+
+ifBody      :   (line ENDLINE)+ (optElse)?
 
 optElse     :   else (line ENDLINE)+
 
@@ -97,75 +96,3 @@ if          :   'if'
 while       :   'while'
 
 else        :   'else'
-
-
-#######################################################
-#######################################################
-#######################################################
-
-# Sum of the prime numbers <= N
-
-readIn N;
-i = 1;
-totSum = 0;
-while (i <= N)
-    j = 2;
-    isPrime = True;
-    maxCount = i / 2;
-    while (j <= maxCount && isPrime)
-        if (i % j == 0)
-            writeOut "@ is not prime", i;
-            isPrime = False;
-        ;
-        j = j + 1;
-    ;
-    if (isPrime)
-        totSum = totSum + i;
-    ;
-    i = i + 1;
-;
-writeOut "Total primes sum until @ is @", N, totSum;
-
-# Python equivalent
-
-N = int(input())
-total = 0
-for i in range(2, N + 1):
-    isPrime = True
-    for j in range(2, int(i/2) + 1):
-        if i % j == 0:
-          print(f'{i} is not prime')
-          isPrime = False
-        if not isPrime:
-            break
-    if isPrime:
-        total += i
-print(f'Total primes sum until {N} is {total}')
-
-#######################################################
-#######################################################
-#######################################################
-
-# Find the N-th number in Fibonacci series
-
-readIn N;
-current = 2;
-fib = [1, 1];
-while (current < N)
-    new = fib[0] + fib[1]
-    fib = [fib[1], new]
-    current = current + 1;
-;
-writeOut "The @th number in Fibonacci series is @", N, fib[1];
-
-# python equivalent
-
-N = int(input())
-fib = [1, 1]
-current = 2;
-while current < N:
-    new = fib[0] + fib[1]
-    fib[0] = fib[1]
-    fib[1] = new
-    current += 1;
-print(f'The {N}th in Fibonacci series is {fib[1]}')
