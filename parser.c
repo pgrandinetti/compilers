@@ -193,7 +193,7 @@ int is_Break (struct TokenList** tok, struct ParseTree** new) {
 
 
 int is_Continue (struct TokenList** tok, struct ParseTree** new) {
-    return _single_Token_template(tok, new, Continue, "Continue");
+    return _single_Token_template(tok, new, Continue, "continue");
 }
 
 
@@ -434,6 +434,7 @@ int match_AritmOp_type (enum TokenType type) {
             type == FloatDiv ||
             type == Percent);
 }
+
 
 int match_TermOp_type (enum TokenType type) {
     return (type == Star ||
@@ -710,6 +711,65 @@ int is_List (struct TokenList** tok, struct ParseTree** new) {
 }
 
 
+int is_ListElem(struct TokenList** tok, struct ParseTree** new) {
+    struct ParseTree *var, *lbrack, *idx, *rbrack;
+    int status;
+    struct Token *newTok;
+
+    status = SUBTREE_OK;
+    newTok = new_Token((char[1]){'\0'}, ListElem);
+    if (newTok == NULL)
+        return MEMORY_ERROR;
+    (*new)->data = newTok;
+
+    var = alloc_ParseTree();
+    if (var == NULL)
+        return MEMORY_ERROR;
+    status = is_Var(tok, &var);
+    if (status != SUBTREE_OK) {
+        free_ParseTree(var);
+        return status;
+    }
+    (*new)->child = var;
+
+    lbrack = alloc_ParseTree();
+    if (lbrack == NULL)
+        return MEMORY_ERROR;
+    status = is_Lbrack(tok, &lbrack);
+    if (status != SUBTREE_OK) {
+        free_ParseTree(lbrack);
+        return status;
+    }
+    var->sibling = lbrack;
+
+    idx = alloc_ParseTree();
+    if (idx == NULL)
+        return MEMORY_ERROR;
+    // only int and var are allowed as list index
+    if ((*tok)->token->type == Int)
+        status = is_Int(tok, &idx);
+    else
+        status = is_Var(tok, &idx);
+    if (status != SUBTREE_OK) {
+        free_ParseTree(idx);
+        return status;
+    }
+    lbrack->sibling = idx;
+
+    rbrack = alloc_ParseTree();
+    if (rbrack == NULL)
+        return MEMORY_ERROR;
+    status = is_Rbrack(tok, &rbrack);
+    if (status != SUBTREE_OK) {
+        free_ParseTree(rbrack);
+        return status;
+    }
+    idx->sibling = rbrack;
+
+    return status;
+}
+
+
 int is_ListExpr(struct TokenList** tok, struct ParseTree** new) {
     struct ParseTree *obj, *comma, *last;
     int status;
@@ -717,10 +777,8 @@ int is_ListExpr(struct TokenList** tok, struct ParseTree** new) {
 
     status = SUBTREE_OK;
     newTok = new_Token((char[1]){'\0'}, ListExpr);
-    if (newTok == NULL) {
-        free_ParseTree(obj);
+    if (newTok == NULL)
         return MEMORY_ERROR;
-    }
     (*new)->data = newTok;
 
     obj = alloc_ParseTree();
@@ -768,10 +826,8 @@ int is_Str (struct TokenList** tok, struct ParseTree** new) {
     struct Token* newTok;
 
     newTok = new_Token((char[1]){'\0'}, Str);
-    if (newTok == NULL) {
-        free_ParseTree(quotedstr);
+    if (newTok == NULL)
         return MEMORY_ERROR;
-    }
     (*new)->data = newTok;
 
     status = SUBTREE_OK;
@@ -1060,8 +1116,12 @@ int is_Obj(struct TokenList** tok, struct ParseTree** new) {
     // use LL(1) FOLLOW Sets
     struct TokenList* curr;
     curr = *tok;
-    if (curr->token->type == Var)
-        status = is_Var(tok, &subtree);
+    if (curr->token->type == Var) {
+        if (curr->next->token->type == Lbrack)
+            status = is_ListElem(tok, &subtree);
+        else
+            status = is_Var(tok, &subtree);
+    }
     else if (curr->token->type == Null)
         status = is_Null(tok, &subtree);
     else if (curr->token->type == Lbrack)

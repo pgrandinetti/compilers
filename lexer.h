@@ -66,6 +66,7 @@ enum TokenType {
     Num,
     Frac,
     List,
+    ListElem,
     ListExpr
 };
 

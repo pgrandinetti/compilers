@@ -80,6 +80,7 @@ const char* type2char (enum TokenType t) {
         case Num: return "Num";
         case Frac: return "Frac";
         case List: return "List";
+        case ListElem: return "ListElem";
         case ListExpr: return "ListExpr";
         default: return "UNK";
     }

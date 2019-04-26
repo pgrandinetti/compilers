@@ -30,9 +30,9 @@ var         :   letter (digit | letter)*
 
 list        :   '[' (listExpr)? ']'
 
-listElem    :   var '[' int ']'
+listElem    :   var '[' (int | var) ']'
 
-obj         :   var | num | str | bool | null | list
+obj         :   var | num | str | bool | null | list | listElem
 
 listExpr    :   obj (',' obj)*
 
