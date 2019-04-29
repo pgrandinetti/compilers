@@ -163,7 +163,7 @@ int is_Var (struct TokenList** tok, struct ParseTree** new) {
 
 
 int is_readIn (struct TokenList** tok, struct ParseTree** new) {
-    return _single_Token_template(tok, new, ReadIn, "readIn");
+    return _single_Token_template(tok, new, ReadIn, NULL);
 }
 
 

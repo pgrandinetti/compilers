@@ -83,7 +83,7 @@ loopBody    :   program
 
 #-------- ================ --------#
 
-readIn      :   'readIn'
+readIn      :   'readInt' | 'readFloat' | 'readBool' | 'readStr'
 
 writeOut    :   'writeOut'
 

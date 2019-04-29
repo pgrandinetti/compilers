@@ -32,12 +32,16 @@ void free_Symbol(struct Symbol *sym) {
 
 const char* type2str(int type){
     switch (type){
-        case 0: return "int";
-        case 1: return "float";
-        case 2: return "string";
-        case 4: return "bool";
-        case 3: return "null";
-        case 5: return "list";
+        case _int: return "int";
+        case _float: return "float";
+        case _string: return "string";
+        case _bool: return "bool";
+        case _null: return "null";
+        case _list: return "list";
+        case _undef: return "undef";
+        case UNDEFINED_SYMBOL: return "UNDEFINED_SYMBOL";
+        case NODE_TYPE_ERROR: return "NODE_TYPE_ERROR";
+        case LIST_TYPE_ERROR: return "LIST_TYPE_ERROR";
     }
 }
 
@@ -94,7 +98,7 @@ void print_SymbolTable(struct SymbolTable *table){
 }
 
 
-void add_symbol(struct SymbolTable **table, char *lexeme) {
+void _add_symbol(struct SymbolTable **table, char *lexeme, int type) {
     struct Symbol *new;
     struct SymbolTable *new_head;
 
@@ -103,11 +107,18 @@ void add_symbol(struct SymbolTable **table, char *lexeme) {
         printf("Memory Error While Creating Symbol: %s\n", lexeme);
         return;
     }
+    new->type = type;
     new_head = alloc_SymbolTable();
     new_head->head = new;
     new_head->next = *(table);
     *table = new_head;
     printf("Symbol Added Into Table: %s\n", lexeme);
+    printf("Type Assigned to Symbol %s: %s\n", lexeme, type2str(type));
+}
+
+
+void add_symbol(struct SymbolTable **table, char *lexeme) {
+    _add_symbol(table, lexeme, _undef);
 }
 
 
@@ -402,11 +413,39 @@ int analyze_Assign(struct ParseTree *node, struct SymbolTable **table) {
 }
 
 
+int analyze_Input(struct ParseTree *node, struct SymbolTable **table) {
+    struct ParseTree *readin, *var;
+    struct Symbol *found;
+    int type;
+
+    readin = node->child;
+    var = readin->sibling;
+    if (strcmp(readin->data->lexeme, "readInt") == 0)
+        type = _int;
+    else if (strcmp(readin->data->lexeme, "readFloat") == 0)
+        type = _float;
+    else if (strcmp(readin->data->lexeme, "readStr") == 0)
+        type = _string;
+    else if (strcmp(readin->data->lexeme, "readBool") == 0)
+        type = _bool;
+    else
+        type = _undef;
+
+    found = search_symbol(*table, var->data->lexeme);
+    if (found != NULL)
+        printf("WARNING: Identifier Will Be Overwritten: %s\n", var->data->lexeme);
+    if (type == _undef)
+        printf("WARNING: Identifier Will Have Undefined Type: %s\n", var->data->lexeme);
+    _add_symbol(table, var->data->lexeme, type);
+    return type;
+}
+
+
 int main(int argc, char* argv[]){
     struct SymbolTable *table;
     char sym;
     int found;
-    struct ParseTree *tree, *assign1, *assign2, *assign3;
+    struct ParseTree *tree, *assign1, *line2, *assign3;
     int status;
 
     if (argc < 2) {
@@ -431,8 +470,8 @@ int main(int argc, char* argv[]){
     found = analyze_Assign(assign1, &table);
     printf("Result: %d\n", found);
 
-    assign2 = tree->child->sibling->sibling->child;
-    found = analyze_Assign(assign2, &table);
+    line2 = tree->child->sibling->sibling->child;
+    found = analyze_Input(line2, &table);
     printf("Result: %d\n", found);
 
     assign3 = tree->child->sibling->sibling->sibling->sibling->child;

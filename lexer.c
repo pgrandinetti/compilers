@@ -542,7 +542,13 @@ int match_id(const char** p, struct Token* tok) {
         tok->type = Else;
     else if (strcmp(tok->lexeme, "while") == 0)
         tok->type = While;
-    else if (strcmp(tok->lexeme, "readIn") == 0)
+    else if (strcmp(tok->lexeme, "readInt") == 0)
+        tok->type = ReadIn;
+    else if (strcmp(tok->lexeme, "readFloat") == 0)
+        tok->type = ReadIn;
+    else if (strcmp(tok->lexeme, "readStr") == 0)
+        tok->type = ReadIn;
+    else if (strcmp(tok->lexeme, "readBool") == 0)
         tok->type = ReadIn;
     else if (strcmp(tok->lexeme, "writeOut") == 0)
         tok->type = WriteOut;
