@@ -57,7 +57,7 @@ int resultType_compare [6][6] = {
     /*             int       float    null    string    bool    list*/
     /* int   */ { _bool,    _bool,   _undef,  _undef,  _undef, _undef},
     /* float */ { _bool,    _bool,   _undef,  _undef,  _undef, _undef},
-   /* string */ { _undef,   _undef,  _undef,  _undef,  _undef, _undef},
+    /* string */{ _undef,   _undef,  _undef,  _undef,  _undef, _undef},
     /* bool  */ { _undef,   _undef,  _undef,  _undef,  _undef, _undef},
     /* null  */ { _undef,   _undef,  _undef,  _undef,  _undef, _undef},
     /* list  */ { _undef,   _undef,  _undef,  _undef,  _undef, _undef}
@@ -75,7 +75,7 @@ int resultType_logic [6][6] = {
     /*             int       float    null    string    bool    list */
     /* int   */ { _bool,    _bool,   _bool,   _bool,   _bool,  _undef},
     /* float */ { _bool,    _bool,   _bool,   _bool,   _bool,  _undef},
-   /* string */ { _bool,    _bool,   _bool,   _bool,   _bool,  _undef},
+    /* string */{ _bool,    _bool,   _bool,   _bool,   _bool,  _undef},
     /* bool  */ { _bool,    _bool,   _bool,   _bool,   _bool,  _undef},
     /* null  */ { _bool,    _bool,   _bool,   _bool,   _bool,  _undef},
     /* list  */ { _undef,   _undef,  _undef,  _undef,  _undef, _undef}

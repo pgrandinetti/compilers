@@ -237,13 +237,13 @@ int analyze_Term(struct ParseTree *node, struct SymbolTable **table, struct Symb
 
     child = node->child;
     type1 = analyze_BaseExpr(child, table, sym);
-    if (type1 == UNDEFINED_SYMBOL)
+    if (type1 < 0)
         return type1;
     if (child->sibling == NULL)
         return type1;
     op = child->sibling; // save the operator
     type2 = analyze_Term(op->sibling, table, sym);
-    if (type2 == UNDEFINED_SYMBOL)
+    if (type2 < 0)
         return type2;
 
     // Now compute the result type
@@ -266,13 +266,13 @@ int analyze_Pred(struct ParseTree *node, struct SymbolTable **table, struct Symb
 
     child = node->child;
     type1 = analyze_Term(child, table, sym);
-    if (type1 == UNDEFINED_SYMBOL)
+    if (type1 < 0)
         return type1;
     if (child->sibling == NULL)
         return type1;
     op = child->sibling; // save the operator
     type2 = analyze_Pred(op->sibling, table, sym);
-    if (type2 == UNDEFINED_SYMBOL)
+    if (type2 < 0)
         return type2;
 
     // Now compute the result type
@@ -292,14 +292,18 @@ int analyze_Expr(struct ParseTree *node, struct SymbolTable **table, struct Symb
 
     child = node->child;
     type1 = analyze_Pred(child, table, sym);
-    if (type1 == UNDEFINED_SYMBOL)
+    if (type1 < 0){
+        printf("Sub Expression Ill-Formed For Symbol: %s\n", (*sym)->sym);
         return type1;
+    }
     if (child->sibling == NULL)
         return type1;
     op = child->sibling; // save the operator
     type2 = analyze_Expr(op->sibling, table, sym);
-    if (type2 == UNDEFINED_SYMBOL)
+    if (type2 < 0){
+        printf("Sub Expression Ill-Formed For Symbol: %s\n", (*sym)->sym);
         return type2;
+    }
 
     // Now compute the result type
     if (is_ComparisonOp(op->data->type))
