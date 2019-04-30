@@ -186,8 +186,15 @@ int analyze_List(struct ParseTree *node, struct SymbolTable **table, struct Symb
     type = analyze_ListExpr(elems, table, sym);
     if (type < 0)
         return type;
-    printf("Setting List Type to %s: %s\n", type2str(type), (*sym)->sym);
-    (*sym)->list_type = type;
+    if (sym != NULL){
+        printf("Setting List Type to %s: ", type2str(type));
+        if (sym != NULL){
+            printf(": %s\n", (*sym)->sym);
+            (*sym)->list_type = type;
+        }
+        else
+            printf("\n");
+    }
     return _list;
 }
 
@@ -304,7 +311,11 @@ int analyze_Expr(struct ParseTree *node, struct SymbolTable **table, struct Symb
     child = node->child;
     type1 = analyze_Pred(child, table, sym);
     if (type1 < 0){
-        printf("Sub Expression Ill-Formed For Symbol: %s\n", (*sym)->sym);
+        printf("Sub Expression Ill-Formed ");
+        if (sym != NULL)
+            printf("For Symbol: %s\n", (*sym)->sym);
+        else
+            printf("\n");
         return type1;
     }
     if (child->sibling == NULL)
@@ -312,7 +323,11 @@ int analyze_Expr(struct ParseTree *node, struct SymbolTable **table, struct Symb
     op = child->sibling; // save the operator
     type2 = analyze_Expr(op->sibling, table, sym);
     if (type2 < 0){
-        printf("Sub Expression Ill-Formed For Symbol: %s\n", (*sym)->sym);
+        printf("Sub Expression Ill-Formed ");
+        if (sym != NULL)
+            printf("For Symbol: %s\n", (*sym)->sym);
+        else
+            printf("\n");
         return type2;
     }
 
@@ -441,6 +456,106 @@ int analyze_Input(struct ParseTree *node, struct SymbolTable **table) {
 }
 
 
+int analyze_Output(struct ParseTree *node, struct SymbolTable **table) {
+    int res;
+    res = analyze_Obj(node->child->sibling, table, NULL);
+    if (res > 0)
+        return NODE_OK;
+    return res;
+}
+
+
+int analyze_ifCond(struct ParseTree *node, struct SymbolTable **table) {
+    struct ParseTree *expr;
+    int res;
+
+    expr = node->child->sibling;
+    res = analyze_Expr(expr, table, NULL);
+    if (res != _bool){
+        printf("ERROR. If Condition Must Be Boolean Expression: %s\n", type2str(res));
+        return NODE_TYPE_ERROR;
+    }
+    return res;
+}
+
+
+int analyze_OptElse(struct ParseTree *node, struct SymbolTable **table) {
+    struct ParseTree *line;
+    int res;
+
+    // skip 'else' keyword
+    line = node->child->sibling;
+    while (line != NULL){
+        res = analyze_Line(line, table);
+        if (res < 0){
+            printf("ERROR In Else Body\n");
+            return res;
+        }
+        // Skip Endline
+        line = line->sibling->sibling;
+    }
+    return NODE_OK;
+}
+
+
+int analyze_ifBody(struct ParseTree *node, struct SymbolTable **table) {
+    struct ParseTree *line;
+    int res;
+
+    // we alredy know ifBody cannot be empty from parsing
+    line = node->child;
+    while (line != NULL){
+        res = analyze_Line(line, table);
+        if (res < 0){
+            printf("ERROR In IfBody\n");
+            return res;
+        }
+        // Skip Endline
+        line = line->sibling->sibling;
+        if (line->data->type == OptElse)
+            return analyze_OptElse(line, table);
+    }
+    return NODE_OK;
+}
+
+
+int analyze_IfLine(struct ParseTree *node, struct SymbolTable **table) {
+    int res_cond, res_body;
+
+    res_cond = analyze_ifCond(node->child->sibling, table);
+    if (res_cond < 0){
+        printf("If Condition Ill-Formed: %s\n", type2str(res_cond));
+        return res_cond;
+    }
+
+    res_body = analyze_ifBody(node->child->sibling->sibling, table);
+    if (res_body < 0){
+        printf("If Body Ill-Formed: %s\n", type2str(res_cond));
+        return res_body;
+    }
+
+    return NODE_OK;
+}
+
+int analyze_Line(struct ParseTree *node, struct SymbolTable **table) {
+    struct ParseTree *line;
+    int res;
+
+    line = node->child;
+    if (line->data->type == Assign)
+        res = analyze_Assign(line, table);
+    else if (line->data->type == IfLine)
+        res = analyze_IfLine(line, table);
+    else
+        res = -5;
+
+    if (res < 0)
+        return res;
+    else
+        return NODE_OK;
+}
+
+
 int main(int argc, char* argv[]){
     struct SymbolTable *table;
     char sym;
@@ -467,9 +582,10 @@ int main(int argc, char* argv[]){
     table = alloc_SymbolTable();
 
     assign1 = tree->child->child;
-    found = analyze_Assign(assign1, &table);
+    found = analyze_IfLine(assign1, &table);
     printf("Result: %d\n", found);
 
+/*
     line2 = tree->child->sibling->sibling->child;
     found = analyze_Input(line2, &table);
     printf("Result: %d\n", found);
@@ -482,6 +598,6 @@ int main(int argc, char* argv[]){
     print_SymbolTable(table);
 
     free_SymbolTable(table);
-
+*/
     free_ParseTree(tree);
 }

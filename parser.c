@@ -533,7 +533,11 @@ int is_Term (struct TokenList** tok, struct ParseTree** new) {
     (*new)->child = base;
 
     // The remainder of a Term is optional
+    if (*tok == NULL)
+        // Cannot be the end of the token list
+        return PARSING_ERROR;
     type = (*tok)->token->type;
+
     if (match_TermOp_type(type)){
         op = alloc_ParseTree();
         if (op == NULL)
@@ -582,6 +586,9 @@ int is_Pred (struct TokenList** tok, struct ParseTree** new) {
 
     // The remainder of Pred is optional
     // (only if there is '+' | '-')
+    if (*tok == NULL)
+        // Cannot be the end of the token list
+        return PARSING_ERROR;
     type = (*tok)->token->type;
     if (match_AritmOp_type(type) &&
         !match_TermOp_type(type)){
@@ -605,6 +612,7 @@ int is_Pred (struct TokenList** tok, struct ParseTree** new) {
         }
         op->sibling = pred;
     }
+
     return status;
 }
 
@@ -632,6 +640,9 @@ int is_Expr (struct TokenList** tok, struct ParseTree** new) {
 
     // The remainder of Expr is optional
     // (only if there is a conditional operator)
+    if (*tok == NULL)
+        // Cannot be the end of the token list
+        return PARSING_ERROR;
     type = (*tok)->token->type;
     if (match_CondOp_type(type)){
         op = alloc_ParseTree();
@@ -654,6 +665,7 @@ int is_Expr (struct TokenList** tok, struct ParseTree** new) {
         }
         op->sibling = expr;
     }
+
     return status;
 }
 
@@ -1116,6 +1128,10 @@ int is_Obj(struct TokenList** tok, struct ParseTree** new) {
     // use LL(1) FOLLOW Sets
     struct TokenList* curr;
     curr = *tok;
+    if (curr->token == NULL)
+        // Can never be empty at this point
+        return PARSING_ERROR;
+
     if (curr->token->type == Var) {
         if (curr->next->token->type == Lbrack)
             status = is_ListElem(tok, &subtree);
@@ -1144,7 +1160,6 @@ int is_Obj(struct TokenList** tok, struct ParseTree** new) {
         free_ParseTree(subtree);
     return status;
 }
-
 
 
 int is_Assign(struct TokenList** tok, struct ParseTree** new) {
@@ -1553,14 +1568,17 @@ int is_Program(struct TokenList** head, struct ParseTree** tree) {
     // A program is a (possibly empty) sequence of 'line' 'endline'
     while ((*head) != NULL &&
            (*head)->token->type != Endline) {
+
         // Match Line
         status = is_Line(head, &line);
+
         if (child) {
             current->child = line;
             child = !child;
         }
         else
             current->sibling = line;
+
         current = line;
         line = alloc_ParseTree();
         if (status != SUBTREE_OK) {

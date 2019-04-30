@@ -7,6 +7,8 @@
 #define _bool 4
 #define _list 5
 
+#define NODE_OK 100
+
 #define _undef -100
 #define UNDEFINED_SYMBOL -1
 #define NODE_TYPE_ERROR -2
@@ -106,3 +108,4 @@ int analyze_ListExpr(struct ParseTree *node, struct SymbolTable **table, struct 
 int analyze_List(struct ParseTree *node, struct SymbolTable **table, struct Symbol **sym);
 int analyze_ListElem(struct ParseTree *node, struct SymbolTable **table);
 int analyze_Expr(struct ParseTree *node, struct SymbolTable **table, struct Symbol **sym);
+int analyze_Line(struct ParseTree *node, struct SymbolTable **table);
