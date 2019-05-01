@@ -581,23 +581,22 @@ int main(int argc, char* argv[]){
 
     table = alloc_SymbolTable();
 
-    assign1 = tree->child->child;
-    found = analyze_IfLine(assign1, &table);
+    assign1 = tree->child;
+    found = analyze_Line(assign1, &table);
     printf("Result: %d\n", found);
 
-/*
-    line2 = tree->child->sibling->sibling->child;
-    found = analyze_Input(line2, &table);
+    line2 = tree->child->sibling->sibling;
+    found = analyze_Line(line2, &table);
     printf("Result: %d\n", found);
 
-    assign3 = tree->child->sibling->sibling->sibling->sibling->child;
-    found = analyze_Assign(assign3, &table);
+    assign3 = tree->child->sibling->sibling->sibling->sibling;
+    found = analyze_Line(assign3, &table);
     printf("Result: %d\n", found);
 
     printf("TABLE:\n");
     print_SymbolTable(table);
 
     free_SymbolTable(table);
-*/
+
     free_ParseTree(tree);
 }
