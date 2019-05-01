@@ -38,8 +38,6 @@ int is_BaseExpr(struct TokenList** head, struct ParseTree** tree);
 
 int is_Term(struct TokenList** head, struct ParseTree** tree);
 
-/* */
-
 
 struct ParseTree* alloc_ParseTree() {
     struct ParseTree* tree;
@@ -117,7 +115,13 @@ void free_ParseTree(struct ParseTree* tree) {
  *
  * It ASSUMES WS are already removed
 */
-int _single_Token_template(struct TokenList** tok, struct ParseTree** new, enum TokenType type, char* lexeme) {
+
+int _single_Token_template (struct TokenList** tok, struct ParseTree** new, enum TokenType type, char* lexeme) {
+    return __single_Token_template(tok, new, type, 1);
+}
+
+
+int __single_Token_template (struct TokenList** tok, struct ParseTree** new, enum TokenType type, char* lexeme, int hasEndline) {
     if (*tok == NULL)
         return PARSING_ERROR;
     struct TokenList* current = *tok;
@@ -138,12 +142,16 @@ int _single_Token_template(struct TokenList** tok, struct ParseTree** new, enum 
     (*new)->child = NULL;
     (*new)->sibling = NULL;
     *tok = current->next;
+    if (hasEndline && *tok==NULL){
+        printf("Did you forget a Endline Token (semicolon)?\n");
+        return PARSING_ERROR;
+    }
     return SUBTREE_OK;
 }
 
 
 int is_Endline (struct TokenList** tok, struct ParseTree** new) {
-    return _single_Token_template(tok, new, Endline, NULL);
+    return __single_Token_template(tok, new, Endline, NULL, 0);
 }
 
 
@@ -318,6 +326,9 @@ int is_CharSeq (struct TokenList** tok, struct ParseTree** new) {
 
 
 int is_QuotedStr (struct TokenList** tok, struct ParseTree** new) {
+    if (*tok == NULL)
+        return PARSING_ERROR;
+
     struct ParseTree *charseq, *comma, *obj, *last;
     int status;
     struct Token *newTok;
@@ -339,8 +350,7 @@ int is_QuotedStr (struct TokenList** tok, struct ParseTree** new) {
     }
     (*new)->child = charseq;
     last = charseq;
-
-    while ( (*tok)->token->type == Comma) {
+    while (*tok != NULL && (*tok)->token->type == Comma) {
         comma = alloc_ParseTree();
         if (comma == NULL)
             return MEMORY_ERROR;
@@ -363,7 +373,8 @@ int is_QuotedStr (struct TokenList** tok, struct ParseTree** new) {
         last->sibling = obj;
         last = obj;
     }
-
+    if (*tok == NULL)
+        return PARSING_ERROR;
     return status;
 }
 
@@ -451,6 +462,9 @@ int match_operator_type (enum TokenType type) {
 
 
 int is_BaseExpr (struct TokenList** tok, struct ParseTree** new) {
+    if (*tok == NULL)
+        return PARSING_ERROR;
+
     int status;
     struct ParseTree *lpar, *rpar, *subexpr, *obj;
     struct Token *newTok;
@@ -510,6 +524,9 @@ int is_BaseExpr (struct TokenList** tok, struct ParseTree** new) {
 }
 
 int is_Term (struct TokenList** tok, struct ParseTree** new) {
+    if (*tok == NULL)
+        return PARSING_ERROR;
+
     int status;
     enum TokenType type;
     struct ParseTree *base, *op, *term;
@@ -563,6 +580,9 @@ int is_Term (struct TokenList** tok, struct ParseTree** new) {
 }
 
 int is_Pred (struct TokenList** tok, struct ParseTree** new) {
+    if (*tok == NULL)
+        return PARSING_ERROR;
+
     struct ParseTree *term, *op, *pred;
     struct Token *newTok;
     enum TokenType type;
@@ -617,6 +637,9 @@ int is_Pred (struct TokenList** tok, struct ParseTree** new) {
 }
 
 int is_Expr (struct TokenList** tok, struct ParseTree** new) {
+    if (*tok == NULL)
+        return PARSING_ERROR;
+
     struct ParseTree *pred, *op, *expr;
     struct Token *newTok;
     enum TokenType type;
@@ -665,7 +688,6 @@ int is_Expr (struct TokenList** tok, struct ParseTree** new) {
         }
         op->sibling = expr;
     }
-
     return status;
 }
 
@@ -833,6 +855,9 @@ int is_ListExpr(struct TokenList** tok, struct ParseTree** new) {
 
 
 int is_Str (struct TokenList** tok, struct ParseTree** new) {
+    if (*tok == NULL)
+        return PARSING_ERROR;
+
     struct ParseTree *quotedstr, *plus, *last;
     int status;
     struct Token* newTok;
@@ -855,7 +880,7 @@ int is_Str (struct TokenList** tok, struct ParseTree** new) {
     (*new)->child = quotedstr;
     last = quotedstr;
 
-    while( (*tok)->token->type == Plus) {
+    while(*tok != NULL && (*tok)->token->type == Plus) {
         plus = alloc_ParseTree();
         if (plus == NULL)
             return MEMORY_ERROR;
@@ -866,7 +891,8 @@ int is_Str (struct TokenList** tok, struct ParseTree** new) {
         }
         last->sibling = plus;
         last = plus;
-        if ((*tok)->token->type != QuotedStr)
+
+        if (*tok == NULL || (*tok)->token->type != QuotedStr)
             return PARSING_ERROR;
         quotedstr = alloc_ParseTree();
         if (quotedstr == NULL)
@@ -879,6 +905,8 @@ int is_Str (struct TokenList** tok, struct ParseTree** new) {
         last->sibling = quotedstr;
         last = quotedstr;
     }
+    if (*tok == NULL)
+        return PARSING_ERROR;
     return status;
 }
 
@@ -982,6 +1010,9 @@ int is_Exp (struct TokenList** tok, struct ParseTree** new) {
 
 
 int is_Float(struct TokenList** tok, struct ParseTree** new) {
+    if (*tok == NULL)
+        return PARSING_ERROR;
+
     struct ParseTree *integer, *frac, *pow, *last;
     int status;
     struct Token* newTok;
@@ -1004,6 +1035,8 @@ int is_Float(struct TokenList** tok, struct ParseTree** new) {
         }
         (*new)->child = frac;
         last = frac;
+        if (*tok == NULL)
+            return PARSING_ERROR;
         if ((*tok)->token->type == Pow) {
             pow = alloc_ParseTree();
             if (pow == NULL)
@@ -1028,6 +1061,8 @@ int is_Float(struct TokenList** tok, struct ParseTree** new) {
         }
         (*new)->child = integer;
         last = integer;
+        if (*tok == NULL)
+            return PARSING_ERROR;
         if ((*tok)->token->type == Dot) {
             frac = alloc_ParseTree();
             if (frac == NULL)
@@ -1040,6 +1075,8 @@ int is_Float(struct TokenList** tok, struct ParseTree** new) {
             last->sibling = frac;
             last = frac;
         }
+        if (*tok == NULL)
+            return PARSING_ERROR;
         if ((*tok)->token->type == Pow) {
             pow = alloc_ParseTree();
             if (pow == NULL)
@@ -1055,7 +1092,6 @@ int is_Float(struct TokenList** tok, struct ParseTree** new) {
     }
     else
         status = PARSING_ERROR;
-
     return status;
 }
 
@@ -1112,6 +1148,8 @@ int is_Num(struct TokenList** tok, struct ParseTree** new) {
 
 
 int is_Obj(struct TokenList** tok, struct ParseTree** new) {
+    if (*tok == NULL)
+        return PARSING_ERROR;
     struct Token* newTok;
     struct ParseTree* subtree;
     int status;
@@ -1133,7 +1171,7 @@ int is_Obj(struct TokenList** tok, struct ParseTree** new) {
         return PARSING_ERROR;
 
     if (curr->token->type == Var) {
-        if (curr->next->token->type == Lbrack)
+        if (curr->next != NULL && curr->next->token->type == Lbrack)
             status = is_ListElem(tok, &subtree);
         else
             status = is_Var(tok, &subtree);
