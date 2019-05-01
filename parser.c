@@ -982,6 +982,8 @@ int is_Exp (struct TokenList** tok, struct ParseTree** new) {
     }
     if (has_sign)
         (*new)->child->sibling = sign;
+    else
+        free_ParseTree(sign);
 
     integer = alloc_ParseTree();
     if (integer == NULL)
