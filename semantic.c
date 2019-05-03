@@ -6,6 +6,14 @@
 #include "semantic.h"
 
 
+int analyze_ListExpr(struct ParseTree *node, struct SymbolTable **table, struct Symbol **sym);
+int analyze_List(struct ParseTree *node, struct SymbolTable **table, struct Symbol **sym);
+int analyze_ListElem(struct ParseTree *node, struct SymbolTable **table);
+int analyze_Expr(struct ParseTree *node, struct SymbolTable **table, struct Symbol **sym);
+int analyze_Line(struct ParseTree *node, struct SymbolTable **table, struct ContextStack **stack);
+int analyze_ifCond(struct ParseTree *node, struct SymbolTable **table);
+
+
 struct Symbol* new_Sym(char *sym) {
     struct Symbol *new;
 
@@ -42,6 +50,11 @@ const char* type2str(int type){
         case UNDEFINED_SYMBOL: return "UNDEFINED_SYMBOL";
         case NODE_TYPE_ERROR: return "NODE_TYPE_ERROR";
         case LIST_TYPE_ERROR: return "LIST_TYPE_ERROR";
+        case NODE_OK: return "NODE_OK";
+        case SEMANTIC_ERROR: return "SEMANTIC_ERROR";
+        case BREAK_OUT_OF_CONTEXT: return "BREAK_OUT_OF_CONTEXT";
+        case CONTINUE_OUT_OF_CONTEXT: return "CONTINUE_OUT_OF_CONTEXT";
+        default: return "UNK";
     }
 }
 
@@ -91,10 +104,12 @@ void print_SymbolTable(struct SymbolTable *table){
     struct SymbolTable *current;
 
     current = table;
+    printf("---Sym Table---\n");
     while (current != NULL && current->head != NULL) {
         print_Symbol(current->head);
         current = current->next;
     }
+    printf("---End Table---\n");
 }
 
 
@@ -110,7 +125,7 @@ void _add_symbol(struct SymbolTable **table, char *lexeme, int type) {
     new->type = type;
     new_head = alloc_SymbolTable();
     new_head->head = new;
-    new_head->next = *(table);
+    new_head->next = *table;
     *table = new_head;
     printf("Symbol Added Into Table: %s\n", lexeme);
     printf("Type Assigned to Symbol %s: %s\n", lexeme, type2str(type));
@@ -119,6 +134,58 @@ void _add_symbol(struct SymbolTable **table, char *lexeme, int type) {
 
 void add_symbol(struct SymbolTable **table, char *lexeme) {
     _add_symbol(table, lexeme, _undef);
+}
+
+
+struct ContextStack* alloc_Context() {
+    return NULL;
+}
+
+
+void free_Context(struct ContextStack *stack){
+    struct ContextStack *top;
+
+    while((top=stack) != NULL){
+        stack = stack->next;
+        free(top);
+    }
+}
+
+
+void push_Context(struct ContextStack **stack, enum TokenType type) {
+    struct ContextStack *top;
+
+    top = malloc(sizeof(struct ContextStack));
+    if (top == NULL)
+        return;
+    top->top = type;
+    top->next = *stack;
+    *stack = top;
+}
+
+
+enum TokenType pop_Context(struct ContextStack **stack) {
+    struct ContextStack *top;
+    enum TokenType res;
+
+    if (*stack == NULL)
+        return UNK;
+
+    top = *stack;
+    res = top->top;
+    *stack = (*stack)->next;
+    free(top);
+    return res;
+}
+
+
+void print_Context (struct ContextStack *stack) {
+    printf("---Context---\n");
+    while (stack != NULL){
+        printf("<%s>\n", type2char(stack->top));
+        stack = stack->next;
+    }
+    printf("---End Ctx---\n");
 }
 
 
@@ -134,7 +201,6 @@ int assign_type(struct SymbolTable **table, char *lexeme, int type) {
         }
         tab = tab->next;
     }
-    printf("here, type is %d\n", type);
     printf("ERROR: Tried to assign type to unkown identifier: %s.\n", lexeme);
     return UNDEFINED_SYMBOL;
 }
@@ -163,6 +229,51 @@ int is_AritmOp (enum TokenType type) {
             type == Div ||
             type == FloatDiv ||
             type == Percent);
+}
+
+/* 
+   ---------------
+   ---------------
+*/
+
+int _analyze_Program(struct ParseTree *node, struct SymbolTable **table, struct ContextStack **stack) {
+    struct ParseTree *line;
+    int status, count;
+    int res;
+
+    line = node->child;
+    status = _undef;
+    count = 0;
+    res = NODE_OK;
+    while (line != NULL){
+        status = analyze_Line(line, table, stack);
+        printf("-----Line %d-----\n", ++count);
+        if (status < 0){
+            printf("ERROR: %s\n", type2str(status));
+            res = SEMANTIC_ERROR;
+        }
+        else
+            printf("OK. Type is %s\n", type2str(status));
+        printf("-----------------\n");
+
+        // Skip Endline
+        line = line->sibling->sibling;
+        printf("here\n");fflush(stdout);
+    }
+    return res;
+}
+
+void analyze_Program(struct ParseTree *node) {
+    struct SymbolTable *table;
+    struct ContextStack *stack;
+
+    table = alloc_SymbolTable();
+    stack = alloc_Context();
+
+    _analyze_Program(node, &table, &stack);
+
+    free_SymbolTable(table);
+    free_Context(stack);
 }
 
 
@@ -395,7 +506,10 @@ int analyze_ListExpr(struct ParseTree *node, struct SymbolTable **table, struct 
         }
         else
             if (type != curr_type)
-               return LIST_TYPE_ERROR;
+                if (type == _int && curr_type == _float)
+                    type = _float;
+                else if (type == _float && curr_type != _int)
+                    return LIST_TYPE_ERROR;
         curr_obj = curr_obj->sibling;
     }
     return type;
@@ -479,14 +593,14 @@ int analyze_ifCond(struct ParseTree *node, struct SymbolTable **table) {
 }
 
 
-int analyze_OptElse(struct ParseTree *node, struct SymbolTable **table) {
+int analyze_OptElse(struct ParseTree *node, struct SymbolTable **table, struct ContextStack **stack) {
     struct ParseTree *line;
     int res;
 
     // skip 'else' keyword
     line = node->child->sibling;
     while (line != NULL){
-        res = analyze_Line(line, table);
+        res = analyze_Line(line, table, stack);
         if (res < 0){
             printf("ERROR In Else Body\n");
             return res;
@@ -498,56 +612,112 @@ int analyze_OptElse(struct ParseTree *node, struct SymbolTable **table) {
 }
 
 
-int analyze_ifBody(struct ParseTree *node, struct SymbolTable **table) {
+int analyze_ifBody(struct ParseTree *node, struct SymbolTable **table, struct ContextStack **stack) {
     struct ParseTree *line;
     int res;
 
     // we alredy know ifBody cannot be empty from parsing
     line = node->child;
     while (line != NULL){
-        res = analyze_Line(line, table);
+        res = analyze_Line(line, table, stack);
         if (res < 0){
             printf("ERROR In IfBody\n");
             return res;
         }
         // Skip Endline
         line = line->sibling->sibling;
+        if (line == NULL)
+            break;
         if (line->data->type == OptElse)
-            return analyze_OptElse(line, table);
+            return analyze_OptElse(line, table, stack);
     }
     return NODE_OK;
 }
 
 
-int analyze_IfLine(struct ParseTree *node, struct SymbolTable **table) {
+int analyze_IfLine(struct ParseTree *node, struct SymbolTable **table, struct ContextStack **stack) {
     int res_cond, res_body;
 
+    push_Context(stack, IfLine);
+
     res_cond = analyze_ifCond(node->child->sibling, table);
+    res_body = analyze_ifBody(node->child->sibling->sibling, table, stack);
+
+    pop_Context(stack);
+
     if (res_cond < 0){
         printf("If Condition Ill-Formed: %s\n", type2str(res_cond));
         return res_cond;
     }
-
-    res_body = analyze_ifBody(node->child->sibling->sibling, table);
     if (res_body < 0){
         printf("If Body Ill-Formed: %s\n", type2str(res_cond));
         return res_body;
     }
-
     return NODE_OK;
 }
 
-int analyze_Line(struct ParseTree *node, struct SymbolTable **table) {
+
+int analyze_BreakLine(struct ParseTree *node, struct SymbolTable **table, struct ContextStack **stack) {
+    // 'break' allowed only in conditionals and loops
+    if ((*stack)->top != IfLine && (*stack)->top != LoopLine)
+        return BREAK_OUT_OF_CONTEXT;
+    return NODE_OK;
+}
+
+
+int analyze_ContinueLine(struct ParseTree *node, struct SymbolTable **table, struct ContextStack **stack) {
+    // 'continue' allowed only in conditionals and loops
+    if ((*stack)->top != IfLine && (*stack)->top != LoopLine)
+        return CONTINUE_OUT_OF_CONTEXT;
+    return NODE_OK;
+}
+
+
+int analyze_LoopLine(struct ParseTree *node, struct SymbolTable **table, struct ContextStack **stack) {
+    int res_cond, res_body;
+    printf("here\n");fflush(stdout);
+    push_Context(stack, LoopLine);
+
+    res_cond = analyze_ifCond(node->child->sibling, table);
+    res_body = _analyze_Program(node->child->sibling->sibling, table, stack);
+
+    pop_Context(stack);
+
+    if (res_cond < 0){
+        printf("Loop Condition Ill-Formed: %s\n", type2str(res_cond));
+        return res_cond;
+    }
+    if (res_body < 0){
+        printf("Loop Body Ill-Formed: %s\n", type2str(res_cond));
+        return res_body;
+    }
+    return NODE_OK;
+}
+
+
+int analyze_Line(struct ParseTree *node, struct SymbolTable **table, struct ContextStack **stack) {
     struct ParseTree *line;
     int res;
 
     line = node->child;
+    printf("%s\n", type2char(line->data->type));fflush(stdout);
+    print_Context(*stack); fflush(stdout);
     if (line->data->type == Assign)
         res = analyze_Assign(line, table);
     else if (line->data->type == IfLine)
-        res = analyze_IfLine(line, table);
+        res = analyze_IfLine(line, table, stack);
+    else if (line->data->type == Break)
+        res = analyze_BreakLine(line, table, stack);
+    else if (line->data->type == Continue)
+        res = analyze_BreakLine(line, table, stack);
+    else if (line->data->type == Input)
+        res = analyze_Input(line, table);
+    else if (line->data->type == Output)
+        res = analyze_Output(line, table);
+    else if (line->data->type == LoopLine)
+        res = analyze_LoopLine(line, table, stack);
     else
-        res = -5;
+        res = SEMANTIC_ERROR;
 
     if (res < 0)
         return res;
@@ -558,8 +728,8 @@ int analyze_Line(struct ParseTree *node, struct SymbolTable **table) {
 
 int main(int argc, char* argv[]){
     struct SymbolTable *table;
+    struct ContextStack *stack;
     char sym;
-    int found;
     struct ParseTree *tree, *assign1, *line2, *assign3;
     int status;
 
@@ -575,28 +745,29 @@ int main(int argc, char* argv[]){
 
     status = build_ParseTree_FromFile(fileName, &tree);
 
-    if (status != SUBTREE_OK)
-        printf("PARSING ERROR\n");
     print_ParseTree(tree);
 
-    table = alloc_SymbolTable();
+    if (status != SUBTREE_OK){
+        printf("PARSING ERROR\n");
+        free_ParseTree(tree);
+        return -1;
+    }
 
-    assign1 = tree->child;
-    found = analyze_Line(assign1, &table);
-    printf("Result: %d\n", found);
+    analyze_Program(tree);
+/*
+    stack = alloc_Context();
+    push_Context(&stack, Program);
+    print_Context(stack);
+    push_Context(&stack, IfLine);
+    print_Context(stack);
+    pop_Context(&stack);
+    print_Context(stack);
+    pop_Context(&stack);
+    print_Context(stack);
 
-    line2 = tree->child->sibling->sibling;
-    found = analyze_Line(line2, &table);
-    printf("Result: %d\n", found);
-
-    assign3 = tree->child->sibling->sibling->sibling->sibling;
-    found = analyze_Line(assign3, &table);
-    printf("Result: %d\n", found);
-
-    printf("TABLE:\n");
-    print_SymbolTable(table);
-
-    free_SymbolTable(table);
+    free_Context(stack);
+*/
 
     free_ParseTree(tree);
+    return 0;
 }

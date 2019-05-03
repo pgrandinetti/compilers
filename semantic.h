@@ -13,6 +13,9 @@
 #define UNDEFINED_SYMBOL -1
 #define NODE_TYPE_ERROR -2
 #define LIST_TYPE_ERROR -3
+#define SEMANTIC_ERROR -4
+#define BREAK_OUT_OF_CONTEXT -5
+#define CONTINUE_OUT_OF_CONTEXT -6
 
 
 int resultType_aritm [6][6] = {
@@ -98,14 +101,22 @@ struct SymbolTable {
 };
 
 
+struct ContextStack {
+    // will contain the context given by TokenType
+    // e.g., Program, LoopLine, etc.
+    enum TokenType top;
+    struct ContextStack *next;
+};
+
+
 struct Symbol* new_Sym(char *sym);
-
 struct SymbolTable* alloc_SymbolTable();
-
 struct Symbol* search_symbol(struct SymbolTable *table, char *lexeme);
 
-int analyze_ListExpr(struct ParseTree *node, struct SymbolTable **table, struct Symbol **sym);
-int analyze_List(struct ParseTree *node, struct SymbolTable **table, struct Symbol **sym);
-int analyze_ListElem(struct ParseTree *node, struct SymbolTable **table);
-int analyze_Expr(struct ParseTree *node, struct SymbolTable **table, struct Symbol **sym);
-int analyze_Line(struct ParseTree *node, struct SymbolTable **table);
+void push_Context(struct ContextStack **stack, enum TokenType type);
+enum TokenType pop_Context(struct ContextStack **stack);
+void free_Context(struct ContextStack *stack);
+struct ContextStack* alloc_Context();
+void print_Context(struct ContextStack *stack);
+
+void analyze_Program(struct ParseTree *node);

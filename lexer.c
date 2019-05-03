@@ -63,8 +63,8 @@ const char* type2char (enum TokenType t) {
         case Assign: return "Assign";
         case Input: return "Input";
         case Output: return "Output";
-        case IfLine: return "ifLine";
-        case LoopLine: return "loopLine";
+        case IfLine: return "IfLine";
+        case LoopLine: return "LoopLine";
         case Expr: return "Expr";
         case Term: return "Term";
         case Pred: return "Pred";
