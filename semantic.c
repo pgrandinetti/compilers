@@ -189,6 +189,18 @@ void print_Context (struct ContextStack *stack) {
 }
 
 
+int len_Context(struct ContextStack *stack){
+    int count;
+
+    count = 0;
+    while ( stack != NULL){
+        ++count;
+        stack = stack->next;
+    }
+    return count;
+}
+
+
 int assign_type(struct SymbolTable **table, char *lexeme, int type) {
     struct SymbolTable *tab;
 
@@ -246,8 +258,9 @@ int _analyze_Program(struct ParseTree *node, struct SymbolTable **table, struct 
     count = 0;
     res = NODE_OK;
     while (line != NULL){
-        status = analyze_Line(line, table, stack);
         printf("-----Line %d-----\n", ++count);
+        status = analyze_Line(line, table, stack);
+        printf("\n");
         if (status < 0){
             printf("ERROR: %s\n", type2str(status));
             res = SEMANTIC_ERROR;
@@ -255,10 +268,8 @@ int _analyze_Program(struct ParseTree *node, struct SymbolTable **table, struct 
         else
             printf("OK. Type is %s\n", type2str(status));
         printf("-----------------\n");
-
         // Skip Endline
         line = line->sibling->sibling;
-        printf("here\n");fflush(stdout);
     }
     return res;
 }
@@ -675,7 +686,7 @@ int analyze_ContinueLine(struct ParseTree *node, struct SymbolTable **table, str
 
 int analyze_LoopLine(struct ParseTree *node, struct SymbolTable **table, struct ContextStack **stack) {
     int res_cond, res_body;
-    printf("here\n");fflush(stdout);
+
     push_Context(stack, LoopLine);
 
     res_cond = analyze_ifCond(node->child->sibling, table);
@@ -700,8 +711,6 @@ int analyze_Line(struct ParseTree *node, struct SymbolTable **table, struct Cont
     int res;
 
     line = node->child;
-    printf("%s\n", type2char(line->data->type));fflush(stdout);
-    print_Context(*stack); fflush(stdout);
     if (line->data->type == Assign)
         res = analyze_Assign(line, table);
     else if (line->data->type == IfLine)
@@ -745,7 +754,7 @@ int main(int argc, char* argv[]){
 
     status = build_ParseTree_FromFile(fileName, &tree);
 
-    print_ParseTree(tree);
+    //print_ParseTree(tree);
 
     if (status != SUBTREE_OK){
         printf("PARSING ERROR\n");
@@ -754,19 +763,6 @@ int main(int argc, char* argv[]){
     }
 
     analyze_Program(tree);
-/*
-    stack = alloc_Context();
-    push_Context(&stack, Program);
-    print_Context(stack);
-    push_Context(&stack, IfLine);
-    print_Context(stack);
-    pop_Context(&stack);
-    print_Context(stack);
-    pop_Context(&stack);
-    print_Context(stack);
-
-    free_Context(stack);
-*/
 
     free_ParseTree(tree);
     return 0;
