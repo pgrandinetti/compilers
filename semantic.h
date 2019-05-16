@@ -119,4 +119,4 @@ void free_Context(struct ContextStack *stack);
 struct ContextStack* alloc_Context();
 void print_Context(struct ContextStack *stack);
 
-void analyze_Program(struct ParseTree *node);
+int analyze_Program(struct ParseTree *node);

@@ -274,17 +274,20 @@ int _analyze_Program(struct ParseTree *node, struct SymbolTable **table, struct 
     return res;
 }
 
-void analyze_Program(struct ParseTree *node) {
+int analyze_Program(struct ParseTree *node) {
     struct SymbolTable *table;
     struct ContextStack *stack;
+    int res;
 
     table = alloc_SymbolTable();
     stack = alloc_Context();
 
-    _analyze_Program(node, &table, &stack);
+    res = _analyze_Program(node, &table, &stack);
 
     free_SymbolTable(table);
     free_Context(stack);
+
+    return res;
 }
 
 
@@ -325,6 +328,9 @@ int analyze_Num(struct ParseTree *tree) {
     struct ParseTree *num;
 
     num = tree->child; // the Float node
+    if (num->data->type != Float)
+        // it's the sign
+        num = num->sibling;
     if (num->child->data->type != Int)
         return _float;
     if (num->child->sibling != NULL)
@@ -538,17 +544,17 @@ int analyze_Assign(struct ParseTree *node, struct SymbolTable **table) {
     found_var = analyze_Var(var, table);
     if (found_var == UNDEFINED_SYMBOL)
         add_symbol(table, var->data->lexeme);
-    else {
-        printf("WARNING: Identifier is already being used: %s\n", var->data->lexeme);
-        printf("Type for Identifier will be overwritten: %s\n", var->data->lexeme);
-    }
-    sym = search_symbol(*table, var->data->lexeme);
 
+    sym = search_symbol(*table, var->data->lexeme);
     valid_expr = analyze_Expr(expr, table, &sym);
     if (valid_expr < 0)
         printf("Expression is not valid\n");
-    else
+    else{
+        if (sym->type != _undef && valid_expr != sym->type)
+            printf("WARNING: Type for Identifier will be overwritten: %s. It was %s.\n",
+                   var->data->lexeme, type2str(sym->type));
         assign_type(table, var->data->lexeme, valid_expr);
+    }
     return valid_expr;
 }
 
@@ -740,7 +746,7 @@ int main(int argc, char* argv[]){
     struct ContextStack *stack;
     char sym;
     struct ParseTree *tree, *assign1, *line2, *assign3;
-    int status;
+    int parser, semantic;
 
     if (argc < 2) {
         printf("Expecting exactly 1 argument: file path.\n");
@@ -752,17 +758,23 @@ int main(int argc, char* argv[]){
     if (tree == NULL)
         return MEMORY_ERROR;
 
-    status = build_ParseTree_FromFile(fileName, &tree);
+    parser = build_ParseTree_FromFile(fileName, &tree);
 
-    //print_ParseTree(tree);
+    print_ParseTree(tree);
 
-    if (status != SUBTREE_OK){
+    if (parser != SUBTREE_OK){
         printf("PARSING ERROR\n");
         free_ParseTree(tree);
         return -1;
     }
 
-    analyze_Program(tree);
+    semantic = analyze_Program(tree);
+
+    if (semantic < 0){
+        printf("SEMANTIC ERROR\n");
+        free_ParseTree(tree);
+        return -1;
+    }
 
     free_ParseTree(tree);
     return 0;
