@@ -724,7 +724,7 @@ int analyze_Line(struct ParseTree *node, struct SymbolTable **table, struct Cont
     else if (line->data->type == Break)
         res = analyze_BreakLine(line, table, stack);
     else if (line->data->type == Continue)
-        res = analyze_BreakLine(line, table, stack);
+        res = analyze_ContinueLine(line, table, stack);
     else if (line->data->type == Input)
         res = analyze_Input(line, table);
     else if (line->data->type == Output)
