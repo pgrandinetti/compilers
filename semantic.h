@@ -16,6 +16,7 @@
 #define SEMANTIC_ERROR -4
 #define BREAK_OUT_OF_CONTEXT -5
 #define CONTINUE_OUT_OF_CONTEXT -6
+#define OVERWRITE_TYPE_ERROR -7
 
 
 int resultType_aritm [6][6] = {
@@ -83,7 +84,7 @@ int resultType_logic [6][6] = {
     /* string */{ _bool,    _bool,   _bool,   _bool,   _bool,  _undef},
     /* bool  */ { _bool,    _bool,   _bool,   _bool,   _bool,  _undef},
     /* null  */ { _bool,    _bool,   _bool,   _bool,   _bool,  _undef},
-    /* list  */ { _undef,   _undef,  _undef,  _undef,  _undef, _undef}
+    /* list  */ { _undef,   _undef,  _undef,  _undef,  _undef, _bool}
 };
 
 

@@ -54,6 +54,7 @@ const char* type2str(int type){
         case SEMANTIC_ERROR: return "SEMANTIC_ERROR";
         case BREAK_OUT_OF_CONTEXT: return "BREAK_OUT_OF_CONTEXT";
         case CONTINUE_OUT_OF_CONTEXT: return "CONTINUE_OUT_OF_CONTEXT";
+        case OVERWRITE_TYPE_ERROR: return "OVERWRITE_TYPE_ERROR";
         default: return "UNK";
     }
 }
@@ -312,13 +313,8 @@ int analyze_List(struct ParseTree *node, struct SymbolTable **table, struct Symb
     if (type < 0)
         return type;
     if (sym != NULL){
-        printf("Setting List Type to %s: ", type2str(type));
-        if (sym != NULL){
-            printf(": %s\n", (*sym)->sym);
-            (*sym)->list_type = type;
-        }
-        else
-            printf("\n");
+        printf("Setting List Type to %s: %s\n", type2str(type), (*sym)->sym);
+        (*sym)->list_type = type;
     }
     return _list;
 }
@@ -458,7 +454,6 @@ int analyze_Expr(struct ParseTree *node, struct SymbolTable **table, struct Symb
             printf("\n");
         return type2;
     }
-
     // Now compute the result type
     if (is_ComparisonOp(op->data->type))
         result = resultType_compare[type1][type2];
@@ -517,15 +512,17 @@ int analyze_ListExpr(struct ParseTree *node, struct SymbolTable **table, struct 
         curr_type = analyze_Obj(curr_obj, table, sym);
         if (curr_type == UNDEFINED_SYMBOL || curr_type == _undef)
             return curr_type;
+        //printf("Current type is %s\n", type2str(curr_type));
         if (first) {
             type = curr_type;
             first = 0;
         }
         else
             if (type != curr_type)
-                if (type == _int && curr_type == _float)
+                if ((type == _int && curr_type == _float) ||
+                    (type == _float && curr_type == _int))
                     type = _float;
-                else if (type == _float && curr_type != _int)
+                else
                     return LIST_TYPE_ERROR;
         curr_obj = curr_obj->sibling;
     }
@@ -547,14 +544,16 @@ int analyze_Assign(struct ParseTree *node, struct SymbolTable **table) {
 
     sym = search_symbol(*table, var->data->lexeme);
     valid_expr = analyze_Expr(expr, table, &sym);
-    if (valid_expr < 0)
+    if (valid_expr < 0){
         printf("Expression is not valid\n");
-    else{
-        if (sym->type != _undef && valid_expr != sym->type)
-            printf("WARNING: Type for Identifier will be overwritten: %s. It was %s.\n",
-                   var->data->lexeme, type2str(sym->type));
-        assign_type(table, var->data->lexeme, valid_expr);
+        return valid_expr;
     }
+    if (sym->type != _undef && valid_expr != sym->type){
+        printf("ERROR: Cannot Modify Type for Identifier %s to %s. It was %s.\n",
+               var->data->lexeme, type2str(valid_expr), type2str(sym->type));
+        return OVERWRITE_TYPE_ERROR;
+    }
+    assign_type(table, var->data->lexeme, valid_expr);
     return valid_expr;
 }
 
@@ -578,8 +577,11 @@ int analyze_Input(struct ParseTree *node, struct SymbolTable **table) {
         type = _undef;
 
     found = search_symbol(*table, var->data->lexeme);
-    if (found != NULL)
-        printf("WARNING: Identifier Will Be Overwritten: %s\n", var->data->lexeme);
+    if (found != NULL && type != found->type){
+        printf("ERROR: Cannot Modify Type for Identifier %s to %s. It was %s.\n",
+               var->data->lexeme, type2str(type), type2str(found->type));
+        return OVERWRITE_TYPE_ERROR;
+    }
     if (type == _undef)
         printf("WARNING: Identifier Will Have Undefined Type: %s\n", var->data->lexeme);
     _add_symbol(table, var->data->lexeme, type);
