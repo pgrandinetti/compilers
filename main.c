@@ -1,20 +1,56 @@
 #include <time.h>
 #include <stdio.h>
 #include <sys/stat.h>
+#include <stdlib.h>
 
-#include "parser.h"
+#include "cgen.h"
 
 // gcc main.c parser.c lexer.c
 
 
 int main_parser(int argc, char* argv[]);
 int main_lexer(int argc, char* argv[]);
+int main_cgen(int argc, char* argv[]);
 
 
 int main(int argc, char* argv[]) {
-    main_parser(argc, argv);
+    main_cgen(argc, argv);
 }
 
+
+int main_cgen(int argc, char* argv[]) {
+    struct ParseTree *tree, *tmp;
+    char* code;
+    int status;
+
+    if (argc < 2) {
+        printf("Expecting exactly 1 argument: file path.\n");
+        return 1;
+    }
+    char const* const fileName = argv[1];
+
+    tree = alloc_ParseTree();
+    if (tree == NULL)
+        return MEMORY_ERROR;
+
+    status = build_ParseTree_FromFile(fileName, &tree);
+
+    if (status != SUBTREE_OK)
+        printf("PARSING ERROR\n");
+    print_ParseTree(tree);
+
+    tmp = tree->child->child->child;
+    tmp = tmp->sibling->sibling;
+    tmp = tmp->child->child->child->child->child; // Num
+
+    code = cgen_Num(tmp);
+    printf("Generated code is: |%s|\n", code);
+
+    free(code);
+    free_ParseTree(tree);
+    return status;
+
+}
 
 int main_parser(int argc, char* argv[]) {
     struct ParseTree *tree;
