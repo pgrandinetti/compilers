@@ -154,7 +154,7 @@ char* cgen_Float (struct ParseTree* tree) {
 
 
 char* cgen_Num (struct ParseTree* tree) {
-    if (! tree|| tree->data->type != Num)
+    if (! tree || tree->data->type != Num)
         return NULL;
 
     char *result, *aFloat;
@@ -181,6 +181,211 @@ char* cgen_Num (struct ParseTree* tree) {
     memcpy(result + 1, aFloat, l_float * sizeof(char));
 
     free(aFloat);
+    return result;
+}
+
+
+char* cgen_Bool (struct ParseTree* tree) {
+    if (! tree || tree->data->type != Bool)
+        return NULL;
+
+    char* result;
+    int l_bool;
+
+    l_bool = strlen(tree->data->lexeme);
+    result = calloc(l_bool + 1, sizeof(char));
+    if (! result)
+        return NULL;
+
+    if (l_bool == 4)
+        memcpy(result, "True", 4 * sizeof(char));
+    else
+        memcpy(result, "False", 5 * sizeof(char));
+
+    return result;
+}
+
+
+char* cgen_Null (struct ParseTree* tree) {
+    if (! tree || tree->data->type != Null)
+        return NULL;
+
+    char* result;
+    result = calloc(5, sizeof(char));
+    if (! result)
+        return NULL;
+    memcpy(result, "None", 4 * sizeof(char));
+    return result;
+}
+
+
+char* cgen_Var (struct ParseTree* tree) {
+    if (! tree || tree->data->type != Var)
+        return NULL;
+
+    char* result;
+    int l_var;
+
+    l_var = strlen(tree->data->lexeme);
+    result = calloc(l_var + 1, sizeof(char));
+    if (! result)
+        return NULL;
+    memcpy(result, tree->data->lexeme, l_var * sizeof(char));
+    return result;
+}
+
+
+char* cgen_Obj (struct ParseTree* tree) {
+    if (! tree || tree->data->type != Obj)
+        return NULL;
+
+    if (tree->child->data->type == Var)
+        return cgen_Var(tree->child);
+    if (tree->child->data->type == Num)
+        return cgen_Num(tree->child);
+    if (tree->child->data->type == Str)
+        return cgen_Str(tree->child);
+    if (tree->child->data->type == Bool)
+        return cgen_Bool(tree->child);
+    //if (tree->child->data->type == List)
+    //   return cgen_List(tree->child);
+    //if (tree->child->data->type == ListElem)
+    //    return cgen_ListElem(tree->child);
+    return NULL;
+}
+
+
+char* _bail_out_Str (char* vec[], int count) {
+    for (int i=0; i<count; i++)
+        free(vec[i]);
+    return NULL;
+}
+
+
+char* cgen_QuotedStr (struct ParseTree* tree) {
+    if (! tree || tree->data->type != QuotedStr)
+        return NULL;
+
+    char *result, *obj;
+    int total, last, count, l_str;
+    struct ParseTree *tmp;
+
+    tmp = tree->child; // actual quoted string node
+
+    total = strlen(tmp->data->lexeme);
+    last = 0;
+    count = 1; // counting the first quoted string too
+    obj = NULL;
+
+    // Count total Obj
+    while (tmp->sibling != NULL) {
+        count ++;
+        tmp = tmp->sibling->sibling; // skip Comma
+    }
+    if (count > 1)
+        total += 4; // the padding " %(" ... ")"
+
+    printf("total count is %d\n", count);
+
+    // To avoid triple pass store computed Obj(s)
+    char* objs[count];
+    count = 0;
+
+    tmp = tree->child; // start over
+
+    l_str = strlen(tmp->data->lexeme);
+    objs[count] = calloc(l_str + 1, sizeof(char));
+    if (objs[count] == NULL)
+        return NULL;
+    memcpy(objs[count], tmp->data->lexeme, l_str * sizeof(char));
+    count ++;
+
+    while (tmp->sibling != NULL) {
+        tmp = tmp->sibling->sibling;
+        obj = cgen_Obj(tmp);
+        printf("current obj is %s\n", obj);
+        if (obj == NULL)
+            return _bail_out_Str(objs, count);
+        objs[count++] = obj;
+        total += strlen(obj) + 1; // + 1 for the ","
+    }
+
+    result = calloc(total + 1, sizeof(char));
+    if (! result)
+        return _bail_out_Str(objs, count);
+
+    for (int i=0; i<count; i++) {
+        l_str = strlen(objs[i]);
+        memcpy(result + last, objs[i], l_str * sizeof(char));
+        last += l_str;
+        free(objs[i]);
+        if (i == 0 && count > 1) {
+            result[last++] = ' ';
+            result[last++] = '%';
+            result[last++] = '(';
+        }
+        if (i > 0 && i < count - 1)
+            result[last++] = ',';
+    }
+    if (count > 1)
+        result[last] = ')';
+    return result;
+}
+
+
+char* cgen_Str (struct ParseTree* tree) {
+    if (! tree || tree->data->type != Str)
+        return NULL;
+
+    char *result, *quoted;
+    int total, last, count, l_str;
+    struct ParseTree *tmp;
+
+    total = 127;
+    last = l_str = 0;
+    count = 1; // At the least 1 QuotedStr will be there
+    tmp = tree->child; // The first QuotedStr
+
+    // Count total quoted strings
+    while (tmp->sibling != NULL) {
+        count ++;
+        tmp = tmp->sibling->sibling;
+    }
+
+    // To avoid triple pass, store strings while calculating the length
+    char* strs[count];
+    count = 0;
+    tmp = tree->child; // start over
+
+    quoted = cgen_QuotedStr(tmp);
+    strs[count++] = quoted;
+    total += strlen(quoted);
+
+    while (tmp->sibling != NULL) {
+        total += 3; // the padding " + "
+        tmp = tmp->sibling->sibling;
+        quoted = cgen_QuotedStr(tmp);
+        if (quoted == NULL)
+            return _bail_out_Str(strs, count);
+        strs[count++] = quoted;
+        total += strlen(quoted);
+    }
+
+    result = calloc(total + 1, sizeof(char));
+    if (! result)
+        return _bail_out_Str(strs, count);
+
+    for (int i=0; i<count; i++) {
+        l_str = strlen(strs[i]);
+        memcpy(result + last, strs[i], l_str * sizeof(char));
+        last += l_str;
+        free(strs[i]);
+        if (i < count - 1) {
+            result[last++] = ' ';
+            result[last++] = '+';
+            result[last++] = ' ';
+        }
+    }
     return result;
 }
 

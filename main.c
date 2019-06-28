@@ -34,16 +34,18 @@ int main_cgen(int argc, char* argv[]) {
         return MEMORY_ERROR;
 
     status = build_ParseTree_FromFile(fileName, &tree);
-
-    if (status != SUBTREE_OK)
-        printf("PARSING ERROR\n");
     print_ParseTree(tree);
+
+    if (status != SUBTREE_OK) {
+        printf("PARSING ERROR\n");
+        return - 1;
+    }
 
     tmp = tree->child->child->child;
     tmp = tmp->sibling->sibling;
-    tmp = tmp->child->child->child->child->child; // Num
+    tmp = tmp->child->child->child->child->child; // Str
 
-    code = cgen_Num(tmp);
+    code = cgen_Str(tmp);
     printf("Generated code is: |%s|\n", code);
 
     free(code);
@@ -67,10 +69,13 @@ int main_parser(int argc, char* argv[]) {
         return MEMORY_ERROR;
 
     status = build_ParseTree_FromFile(fileName, &tree);
-
-    if (status != SUBTREE_OK)
-        printf("PARSING ERROR\n");
     print_ParseTree(tree);
+
+    if (status != SUBTREE_OK) {
+        printf("PARSING ERROR\n");
+        return - 1;
+    }
+
     free_ParseTree(tree);
 
     return status;

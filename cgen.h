@@ -1,3 +1,3 @@
 #include "parser.h"
 
-char* cgen_Num (struct ParseTree* tree);
+char* cgen_Str (struct ParseTree* tree);
