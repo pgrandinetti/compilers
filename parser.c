@@ -331,10 +331,11 @@ int is_QuotedStr (struct TokenList** tok, struct ParseTree** new) {
         return PARSING_ERROR;
 
     struct ParseTree *charseq, *comma, *obj, *last;
-    int status;
+    int status, nVar, nObj;
     struct Token *newTok;
 
     status = SUBTREE_OK;
+    nVar = nObj = 0;
 
     newTok = new_Token((char[1]){'\0'}, QuotedStr);
     if (newTok == NULL)
@@ -351,6 +352,21 @@ int is_QuotedStr (struct TokenList** tok, struct ParseTree** new) {
     }
     (*new)->child = charseq;
     last = charseq;
+
+    // Count the variables to interpolate
+    int i = 0;
+    while (charseq->data->lexeme[i] != '\0') {
+        if (charseq->data->lexeme[i] == '%') {
+            if (charseq->data->lexeme[i+1] == '%') // escape char
+                i += 2;
+            else if (charseq->data->lexeme[i+1] == 's') {
+                nVar += 1;
+                i += 2;
+            }
+            else i++;
+        }
+        else i++;
+    }
 
     while ((*tok)->token->type == Comma) {
         comma = alloc_ParseTree();
@@ -374,6 +390,12 @@ int is_QuotedStr (struct TokenList** tok, struct ParseTree** new) {
         }
         last->sibling = obj;
         last = obj;
+        nObj ++;
+    }
+
+    if (nObj != nVar) {
+        printf("QuotedStr with #obj != #interpolation (%d != %d)\n", nObj, nVar);
+        return PARSING_ERROR;
     }
     return status;
 }
