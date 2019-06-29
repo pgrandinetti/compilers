@@ -46,7 +46,7 @@ int main_cgen(int argc, char* argv[]) {
     tmp = tmp->sibling->sibling;
     tmp = tmp->child->child->child->child->child; // Str
 
-    code = cgen_List(tmp);
+    code = cgen_ListElem(tmp);
     printf("Generated code is: |%s|\n", code);
 
     free(code);

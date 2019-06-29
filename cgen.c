@@ -247,10 +247,10 @@ char* cgen_Obj (struct ParseTree* tree) {
         return cgen_Str(tree->child);
     if (tree->child->data->type == Bool)
         return cgen_Bool(tree->child);
-    //if (tree->child->data->type == List)
-    //   return cgen_List(tree->child);
-    //if (tree->child->data->type == ListElem)
-    //    return cgen_ListElem(tree->child);
+    if (tree->child->data->type == List)
+       return cgen_List(tree->child);
+    if (tree->child->data->type == ListElem)
+        return cgen_ListElem(tree->child);
     return NULL;
 }
 
@@ -461,6 +461,51 @@ char* cgen_List (struct ParseTree* tree) {
     memcpy(result + 1, lexpr, l_expr * sizeof(char));
     result[l_expr + 1] = ']';
     free(lexpr);
+    return result;
+}
+
+
+char* cgen_ListElem (struct ParseTree* tree) {
+    if (! tree || tree->data->type != ListElem)
+        return NULL;
+
+    char *result, *var, *idx;
+    int total, l_var, l_idx;
+
+    total = 0;
+
+    var = cgen_Var(tree->child);
+    if (var == NULL)
+        return NULL;
+    l_var = strlen(var);
+    total += l_var;
+
+    tree = tree->child->sibling->sibling;
+
+    if (tree->data->type == Int)
+        idx = cgen_Int(tree);
+    else
+        idx = cgen_Var(tree);
+    if (idx == NULL) {
+        free(var);
+        return NULL;
+    }
+    l_idx = strlen(idx);
+    total += l_idx;
+
+    result = calloc(total + 3, sizeof(char));
+    if (! result) {
+        free(var);
+        free(idx);
+        return NULL;
+    }
+    memcpy(result, var, l_var * sizeof(char));
+    result[l_var] = '[';
+    memcpy(result + l_var + 1, idx, l_idx * sizeof(char));
+    result[l_var + 1 + l_idx] = ']';
+
+    free(var);
+    free(idx);
     return result;
 }
 
