@@ -14,6 +14,7 @@ int main_cgen(int argc, char* argv[]);
 
 
 int main(int argc, char* argv[]) {
+    //main_parser(argc, argv);
     main_cgen(argc, argv);
 }
 
@@ -45,7 +46,7 @@ int main_cgen(int argc, char* argv[]) {
     tmp = tmp->sibling->sibling;
     tmp = tmp->child->child->child->child->child; // Str
 
-    code = cgen_Str(tmp);
+    code = cgen_List(tmp);
     printf("Generated code is: |%s|\n", code);
 
     free(code);

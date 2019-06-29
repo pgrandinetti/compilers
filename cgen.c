@@ -341,8 +341,7 @@ char* cgen_Str (struct ParseTree* tree) {
     int total, last, count, l_str;
     struct ParseTree *tmp;
 
-    total = 127;
-    last = l_str = 0;
+    total = last = l_str = 0;
     count = 1; // At the least 1 QuotedStr will be there
     tmp = tree->child; // The first QuotedStr
 
@@ -386,6 +385,82 @@ char* cgen_Str (struct ParseTree* tree) {
             result[last++] = ' ';
         }
     }
+    return result;
+}
+
+
+char* cgen_ListExpr (struct ParseTree* tree) {
+    if (! tree || tree->data->type != ListExpr)
+        return NULL;
+
+    char *obj, *result;
+    int l_obj, total, count, last;;
+    struct ParseTree *tmp;
+
+    total = 0;
+    count = 1;
+    tmp = tree->child;
+
+    while (tmp->sibling != NULL) {
+        tmp = tmp->sibling->sibling;
+        count++;
+    }
+
+    char* objs[count];
+    count = last = 0;
+    tmp = tree->child;
+    while (1) {
+        obj = cgen_Obj(tmp);
+        if (obj == NULL)
+            return _bail_out_Str(objs, count);
+        objs[count++] = obj;
+        total += strlen(obj);
+        if (tmp->sibling != NULL) {
+            tmp = tmp->sibling->sibling;
+            total += 1; // for the ','
+        }
+        else
+            break;
+    }
+
+    result = calloc(total + 1, sizeof(char));
+    if (! result)
+        return _bail_out_Str(objs, count);
+    for (int i=0; i<count; i++) {
+        l_obj = strlen(objs[i]);
+        memcpy(result + last, objs[i], l_obj * sizeof(char));
+        free(objs[i]);
+        last += l_obj;
+        if (i < count - 1)
+            result[last++] = ',';
+    }
+    return result;
+}
+
+
+char* cgen_List (struct ParseTree* tree) {
+    if (! tree || tree->data->type != List)
+        return NULL;
+
+    char *lexpr, *result;
+    int l_expr, total;
+
+    lexpr = cgen_ListExpr(tree->child->sibling);
+    if (! lexpr)
+        return NULL;
+    l_expr = strlen(lexpr);
+    total = l_expr + 2; //
+
+    result = calloc(total + 1, sizeof(char));
+    if (! result) {
+        free(lexpr);
+        return NULL;
+    }
+
+    result[0] = '[';
+    memcpy(result + 1, lexpr, l_expr * sizeof(char));
+    result[l_expr + 1] = ']';
+    free(lexpr);
     return result;
 }
 
