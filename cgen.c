@@ -5,6 +5,15 @@
 #include "cgen.h"
 
 
+char* cgen_Str (struct ParseTree* tree);
+char* cgen_List (struct ParseTree* tree);
+char* cgen_ListElem (struct ParseTree* tree);
+char* cgen_Expr (struct ParseTree* tree);
+char* cgen_Pred (struct ParseTree* tree);
+char* cgen_Term (struct ParseTree* tree);
+char* cgen_BaseExpr (struct ParseTree* tree);
+
+
 int str_insert (char** s1, char* s2, int pos) {
     /*
         Insert a sequence of characters into a string, starting from a given index.
@@ -506,6 +515,282 @@ char* cgen_ListElem (struct ParseTree* tree) {
 
     free(var);
     free(idx);
+    return result;
+}
+
+
+char* cgen_Op (struct ParseTree* tree) {
+    char *result;
+    if (tree->data->type == Plus){
+        result = calloc(2, sizeof(char));
+        result[0] = '+';
+        return result;
+    }
+    if (tree->data->type == Minus){
+        result = calloc(2, sizeof(char));
+        result[0] = '-';
+        return result;
+    }
+    if (tree->data->type == Star){
+        result = calloc(2, sizeof(char));
+        result[0] = '*';
+        return result;
+    }
+    if (tree->data->type == Div || tree->data->type == FloatDiv){
+        result = calloc(2, sizeof(char));
+        result[0] = '/';
+        return result;
+    }
+    if (tree->data->type == Percent){
+        result = calloc(2, sizeof(char));
+        result[0] = '%';
+        return result;
+    }
+    if (tree->data->type == And){
+        result = calloc(4, sizeof(char));
+        memcpy(result, "and", 3 * sizeof(char));
+        return result;
+    }
+    if (tree->data->type == Or){
+        result = calloc(3, sizeof(char));
+        memcpy(result, "or", 2 * sizeof(char));
+        return result;
+    }
+    if (tree->data->type == NotEq){
+        result = calloc(3, sizeof(char));
+        memcpy(result, "!=", 2 * sizeof(char));
+        return result;
+    }
+    if (tree->data->type == EqEq){
+        result = calloc(3, sizeof(char));
+        memcpy(result, "==", 2 * sizeof(char));
+        return result;
+    }
+    if (tree->data->type == LesserEq){
+        result = calloc(3, sizeof(char));
+        memcpy(result, "<=", 2 * sizeof(char));
+        return result;
+    }
+    if (tree->data->type == GreaterEq){
+        result = calloc(3, sizeof(char));
+        memcpy(result, ">=", 2 * sizeof(char));
+        return result;
+    }
+    if (tree->data->type == Greater){
+        result = calloc(2, sizeof(char));
+        result[0] = '>';
+        return result;
+    }
+    if (tree->data->type == Lesser){
+        result = calloc(2, sizeof(char));
+        result[0] = '<';
+        return result;
+    }
+    return NULL;
+}
+
+
+char* cgen_BaseExpr (struct ParseTree* tree) {
+    if (! tree || tree->data->type != BaseExpr)
+        return NULL;
+
+    char* result, *subexpr;
+    int l_sub;
+
+    result = subexpr = NULL;
+
+    if (tree->child->data->type == Obj)
+        result = cgen_Obj(tree->child);
+    else {
+        // must be ( Expr )
+        subexpr = cgen_Expr(tree->child->sibling);
+        if (subexpr == NULL)
+            return NULL;
+        l_sub = strlen(subexpr);
+        result = calloc(l_sub + 3, sizeof(char));
+        if (! result) {
+            free(subexpr);
+            return NULL;
+        }
+        result[0] = '(';
+        memcpy(result + 1, subexpr, l_sub * sizeof(char));
+        result[1 + l_sub] = ')';
+    }
+    free(subexpr);
+    return result;
+}
+
+
+char* cgen_Term (struct ParseTree* tree) {
+    if (! tree || tree->data->type != Term)
+        return NULL;
+
+    char *basexpr, *op, *term, *result;
+    int l_base, l_op, l_term;
+
+    basexpr = op = term = result = NULL;
+    l_op = l_term = 0;
+    tree = tree->child; // must be BaseExpr
+
+    basexpr = cgen_BaseExpr(tree);
+    if (basexpr == NULL)
+        return NULL;
+    l_base = strlen(basexpr);
+
+    if (tree->sibling != NULL) {
+        tree = tree->sibling; // the Op
+        op = cgen_Op(tree);
+        if (op == NULL) {
+            free(basexpr);
+            return NULL;
+        }
+        l_op = strlen(op);
+        tree = tree->sibling; // the other Term
+        term = cgen_Term(tree);
+        if (term == NULL) {
+            free(op);
+            free(basexpr);
+            return NULL;
+        }
+        l_term = strlen(term);
+    }
+
+    if (l_op > 0)
+        result = calloc(l_base + 2 + l_op + l_term + 1, sizeof(char));
+    else
+        result = calloc(l_base + l_op + l_term + 1, sizeof(char));
+    if (! result) {
+        free(basexpr);
+        free(op);
+        free(term);
+        return NULL;
+    }
+    memcpy(result, basexpr, l_base * sizeof(char));
+    if (l_op > 0) {
+        result[l_base] = ' ';
+        memcpy(result + l_base + 1, op, l_op * sizeof(char));
+        result[l_base + 1 + l_op] = ' ';
+        memcpy(result + l_base + l_op + 2, term, l_term * sizeof(char));
+    }
+    free(basexpr);
+    free(op);
+    free(term);
+    return result;
+}
+
+
+char* cgen_Pred (struct ParseTree* tree) {
+    if (! tree || tree->data->type != Pred)
+        return NULL;
+
+    char *term, *op, *pred, *result;
+    int l_term, l_op, l_pred;
+
+    term = op = pred = result = NULL;
+    l_op = l_pred = 0;
+    tree = tree->child; // must be Term
+
+    term = cgen_Term(tree);
+    if (term == NULL)
+        return NULL;
+    l_term = strlen(term);
+
+    if (tree->sibling != NULL) {
+        tree = tree->sibling; // the Op
+        op = cgen_Op(tree);
+        if (op == NULL) {
+            free(term);
+            return NULL;
+        }
+        l_op = strlen(op);
+        tree = tree->sibling; // the other Pred
+        pred = cgen_Pred(tree);
+        if (pred == NULL) {
+            free(op);
+            free(term);
+            return NULL;
+        }
+        l_pred = strlen(pred);
+    }
+
+    if (l_op > 0)
+        result = calloc(l_term + 2 + l_op + l_pred + 1, sizeof(char));
+    else
+        result = calloc(l_term + l_op + l_pred + 1, sizeof(char));
+    if (! result) {
+        free(term);
+        free(op);
+        free(pred);
+        return NULL;
+    }
+    memcpy(result, term, l_term * sizeof(char));
+    if (l_op > 0) {
+        result[l_term] = ' ';
+        memcpy(result + l_term + 1, op, l_op * sizeof(char));
+        result[l_term + 1 + l_op] = ' ';
+        memcpy(result + l_term + l_op + 2, pred, l_pred * sizeof(char));
+    }
+    free(term);
+    free(op);
+    free(pred);
+    return result;
+}
+
+
+char* cgen_Expr (struct ParseTree* tree) {
+    if (! tree || tree->data->type != Expr)
+        return NULL;
+
+    char *pred, *op, *expr, *result;
+    int l_pred, l_op, l_expr;
+
+    pred = op = expr = result = NULL;
+    l_pred = l_op = l_expr = 0;
+    tree = tree->child; // must be Pred
+
+    pred = cgen_Pred(tree);
+    if (pred == NULL)
+        return NULL;
+    l_pred = strlen(pred);
+
+    if (tree->sibling != NULL) {
+        tree = tree->sibling; // the Op
+        op = cgen_Op(tree);
+        if (op == NULL) {
+            free(pred);
+            return NULL;
+        }
+        l_op = strlen(op);
+        tree = tree->sibling; // the other Expr
+        expr = cgen_Expr(tree);
+        if (expr == NULL) {
+            free(op);
+            free(pred);
+            return NULL;
+        }
+        l_expr = strlen(expr);
+    }
+
+    if (l_op > 0)
+        result = calloc(l_pred + 2 + l_op + l_expr + 1, sizeof(char));
+    else
+        result = calloc(l_pred + l_op + l_expr + 1, sizeof(char));
+    if (! result) {
+        free(pred);
+        free(op);
+        free(expr);
+        return NULL;
+    }
+    memcpy(result, pred, l_pred * sizeof(char));
+    if (l_op > 0) {
+        result[l_pred] = ' ';
+        memcpy(result + l_pred + 1, op, l_op * sizeof(char));
+        result[l_pred + 1 + l_op] = ' ';
+        memcpy(result + l_pred + l_op + 2, expr, l_expr * sizeof(char));
+    }
+    free(pred);
+    free(op);
+    free(expr);
     return result;
 }
 

@@ -43,10 +43,10 @@ int main_cgen(int argc, char* argv[]) {
     }
 
     tmp = tree->child->child->child;
-    tmp = tmp->sibling->sibling;
-    tmp = tmp->child->child->child->child->child; // Str
+    tmp = tmp->sibling->sibling; // Expr
+    //tmp = tmp->child->child->child->child->child; // Str
 
-    code = cgen_ListElem(tmp);
+    code = cgen_Expr(tmp);
     printf("Generated code is: |%s|\n", code);
 
     free(code);
