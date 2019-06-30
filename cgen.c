@@ -12,6 +12,8 @@ char* cgen_Expr (struct ParseTree* tree);
 char* cgen_Pred (struct ParseTree* tree);
 char* cgen_Term (struct ParseTree* tree);
 char* cgen_BaseExpr (struct ParseTree* tree);
+char* cgen_IfLine (struct ParseTree* tree, int indent);
+char* cgen_IfBody (struct ParseTree* tree, int indent);
 
 
 int str_insert (char** s1, char* s2, int pos) {
@@ -294,7 +296,6 @@ char* cgen_QuotedStr (struct ParseTree* tree) {
     if (count > 1)
         total += 4; // the padding " %(" ... ")"
 
-    printf("total count is %d\n", count);
 
     // To avoid triple pass store computed Obj(s)
     char* objs[count];
@@ -312,7 +313,6 @@ char* cgen_QuotedStr (struct ParseTree* tree) {
     while (tmp->sibling != NULL) {
         tmp = tmp->sibling->sibling;
         obj = cgen_Obj(tmp);
-        printf("current obj is %s\n", obj);
         if (obj == NULL)
             return _bail_out_Str(objs, count);
         objs[count++] = obj;
@@ -939,13 +939,14 @@ char* cgen_Line (struct ParseTree* tree, int indent) {
         return NULL;
 
     l_line = strlen(line);
-    result = calloc(indent + l_line + 1, sizeof(char));
+    result = calloc(l_line + 2, sizeof(char));
     if (! result) {
         free(line);
         return NULL;
     }
-    memset(result, ' ', indent * sizeof(char));
-    memcpy(result + indent, line, l_line * sizeof(char));
+    memcpy(result, line, l_line * sizeof(char));
+    // Add the ENDLINE TOKEN
+    memset(result + l_line, '\n', sizeof(char));
 
     free(line);
     return result;
@@ -953,12 +954,138 @@ char* cgen_Line (struct ParseTree* tree, int indent) {
 
 
 char* cgen_IfLine (struct ParseTree* tree, int indent) {
-    return NULL;
+    if (! tree || tree->data->type != IfLine)
+        return NULL;
+
+    char *result, *ifcond, *ifbody;
+    struct ParseTree *cond, *body;
+    int l_cond, l_body, last;
+
+    cond = tree->child->sibling->child->sibling;
+    ifcond = cgen_Expr(cond);
+    if (ifcond == NULL)
+        return NULL;
+    l_cond = strlen(ifcond);
+
+    body = tree->child->sibling->sibling;
+    ifbody = cgen_IfBody(body, indent + INDENT_LEV);
+    if (ifbody == NULL) {
+        free(ifcond);
+        return NULL;
+    }
+    l_body = strlen(ifbody);
+
+    // Additional spaces 'if ' ... ':\n' ... '/0'
+    result = calloc(indent + l_cond + l_body + 6, sizeof(char));
+    if (! result) {
+        free(ifbody);
+        free(ifcond);
+        return NULL;
+    }
+    if (indent > 0)
+        memset(result, ' ', indent * sizeof(char));
+    last = indent;
+    result[last++] = 'i';
+    result[last++] = 'f';
+    result[last++] = ' ';
+    memcpy(result + last, ifcond, l_cond * sizeof(char));
+    last += l_cond;
+    result[last++] = ':';
+    result[last++] = '\n';
+    memcpy(result + last, ifbody, l_body * sizeof(char));
+
+    free(ifcond);
+    free(ifbody);
+    return result;
 }
 
 
-char* cgen_LoopLine (struct ParseTree* tree, int indent) {
-    return NULL;
+char* cgen_IfBody (struct ParseTree* tree, int indent) {
+    if (! tree || tree->data->type != IfBody)
+        return NULL;
+
+    char *result, *line;
+    int l_line, nLines, nElseLines, total_if, total_else, last;
+    struct ParseTree *if_p, *else_p;
+
+    line = NULL;
+    l_line = total_if = total_else = 0;
+    if_p = else_p = NULL;
+    nLines = nElseLines = 0;
+
+    if_p = tree->child; // 1st line
+    while (if_p != NULL && if_p->data->type != OptElse) {
+        nLines++;
+        if_p = if_p->sibling->sibling;
+    }
+
+    char* iflines[nLines];
+    nLines = 0;
+    if_p = tree->child; // start over
+    while (if_p != NULL && if_p->data->type != OptElse) {
+        iflines[nLines] = cgen_Line(if_p, indent);
+        if (iflines[nLines] == NULL)
+            return _bail_out_Str(iflines, nLines);
+        total_if += strlen(iflines[nLines]);
+        nLines++;
+        if_p = if_p->sibling->sibling;
+    }
+
+    // else part
+    if (if_p!= NULL && if_p->data->type == OptElse) {
+        else_p = if_p->child->sibling; // 1st else line
+    }
+    while (else_p != NULL) {
+        nElseLines++;
+        else_p = else_p->sibling->sibling;
+    }
+
+    char* elselines[nElseLines];
+    if (nElseLines > 0){
+        nElseLines = 0;
+        else_p = if_p->child->sibling; // to start over
+    }
+    while (else_p != NULL) {
+        elselines[nElseLines] = cgen_Line(else_p, indent);
+        if (elselines[nElseLines] == NULL) {
+            _bail_out_Str(elselines, nElseLines);
+            return _bail_out_Str(iflines, nLines);
+        }
+        total_else += strlen(elselines[nElseLines]);
+        nElseLines++;
+        else_p = else_p->sibling->sibling;
+    }
+
+    if (nElseLines > 0)
+        result = calloc(total_if + indent - INDENT_LEV + 6 + total_else + 1, sizeof(char));
+    else
+        result = calloc(total_if + 1, sizeof(char));
+
+    if (! result){
+        _bail_out_Str(elselines, nElseLines);
+        return _bail_out_Str(iflines, nLines);
+    }
+
+    last = 0;
+    for (int i=0; i<nLines; i++) {
+        l_line = strlen(iflines[i]);
+        memcpy(result + last, iflines[i], l_line * sizeof(char));
+        free(iflines[i]);
+        last += l_line;
+    }
+    if (nElseLines > 0) {
+        memset(result + last, ' ', (indent - INDENT_LEV) * sizeof(char));
+        last = last + indent - INDENT_LEV;
+        memcpy(result + last, "else:\n", 6 * sizeof(char));
+        last += 6;
+    }
+    for (int i=0; i<nElseLines; i++) {
+        l_line = strlen(elselines[i]);
+        memcpy(result + last, elselines[i], l_line * sizeof(char));
+        free(elselines[i]);
+        last += l_line;
+    }
+    return result;
 }
 
 
@@ -996,40 +1123,87 @@ char* cgen_Continue (struct ParseTree* tree, int indent) {
 }
 
 
-void cgen_Program (struct ParseTree* tree) {
-    /*
-        Insert into **code, from index pos, the new code-string.
+char* cgen_Program (struct ParseTree* tree, int indent) {
+    if (! tree || tree->data->type != Program)
+        return NULL;
 
-        - **code: The current code template.
-        - pos: The index at which to insert the new code and fill the template.
-    */
+    char *result;
+    int nLines, total, last, l_line;
+    struct ParseTree *tmp;
 
-    char template[12] = "print ("
-                       " "
-                       "+ "
-                       ")\0";
+    result = NULL;
+    nLines = last = total = l_line = 0;
+    tmp = tree->child;
 
-    char* new = calloc(12, sizeof(char));
-    memcpy(new, template, 12*sizeof(char));
+    while (tmp != NULL) {
+        nLines++;
+        tmp = tmp->sibling->sibling;
+    }
+    if (nLines == 0)
+        return result;
 
-    int idx1 = 7;
-    int idx2 = 10;
+    char* lines[nLines];
+    nLines = 0;
+    tmp = tree->child;
+    while (tmp != NULL) {
+        lines[nLines] = cgen_Line(tmp, indent);
+        printf("line is %s\n", lines[nLines]);
+        if (lines[nLines] == NULL)
+            return _bail_out_Str(lines, nLines);
+        total += strlen(lines[nLines]);
+        nLines++;
+        tmp = tmp->sibling->sibling;
+    }
 
-    char *new1, *new2;
+    result = calloc(total + 1, sizeof(char));
+    if (! result)
+        return _bail_out_Str(lines, nLines);
+    for (int i=0; i<nLines; i++) {
+        l_line = strlen(lines[i]);
+        memcpy(result + last, lines[i], l_line * sizeof(char));
+        last += l_line;
+        free(lines[i]);
+    }
+    return result;
+}
 
-    new1 = cgen_Int(tree);
-    str_insert (&new, new1, idx1);
-    printf("|%s|\n", new);
 
-    idx2 += strlen(new1);
+char* cgen_LoopLine (struct ParseTree* tree, int indent) {
+    if (! tree || tree->data->type != LoopLine)
+        return NULL;
 
-    new2 = cgen_Int(tree);
-    str_insert (&new, new2, idx2);
-    printf("|%s|\n", new);
+    char *result, *prog, *expr;
+    struct ParseTree *cond, *body;
+    int l_expr, l_prog;
 
-    free(new);
-    free(new1);
-    free(new2);
+    l_expr = l_prog = 0;
+    result = prog = expr = NULL;
+
+    cond = tree->child->sibling->child->sibling;
+    expr = cgen_Expr(cond);
+    if (expr == NULL)
+        return NULL;
+    l_expr = strlen(expr);
+
+    body = tree->child->sibling->sibling;
+    prog = cgen_Program(body, indent + INDENT_LEV);
+    if (prog == NULL) {
+        free(expr);
+        return NULL;
+    }
+    l_prog = strlen(prog);
+
+    result = calloc(indent + 6 + l_expr + 2 + l_prog + 1, sizeof(char));
+    memset(result, ' ', indent * sizeof(char));
+    memcpy(result + indent, "while ", 6 * sizeof(char));
+    memcpy(result + indent + 6, expr, l_expr * sizeof(char));
+    result[indent+6+l_expr] = ':';
+    result[indent+6+l_expr+1] = '\n';
+    memcpy(result + indent + 6 + l_expr + 2, prog, l_prog * sizeof(char));
+
+    free(expr);
+    free(prog);
+    return result;
 }
 
 
