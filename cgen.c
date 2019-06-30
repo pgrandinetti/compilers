@@ -795,12 +795,12 @@ char* cgen_Expr (struct ParseTree* tree) {
 }
 
 
-char* cgen_Input (struct ParseTree* tree) {
+char* cgen_Input (struct ParseTree* tree, int indent) {
     if (! tree || tree->data->type != Input)
         return NULL;
 
     char *var, *input, *result;
-    int l_var, l_input;
+    int l_var, l_input, last;
 
     var = tree->child->sibling->data->lexeme;
     l_var = strlen(var);
@@ -815,50 +815,63 @@ char* cgen_Input (struct ParseTree* tree) {
         input = "bool(input())";
     l_input = strlen(input);
 
-    result = calloc(l_var + 4 + l_input, sizeof(char));
+    result = calloc(indent + l_var + 4 + l_input, sizeof(char));
     if (! result)
         return NULL;
-    memcpy(result, var, l_var * sizeof(char));
-    result[l_var] = ' ';
-    result[l_var+1] = '=';
-    result[l_var+2] = ' ';
-    memcpy(result + l_var + 3, input, l_input * sizeof(char));
+    last = 0;
+    if (indent > 0) {
+        memset(result, ' ', indent * sizeof(char));
+        last += indent;
+    }
+    memcpy(result + last, var, l_var * sizeof(char));
+    last += l_var;
+    result[last++] = ' ';
+    result[last++] = '=';
+    result[last++] = ' ';
+    memcpy(result + last, input, l_input * sizeof(char));
     return result;
 }
 
 
-char* cgen_Output (struct ParseTree* tree) {
+char* cgen_Output (struct ParseTree* tree, int indent) {
     if (! tree || tree->data->type != Output)
         return NULL;
 
     char *result, *obj;
-    int l_obj;
+    int l_obj, last;
 
     obj = cgen_Obj(tree->child->sibling);
     if (obj == NULL)
         return NULL;
     l_obj = strlen(obj);
 
-    result = calloc(l_obj + 8, sizeof(char));
+    result = calloc(l_obj + indent + 8, sizeof(char));
     if (! result) {
         free(obj);
         return NULL;
     }
-    memcpy(result, "print(", 6 * sizeof(char));
-    memcpy(result + 6, obj, l_obj * sizeof(char));
-    result[6 + l_obj] = ')';
+    last = 0;
+    if (indent > 0){
+        memset(result, ' ', indent * sizeof(char));
+        last += indent;
+    }
+    memcpy(result + last, "print(", 6 * sizeof(char));
+    last += 6;
+    memcpy(result + last, obj, l_obj * sizeof(char));
+    last += l_obj;
+    result[last] = ')';
 
     free(obj);
     return result;
 }
 
 
-char* cgen_Assign (struct ParseTree* tree) {
+char* cgen_Assign (struct ParseTree* tree, int indent) {
     if (! tree || tree->data->type != Assign)
         return NULL;
 
     char *result, *expr, *var;
-    int l_expr, l_var;
+    int l_expr, l_var, last;
 
     var = cgen_Var(tree->child);
     if (var == NULL)
@@ -872,15 +885,113 @@ char* cgen_Assign (struct ParseTree* tree) {
     }
     l_expr = strlen(expr);
 
-    result = calloc(l_var + 4 + l_expr, sizeof(char));
-    memcpy(result, var, l_var * sizeof(char));
-    result[l_var] = ' ';
-    result[l_var+1] = '=';
-    result[l_var+2] = ' ';
-    memcpy(result + l_var + 3, expr, l_expr * sizeof(char));
+    result = calloc(l_var + indent + 4 + l_expr, sizeof(char));
+    if (! result) {
+        free(expr);
+        free(var);
+        return NULL;
+    }
+    last = 0;
+    if (indent > 0) {
+        memset(result, ' ', indent * sizeof(char));
+        last += indent;
+    }
+    memcpy(result + last, var, l_var * sizeof(char));
+    last += l_var;
+    result[last++] = ' ';
+    result[last++] = '=';
+    result[last++] = ' ';
+    memcpy(result + last, expr, l_expr * sizeof(char));
 
     free(var);
     free(expr);
+    return result;
+}
+
+
+char* cgen_Line (struct ParseTree* tree, int indent) {
+    if (! tree || tree->data->type != Line)
+        return NULL;
+
+    char *line, *result;
+    int l_line;
+    enum TokenType type;
+
+    type = tree->child->data->type;
+    if (type == Assign)
+        line = cgen_Assign(tree->child, indent);
+    else if (type == Output)
+        line = cgen_Output(tree->child, indent);
+    else if (type == Input)
+        line = cgen_Input(tree->child, indent);
+    else if (type == IfLine)
+        line = cgen_IfLine(tree->child, indent);
+    else if (type == LoopLine)
+        line = cgen_LoopLine(tree->child, indent);
+    else if (type == Break)
+        line = cgen_Break(tree->child, indent);
+    else if (type == Continue)
+        line = cgen_Continue(tree->child, indent);
+    else
+        line = NULL;
+
+    if (line == NULL)
+        return NULL;
+
+    l_line = strlen(line);
+    result = calloc(indent + l_line + 1, sizeof(char));
+    if (! result) {
+        free(line);
+        return NULL;
+    }
+    memset(result, ' ', indent * sizeof(char));
+    memcpy(result + indent, line, l_line * sizeof(char));
+
+    free(line);
+    return result;
+}
+
+
+char* cgen_IfLine (struct ParseTree* tree, int indent) {
+    return NULL;
+}
+
+
+char* cgen_LoopLine (struct ParseTree* tree, int indent) {
+    return NULL;
+}
+
+
+char* cgen_Break (struct ParseTree* tree, int indent) {
+    if (! tree || tree->data->type != Break)
+        return NULL;
+
+    char *result;
+
+    result = calloc(indent + 6, sizeof(char));
+    if (! result)
+        return NULL;
+
+    if (indent > 0)
+        memset(result, ' ', indent * sizeof(char));
+    memcpy(result + indent, "break", 5 * sizeof(char));
+    return result;
+}
+
+
+char* cgen_Continue (struct ParseTree* tree, int indent) {
+    if (! tree || tree->data->type != Continue)
+        return NULL;
+
+    char *result;
+
+    result = calloc(indent + 9, sizeof(char));
+    if (! result)
+        return NULL;
+
+    if (indent > 0)
+        memset(result, ' ', indent * sizeof(char));
+    memcpy(result + indent, "continue", 8 * sizeof(char));
     return result;
 }
 

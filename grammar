@@ -67,7 +67,7 @@ baseExpr    :   obj
 
 operator    :   '+' | '-' | '*' | '/' | '/.' | '%' | condOp
 
-condOp      :   '&&' | '||' | '!=' | '==' | '<=' | '>=' | > | <
+condOp      :   '&&' | '||' | '!=' | '==' | '<=' | '>=' | '>' | '<'
 
 ifLine      :   if ifCond ifBody
 
