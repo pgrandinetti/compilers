@@ -42,11 +42,11 @@ int main_cgen(int argc, char* argv[]) {
         return - 1;
     }
 
-    tmp = tree->child->child->child;
-    tmp = tmp->sibling->sibling; // Expr
+    tmp = tree->child->child;//->child;
+    //tmp = tmp->sibling->sibling; // Expr
     //tmp = tmp->child->child->child->child->child; // Str
 
-    code = cgen_Expr(tmp);
+    code = cgen_Assign(tmp);
     printf("Generated code is: |%s|\n", code);
 
     free(code);

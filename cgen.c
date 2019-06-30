@@ -795,6 +795,96 @@ char* cgen_Expr (struct ParseTree* tree) {
 }
 
 
+char* cgen_Input (struct ParseTree* tree) {
+    if (! tree || tree->data->type != Input)
+        return NULL;
+
+    char *var, *input, *result;
+    int l_var, l_input;
+
+    var = tree->child->sibling->data->lexeme;
+    l_var = strlen(var);
+
+    if (strcmp(tree->child->data->lexeme, "readInt") == 0)
+        input = "int(input())";
+    else if (strcmp(tree->child->data->lexeme, "readFloat") == 0)
+        input = "float(input())";
+    else if (strcmp(tree->child->data->lexeme, "readStr") == 0)
+        input = "input()";
+    else
+        input = "bool(input())";
+    l_input = strlen(input);
+
+    result = calloc(l_var + 4 + l_input, sizeof(char));
+    if (! result)
+        return NULL;
+    memcpy(result, var, l_var * sizeof(char));
+    result[l_var] = ' ';
+    result[l_var+1] = '=';
+    result[l_var+2] = ' ';
+    memcpy(result + l_var + 3, input, l_input * sizeof(char));
+    return result;
+}
+
+
+char* cgen_Output (struct ParseTree* tree) {
+    if (! tree || tree->data->type != Output)
+        return NULL;
+
+    char *result, *obj;
+    int l_obj;
+
+    obj = cgen_Obj(tree->child->sibling);
+    if (obj == NULL)
+        return NULL;
+    l_obj = strlen(obj);
+
+    result = calloc(l_obj + 8, sizeof(char));
+    if (! result) {
+        free(obj);
+        return NULL;
+    }
+    memcpy(result, "print(", 6 * sizeof(char));
+    memcpy(result + 6, obj, l_obj * sizeof(char));
+    result[6 + l_obj] = ')';
+
+    free(obj);
+    return result;
+}
+
+
+char* cgen_Assign (struct ParseTree* tree) {
+    if (! tree || tree->data->type != Assign)
+        return NULL;
+
+    char *result, *expr, *var;
+    int l_expr, l_var;
+
+    var = cgen_Var(tree->child);
+    if (var == NULL)
+        return NULL;
+    l_var = strlen(var);
+
+    expr = cgen_Expr(tree->child->sibling->sibling);
+    if (expr == NULL) {
+        free(var);
+        return NULL;
+    }
+    l_expr = strlen(expr);
+
+    result = calloc(l_var + 4 + l_expr, sizeof(char));
+    memcpy(result, var, l_var * sizeof(char));
+    result[l_var] = ' ';
+    result[l_var+1] = '=';
+    result[l_var+2] = ' ';
+    memcpy(result + l_var + 3, expr, l_expr * sizeof(char));
+
+    free(var);
+    free(expr);
+    return result;
+}
+
+
 void cgen_Program (struct ParseTree* tree) {
     /*
         Insert into **code, from index pos, the new code-string.
