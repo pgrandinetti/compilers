@@ -23,9 +23,10 @@ int main_cgen(int argc, char* argv[]) {
     struct ParseTree *tree, *tmp;
     char* code;
     int status;
+    char* outFile;
 
     if (argc < 2) {
-        printf("Expecting exactly 1 argument: file path.\n");
+        printf("Expecting at the least 1 argument: file path.\n");
         return 1;
     }
     char const* const fileName = argv[1];
@@ -42,12 +43,28 @@ int main_cgen(int argc, char* argv[]) {
         return - 1;
     }
 
-    tmp = tree;//->child->child;//->child->child;
+    //tmp = tree;//->child->child;//->child->child;
     //tmp = tmp->sibling->sibling; // Expr
     //tmp = tmp->child->child->child->child->child; // Str
 
-    code = cgen_Program(tmp, 0);
+    code = code_gen(tree);
+    if (code == NULL) {
+        printf("Error in CODE-GEN");
+        free_ParseTree(tree);
+        return -1;
+    }
     printf("Generated code is:\n|\n%s|\n", code);
+
+    if (argc > 2)
+        outFile = argv[2];
+    else
+        outFile = "./out.py";
+
+    FILE *fp = fopen(outFile, "w");
+    if (fp != NULL) {
+        fputs(code, fp);
+        fclose(fp);
+    }
 
     free(code);
     free_ParseTree(tree);

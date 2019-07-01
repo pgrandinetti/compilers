@@ -14,6 +14,13 @@ char* cgen_Term (struct ParseTree* tree);
 char* cgen_BaseExpr (struct ParseTree* tree);
 char* cgen_IfLine (struct ParseTree* tree, int indent);
 char* cgen_IfBody (struct ParseTree* tree, int indent);
+char* cgen_Assign (struct ParseTree* tree, int indent);
+char* cgen_Input (struct ParseTree* tree, int indent);
+char* cgen_LoopLine (struct ParseTree* tree, int indent);
+char* cgen_Break (struct ParseTree* tree, int indent);
+char* cgen_Continue (struct ParseTree* tree, int indent);
+char* cgen_Line (struct ParseTree* tree, int indent);
+char* cgen_Program (struct ParseTree* tree, int indent);
 
 
 int str_insert (char** s1, char* s2, int pos) {
@@ -1206,32 +1213,6 @@ char* cgen_LoopLine (struct ParseTree* tree, int indent) {
     return result;
 }
 
-
-/*
-void main() {
-
-    int res;
-    int l = 10;
-    size_t len;
-    char *s1 = calloc(l, sizeof(char));
-    char w[8] = "1234567\0";
-    memcpy(s1, w, 8);
-    len = strlen(s1);
-    printf("Old L %d\n", l);
-    printf("Old len is %zu\n", len);
-    printf("Old S1 |%s|\n", s1);
-
-    char s2[5] = "abcd\0";
-
-    res = str_insert(&s1, s2, 10);
-
-    len = strlen(s1);
-    printf("Res %d\n", res);
-    printf("New L %d\n", l);
-    printf("New len is %zu\n", len);
-    printf("New S1 |%s|\n", s1);
-    free(s1);
-    return;
-  //  cgen_Program(NULL);
+char* code_gen (struct ParseTree *root) {
+    return cgen_Program(root, 0);
 }
-*/
