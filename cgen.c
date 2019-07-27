@@ -69,7 +69,7 @@ char* cgen_Int (struct ParseTree* tree) {
 
     len = strlen(tree->data->lexeme);
     integer = calloc(len + 1, sizeof(char));
-    memcpy(integer, tree->data->lexeme, len);
+    memcpy(integer, tree->data->lexeme, len * sizeof(char));
     return integer;
 }
 
