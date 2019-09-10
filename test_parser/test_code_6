@@ -3,7 +3,7 @@ while (y < x)
     if (z == 1)
         writeOut "ok";
     else
-        readIn z;
+        readInt z;
     ;
 ;
 if (y == 7)
