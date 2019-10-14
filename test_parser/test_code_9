@@ -1,0 +1,6 @@
+if (x <= 6)
+    writeOut "bad";
+;
+else
+    k = 2;
+;

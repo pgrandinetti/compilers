@@ -1,0 +1,5 @@
+x = "st1 %s", 5 + "st2 %s + %s", 9, 7;
+if (x == 5)
+    readInt y;
+    z = x + y;
+;

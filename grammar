@@ -1,0 +1,98 @@
+digit0      :   0-9
+
+digit       :   1-9
+
+letter      :   a-z | A-Z
+
+otherChar   :   -ascii-
+
+char        :   letter | otherChar
+
+num         :   ('+' | '-')? float
+
+float       :   (frac exp?) | (int frac? exp?)
+
+int         :   '0' | digit+ digit0*
+
+frac        :   '.' int
+
+exp         :   '^' ('+' | '-')? int
+
+str         :   quotedStr ('+' quotedStr)*
+
+quotedStr   :   '"' (char)* '"' (',' obj)*
+
+bool        :   'True' | 'False'
+
+null        :   'NULL'
+
+var         :   letter (digit | letter)*
+
+list        :   '[' (listExpr)? ']'
+
+listElem    :   var '[' (int | var) ']'
+
+obj         :   var | num | str | bool | null | list | listElem
+
+listExpr    :   obj (',' obj)*
+
+#-------- ================ --------#
+
+program     :   (line ENDLINE)*
+
+ENDLINE     :   ';' '\n'
+
+line        :   assign
+            |   input
+            |   output
+            |   ifLine
+            |   loopLine
+            |   breakLine
+            |   contLine
+
+input       :   readIn var
+
+output      :   writeOut obj
+
+assign      :   var '=' expr
+
+expr        :   pred (condOp expr)?
+
+pred        :   term ( ('+' | '-') pred)?
+
+term        :   baseExpr ( ('*' | '/' | '/.' | '%') term)?
+
+baseExpr    :   obj
+            |   '(' expr ')'
+
+operator    :   '+' | '-' | '*' | '/' | '/.' | '%' | condOp
+
+condOp      :   '&&' | '||' | '!=' | '==' | '<=' | '>=' | '>' | '<'
+
+ifLine      :   if ifCond ifBody
+
+ifCond      :   '(' expr ')'
+
+ifBody      :   (line ENDLINE)+ (optElse)?
+
+optElse     :   else (line ENDLINE)+
+
+loopLine    :   while ifCond loopBody
+
+loopBody    :   program
+
+#-------- ================ --------#
+
+readIn      :   'readInt' | 'readFloat' | 'readBool' | 'readStr'
+
+writeOut    :   'writeOut'
+
+breakLine   :   'break'
+
+contLine    :   'continue'
+
+if          :   'if'
+
+while       :   'while'
+
+else        :   'else'
