@@ -18,7 +18,7 @@ This repo contains the Grammar's specifications, as well as the compiler for thi
 
 ## Compile!
 
-1. Compile my Compiler! You'll need a C comiler, e.g. `gcc main.c cgen.c parser.c lexer.c`
+1. Compile my Compiler! You'll need a C compiler, e.g. `gcc main.c cgen.c parser.c lexer.c`
 2. Write your program in _my language_ and place it in a text file. An example is offered in the repo with the file `code.e`.
 3. Now compile your program with `./a.out ./code.e`.
 
