@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>Source Code Optimization in Compilers | Compilers</title>
+  <meta name="description" content="The strongest Compilers out there do not limit their work to direct compilation of the source code.
+They also modify the original source code in order to optimize performances.
+The first concepts we must study are:
+ What they optimize. When they optimize, that is, at which point in the compilation process. Where they optimize, that is, what parts of the code.  What do Compilers Optimize? Software applications vary over a very broad range.">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/source-code-optimization-in-compilers\/",
+          "name": "Source code optimization in compilers"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "Source Code Optimization in Compilers",
+  "description" : "The strongest Compilers out there do not limit their work to direct compilation of the source code.\nThey also modify the original source code in order to optimize performances.\nThe first concepts we must study are:\n What they optimize. When they optimize, that is, at which point in the compilation process. Where they optimize, that is, what parts of the code.  What do Compilers Optimize? Software applications vary over a very broad range.",
+  "inLanguage" : "en",
+  "wordCount":  1358 ,
+  "datePublished" : "2019-10-12T00:00:00",
+  "dateModified" : "2019-10-12T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/source-code-optimization-in-compilers\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="Source Code Optimization in Compilers" />
+<meta property="og:description" content="The strongest Compilers out there do not limit their work to direct compilation of the source code.
+They also modify the original source code in order to optimize performances.
+The first concepts we must study are:
+ What they optimize. When they optimize, that is, at which point in the compilation process. Where they optimize, that is, what parts of the code.  What do Compilers Optimize? Software applications vary over a very broad range.">
+<meta property="og:url" content="http://example.org/page/source-code-optimization-in-compilers/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="Source Code Optimization in Compilers" />
+  <meta name="twitter:description" content="The strongest Compilers out there do not limit their work to direct compilation of the source code.
+They also modify the original source code in order to optimize performances.
+The first concepts we …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>Source Code Optimization in Compilers</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  October 12, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>The strongest Compilers out there do not limit their work to direct compilation of the source code.</p>
+
+<p><strong>They also modify the original source code in order to optimize performances.</strong></p>
+
+<p>The first concepts we must study are:</p>
+
+<ul>
+<li><strong>What</strong> they optimize.</li>
+<li><strong>When</strong> they optimize, that is, at which point in the compilation process.</li>
+<li><strong>Where</strong> they optimize, that is, what parts of the code.</li>
+</ul>
+
+<h2 id="what-do-compilers-optimize">What do Compilers Optimize?</h2>
+
+<p>Software applications vary over a very broad range. Web, Desktop, Database, Embedded Systems are just a few examples.</p>
+
+<p>Thus, it&rsquo;s no surprise that <strong>there exist Compilers to optimize different metrics</strong>.</p>
+
+<p>Here&rsquo;s a few common metrics a Compiler may want to optimize:</p>
+
+<ul>
+<li><strong>Runtime</strong>. This is probably the most common case, when a Compiler wants to minimize the number of execution steps of a program.</li>
+<li><strong>Disk access</strong>. When a Compiler wants to minimize the number of accesses to disk made by a program.</li>
+<li><strong>Network messages</strong>. When the number and size of packets sent through the network must be minimized.</li>
+<li><strong>Power consumption</strong>. When the battery of the machine must be preserved as long as possible.</li>
+<li><strong>Size of the compiled program</strong>. When the size (in kilobytes or megabytes) of the final program is important, and must be minimized.</li>
+</ul>
+
+<p>The most intuitive metric is surely the first one. And indeed is also the one commonly implemented in the Compilers that are the most used out there.</p>
+
+<h2 id="when-do-compilers-optimize">When do Compilers Optimize?</h2>
+
+<p>We have studied the different steps of a Compilers in great depth before. They are, from the first to the last:</p>
+
+<ol>
+<li>Lexical Analysis.</li>
+<li>Parsing.</li>
+<li>Semantic Analysis.</li>
+<li>Optimization.</li>
+<li>Code Generation.</li>
+</ol>
+
+<p>Thus, the Optimization module can work on the result of any of the other steps.</p>
+
+<p><strong>The first option is to optimize the parse-tree</strong>, that is the result of the Parsing step.</p>
+
+<p>This approach has two consequences:</p>
+
+<ul>
+<li>Advantage. The parse-tree is an algorithmic abstraction. Therefore it&rsquo;s a very general approach, not tied to any specific machine architecture.</li>
+<li>Disadvantage. For the same reason, the parse-tree is sometimes too generic. There are not many optimization tricks that can be applied to it.</li>
+</ul>
+
+<p><strong>The second option is to optimize the Assembly code</strong>, that is the result of the Code Generation step. No need to say, this is the deepest optimization level.</p>
+
+<ul>
+<li>Advantage. At such a low level, you can potentially optimize every single bit of code!</li>
+<li>Disadvantage. Assembly code strongly depends on the machine architecture, so we&rsquo;d have to reimplement the optimization module for each architecture.</li>
+</ul>
+
+<p>I will speak in a moment about the trade-offs between complexity and gainings in Source Code Optimization, but for the moment it suffices to say that the disadvantage of performing optimization on Assembly code is such that nobody really does it.</p>
+
+<p><strong>The third option is to optimize an Intermediate Code</strong>. Let&rsquo;s make a small digression to see what Intermediate Code is.</p>
+
+<h3 id="intermediate-code">Intermediate Code</h3>
+
+<p>The concept of <strong>intermediate code</strong>, also known as <strong>intermediate language</strong>, simply refers to a language that is in between the source code and the target (final) language.</p>
+
+<p>For example, the source language can be C and the target can be some mixed Assembly (Intel, MIPS, etc.).</p>
+
+<p>The real question is - <strong>why would one need an Intermediate Language?</strong></p>
+
+<p>The reason is that the Intermediate Language (IL) creates yet one more level of abstraction, and practice has shown that it turns out to be a good thing!</p>
+
+<p>In particular, the IL has:</p>
+
+<ul>
+<li>Many more details than the original source code.</li>
+<li>Some detail less than machine (Assembly) code.</li>
+</ul>
+
+<p>For example, if the source is in Python then we have no way to express something about the machine&rsquo;s register, and their allocation. But before going down to Assembly we might want to express this specific feature of the program in some intermediate language.</p>
+
+<p>To get a more precise idea of what an Intermediate Language is, let&rsquo;s create one.</p>
+
+<p>Our Intermediate Language will have the following features:</p>
+
+<ul>
+<li>It can allocate registers, but assumes there&rsquo;s an infinite number of them.</li>
+<li>It has control structures like Assembly.</li>
+<li>It has opcodes (<code>add</code>, <code>mul</code>, etc.) like Assembly, plus some more higher level, such as push that translates into more than one Assembly instruction.</li>
+</ul>
+
+<p>Furthermore, in this IL, every operation must have one of two forms:</p>
+<div class="highlight"><pre class="chroma">x := y op z, or
+x := op y</pre></div>
+<p>where <code>y</code>, <code>z</code> must be either constants or register names.</p>
+
+<p>This Intermediate Language is called <strong>three-address code</strong>, because every instruction has at most 3 operands. In fact, it&rsquo;s a well known form of IL, and widely used too.</p>
+
+<p>As an example, consider the operation</p>
+<div class="highlight"><pre class="chroma">x + y * z</pre></div>
+<p>How would that be translated in the IL?</p>
+<div class="highlight"><pre class="chroma">t1 := y * z
+t2 := x + t1</pre></div>
+<p>Remember that we can create as many temporary registers as we like (<code>t1</code>, <code>t2</code>, …). This is the most evident approximation respect to Assembly.</p>
+
+<p>The important thing to know is that to generate intermediate code is not conceptually different from generating runnable code the way we already studied.</p>
+
+<p>Thus, if you decide to use IL in your Compiler the sequence of steps would become:</p>
+
+<ol>
+<li>Lexical Analysis.</li>
+<li>Parsing.</li>
+<li>Semantic Analysis.</li>
+<li>Intermediate Code Generation (from the Parse-Tree).</li>
+<li>Intermediate Code optimization.</li>
+<li>Runnable code generation (from the Intermediate Code).</li>
+</ol>
+
+<p>Thus, it&rsquo;s easy to understand that an additional, nice to have feature of an Intermediate Language is that it&rsquo;s easy to translate in Assembly.</p>
+
+<p>Now, let&rsquo;s get back to Optimization.</p>
+
+<h2 id="where-do-compilers-optimize">Where do Compilers Optimize?</h2>
+
+<p>Since Source Code Optimization is literally about modifying some parts of the source code, a natural question arises - can we do that no matter where in the original code?</p>
+
+<p>One possibility is <strong>to optimize basic blocks of code</strong>.</p>
+
+<p>A basic block of code is a sequence of instructions without any label, except possibly for the first line, and without any jump, except possibly for the last line.</p>
+
+<p>The idea is that a basic block is a <strong>piece of code whose execution is completely predictable</strong>. There&rsquo;s no entry point for other parts of the code (except for the first line, maybe), and there&rsquo;s no exit point, except maybe for a final jump. Therefore, we know what&rsquo;s going to happen there, and we can optimize its behavior.</p>
+
+<p>Another option is <strong>to optimize control-flow graphs</strong>.</p>
+
+<p>A control-flow graph is a directed graph that represents the execution of a single function. In such a graph:</p>
+
+<ul>
+<li>Nodes are basic blocks.</li>
+<li>There&rsquo;s an edge between two nodes (basic blocks) A and B, if the execution can pass from the last execution of A to the first execution of B.</li>
+</ul>
+
+<p>Another key point here is that the body of a method (or a procedure) can always be represented as a control-flow graph, where the “return” nodes are terminal. That&rsquo;s why talking about control-flow graphs optimization makes sense.</p>
+
+<p>The third possibility is <strong>to optimize procedures execution</strong>, taking into account that the execution can jump back and forth into each other. Clearly this is the most complex case.</p>
+
+<p>In summary, there are three alternatives:</p>
+
+<ol>
+<li><strong>Local Optimization</strong>. Applied to each basic block in isolation.</li>
+<li><strong>Global Optimization</strong>. Applied to a control-flow graph (a whole function/method) in isolation.</li>
+<li><strong>Inter-procedural Optimization</strong>. Applied across function boundaries.</li>
+</ol>
+
+<p>It&rsquo;s worth noting that most compilers do (1). Many do (2). But just a few do (3). The reason is not only that (1) is the least difficult to implement, but also because it&rsquo;s where the gain is the highest.</p>
+
+<p>This means that there&rsquo;s often a conscious choice of not implementing fancy optimization techniques that are known in literature. Why?</p>
+
+<ul>
+<li>Some optimizations are complex to implement.</li>
+<li>Some are costly in compilation time.</li>
+<li>Some have low payoff.</li>
+<li>The fanciest techniques have all three problems!</li>
+</ul>
+
+<p>This points out what is the real goal of optimization: <strong>Maximum benefit for minimum cost</strong>. This is the tread-off between benefit and costs.</p>
+
+<h2 id="what-s-next">What&rsquo;s next</h2>
+
+<p>In this short article I simply wanted to give an overview of what optimization means in the context of Compilers. It&rsquo;s actually the most involved step of all, in today&rsquo;s Compilers, and also the most active from research point of view.</p>
+
+<p>In one upcoming article in this course I will discuss more in detail a few techniques to perform optimization in the three cases we saw above.</p>
+
+<h2 id="references">References</h2>
+
+<p>Alex Aiken&rsquo;s class Compilers at Stanford University. Available as <a href="https://lagunita.stanford.edu/courses/Engineering/Compilers/Fall2014/course/">free MOOC online</a>.</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fsource-code-optimization-in-compilers%2f&amp;text=Source%20Code%20Optimization%20in%20Compilers&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fsource-code-optimization-in-compilers%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fsource-code-optimization-in-compilers%2f&amp;title=Source%20Code%20Optimization%20in%20Compilers" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fsource-code-optimization-in-compilers%2f&amp;title=Source%20Code%20Optimization%20in%20Compilers" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fsource-code-optimization-in-compilers%2f&amp;title=Source%20Code%20Optimization%20in%20Compilers" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fsource-code-optimization-in-compilers%2f&amp;description=Source%20Code%20Optimization%20in%20Compilers" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

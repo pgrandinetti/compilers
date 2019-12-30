@@ -1,0 +1,3 @@
+[submodule "class/themes/beautifulhugo"]
+	path = class/themes/beautifulhugo
+	url = https://github.com/pgrandinetti/beautifulhugo.git

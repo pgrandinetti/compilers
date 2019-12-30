@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>How do Compilers Manage Garbage Collection? | Compilers</title>
+  <meta name="description" content="A Garbage Collector is the module of a programming language that takes care of cleaning the memory during the program&rsquo;s execution.
+Even though we are used to it, Garbage Collection (also called Automatic Memory Management) is a relatively recent innovation in programming languages.
+In the good old days, programming languages such as C and C&#43;&#43; asked the developer to take care of every bit of memory. For example, in C the developer should:">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/how-compilers-manage-garbage-collection\/",
+          "name": "How do compilers manage garbage collection?"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "How do Compilers Manage Garbage Collection?",
+  "description" : "A Garbage Collector is the module of a programming language that takes care of cleaning the memory during the program\x26rsquo;s execution.\nEven though we are used to it, Garbage Collection (also called Automatic Memory Management) is a relatively recent innovation in programming languages.\nIn the good old days, programming languages such as C and C\x2b\x2b asked the developer to take care of every bit of memory. For example, in C the developer should:",
+  "inLanguage" : "en",
+  "wordCount":  3292 ,
+  "datePublished" : "2019-10-12T00:00:00",
+  "dateModified" : "2019-10-12T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/how-compilers-manage-garbage-collection\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="How do Compilers Manage Garbage Collection?" />
+<meta property="og:description" content="A Garbage Collector is the module of a programming language that takes care of cleaning the memory during the program&rsquo;s execution.
+Even though we are used to it, Garbage Collection (also called Automatic Memory Management) is a relatively recent innovation in programming languages.
+In the good old days, programming languages such as C and C&#43;&#43; asked the developer to take care of every bit of memory. For example, in C the developer should:">
+<meta property="og:url" content="http://example.org/page/how-compilers-manage-garbage-collection/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="How do Compilers Manage Garbage Collection?" />
+  <meta name="twitter:description" content="A Garbage Collector is the module of a programming language that takes care of cleaning the memory during the program&rsquo;s execution.
+Even though we are used to it, Garbage Collection (also called …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>How do Compilers Manage Garbage Collection?</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  October 12, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>A Garbage Collector is the module of a programming language that takes care of cleaning the memory during the program&rsquo;s execution.</p>
+
+<p>Even though we are used to it, Garbage Collection (also called <strong>Automatic Memory Management</strong>) is a relatively recent innovation in programming languages.</p>
+
+<p>In the good old days, programming languages such as C and C++ asked the developer to take care of every bit of memory. For example, in C the developer should:</p>
+
+<ul>
+<li>Request the allocation of new space in memory, specifying how many bytes are needed. This is done with the function <code>malloc(...)</code>.</li>
+<li>Delete from memory those objects that aren&rsquo;t needed anymore, specifying a pointer to that location. This is achieved with the function <code>free(...)</code>.</li>
+</ul>
+
+<p>Obviously, this way to manage memory has really nothing of automatic. It&rsquo;s fully manual.</p>
+
+<p>Decades of experience have proven that <strong>manual memory management leads to bugs</strong> in every program, no matter how good are the developers. It&rsquo;s just too much to have to deal with (among many others):</p>
+
+<ul>
+<li>Memory leaks: when you forget to delete something from memory.</li>
+<li>Dangling pointers: should be dereferenced, but you must remember it!</li>
+<li>Override part of an object: maybe you thought it wasn&rsquo;t there anymore!</li>
+</ul>
+
+<p>The truth is that this type of storage bugs are extremely difficult to find, and many productions systems nowadays still have some memory leaks that&rsquo;s still hidden. This is not a safe and robust way of building systems.</p>
+
+<p>Automatic Memory Management, aka Garbage Collector, gained mainstream popularity with the rise of Java. Java was indeed the first enterprise language to become very popular and to have garbage collection.</p>
+
+<p><strong>The principles of Garbage Collection</strong> are the ones simple intuition would suggest:</p>
+
+<ol>
+<li>When a new object is created, some unused space in memory is reserved for it.</li>
+<li>Doing this over and over means the program will run out of free memory.</li>
+<li>However, some objects that were created will never be used again and if we find them then we can free the memory.</li>
+</ol>
+
+<p>There is one very important concept I would like to start our conversation from. <strong>Garbage Collection is not a perfect system</strong>.</p>
+
+<p>Let&rsquo;s see what that means.</p>
+
+<h2 id="no-garbage-collector-is-perfect">No Garbage Collector is Perfect</h2>
+
+<p>The key concept that all automatic management systems use is that <strong>a program can only use objects that it can find</strong>.</p>
+
+<p>In other words, if there is an object in memory that&rsquo;s not accessible by any part of the program, and therefore can&rsquo;t be used in any sort of operation (assignment, computation, etc.) then it can be deleted and the memory reused.</p>
+
+<p>Let&rsquo;s take a look at one basic example.</p>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="n">x</span> <span class="o">=</span> <span class="k">new</span> <span class="n">A</span><span class="p">();</span>
+<span class="n">y</span> <span class="o">=</span> <span class="k">new</span> <span class="n">B</span><span class="p">();</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">y</span><span class="p">;</span></code></pre></div>
+<p>With the first statement, some words of memory are reserved and a new <code>A</code> object is created there, then this object is referenced by the pointer attached to the variable <code>x</code>.</p>
+
+<p>However, with the third statement the pointer attached to <code>x</code> is moved to a different memory location (one with a <code>&quot;B&quot;</code> object). Therefore, <strong>the object created in memory with the first instruction becomes unreachable</strong>. Thus, that space can be freed.</p>
+
+<p>Let&rsquo;s now throw in two simple definitions.</p>
+
+<p>An object <code>X</code> is <em>reachable</em> if either:</p>
+
+<ol>
+<li>One register has a pointer to X.</li>
+<li>Another reachable object Y contains a pointer to X.</li>
+</ol>
+
+<p>An <em>unreachable</em> object is one that is not reachable. These objects are garbage.</p>
+
+<p>Unfortunately, this approach, as sound as it is, leaves some &ldquo;dark zone&rdquo; in memory that are not considered unreachable, and therefore not reused, even though they should really be.</p>
+
+<p>Let&rsquo;s take a look as one example where this can happen.</p>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="n">x</span> <span class="o">=</span> <span class="k">new</span> <span class="n">A</span><span class="p">();</span>
+<span class="n">y</span> <span class="o">=</span> <span class="k">new</span> <span class="n">B</span><span class="p">();</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">y</span><span class="p">;</span>
+<span class="c1">// assume y is dead here
+</span><span class="c1">// Garbage Collection starts here too, collecting y
+</span><span class="c1"></span><span class="k">if</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="k">new</span> <span class="n">A</span><span class="p">();</span>
+<span class="k">else</span>
+    <span class="n">x</span><span class="p">.</span><span class="na">foo</span><span class="p">()</span></code></pre></div>
+<p>When Garbage Collector starts, it will collect the variable/pointer <code>y</code>, as we&rsquo;re assuming is dead, and it will also collect the object of type <code>A</code> created in memory on the first line.</p>
+
+<p>It will not collect the object B created on the second line, even if <code>y</code> is collected, because that object is referenced by <code>x</code>.</p>
+
+<p>However, that object will never be used again in the code, because the condition of the <code>if</code> is always true, and therefore the statement <code>x.foo()</code> in the else branch will never be executed. This means that the object <code>B</code> should also have been collected in the previous run of the Garbage Collector.</p>
+
+<p>This is just one example, among infinitely many, that shows that <strong>reachability is an approximation</strong>.</p>
+
+<p>With this piece of knowledge in mind, let&rsquo;s move on to analyze three of the most well known <strong>algorithms for Garbage Collection</strong>.</p>
+
+<h2 id="mark-and-sweep-algorithm">Mark and Sweep Algorithm</h2>
+
+<p>As its name says, this algorithm works in two phases:</p>
+
+<ol>
+<li>The Mark Phase, when all reachable objects are traced.</li>
+<li>The Sweep Phase, when all unreachable objects are deleted.</li>
+</ol>
+
+<p>Practically speaking, <strong>this algorithm requires every object to have one more bit</strong>, the mark bit.</p>
+
+<p>Let&rsquo;s now look into the details of the two phases.</p>
+
+<h3 id="mark-algorithm">Mark Algorithm</h3>
+
+<p>The idea of the first phase is to start from &ldquo;roots&rdquo; objects. These are the objects that are always reachable. For each of them, the algorithm finds all objects that can be reached, mark them as reachable (with the mark bit), and consider it as a root too.</p>
+<div class="highlight"><pre class="chroma">Let T = {all roots}
+While T is not empty:
+    Select v from T
+    T ← T - {v}
+    if mark(v) == 0 then
+        mark(v) ← 1
+        Let v1,...,vn all pointers from v
+        T ← T U {v1,...,vn}</pre></div>
+<h2 id="sweep-algorithm">Sweep Algorithm</h2>
+
+<p>In the second phase, the Heap memory is scanned in order to find all objects that have the mark bit unset (that is, equal to zero). These are the garbage objects.</p>
+
+<p>It&rsquo;s worth understanding that the &ldquo;deletion&rdquo; operation happens at the logical level only. Not on the physical level. Let me elaborate this point better.</p>
+
+<p>When an object with mark bit unset is found, we know that we want to be able to reuse the memory currently taken by that object.</p>
+
+<p>Actually clearing that memory is not something meaningful to do. In fact, it&rsquo;s not actually possible! How would &ldquo;clear&rdquo; a slot of memory? Would you set it to zero bits? But that could be a real object with zero value!</p>
+
+<p>Thus, <strong>the action of &ldquo;deleting&rdquo; the object simply consists in knowing that those memory slots can be reused</strong>, and in saving this precious information somewhere.</p>
+
+<p>To implement this logic, let&rsquo;s assume we have:</p>
+
+<ul>
+<li>A function <code>sizeof(p)</code>, that gives the size (in block of memory) the object pointed by p takes in memory.</li>
+<li>A list, called the <em>free-list</em>, where we can store the blocks of memory that can be reused.</li>
+</ul>
+
+<p>Let&rsquo;s now look at the actual algorithm:</p>
+<div class="highlight"><pre class="chroma">Let p ← bottom of the heap
+    while p greater than top of the heap
+        if mark(p) == 1, then mark(p) = 0
+        else add the block [p,..., p + sizeof(p) - 1] to the free list
+        p ← p + sizeof(p)</pre></div>
+<h3 id="comments">Comments</h3>
+
+<p>Overall, Mark and Sweep is an easy to understand procedure. That said, it has many tricky details that&rsquo;s worth knowing about.</p>
+
+<p>For starters, let&rsquo;s consider that the Mark algorithm, as I stated it, needs to create a list of objects that will contain first the root object, and then potentially many more objects.</p>
+
+<p>But <strong>Garbage Collector is run when the program is running out of memory</strong>! It should not need to use a lot of memory to run! And what makes it worse is that the size of the T list is not known in advance.</p>
+
+<p>The solution to circumvent this issue is <strong>to use pointer reversal</strong>. The algorithm avoids to create a new list, and instead follows the same pointers used to determine reachability, reversing them twice in order to follow all paths.</p>
+
+<p>Let&rsquo;s look at one example to clarify how this works. Let&rsquo;s say we have five objects in memory, with only one root, the object A.</p>
+<div class="highlight"><pre class="chroma">A → B → C
+  \
+   \
+    D → E</pre></div>
+<p>So, we start at A and take the path towards B. When we arrive at B, we mark B as reachable (mark(B) = 1) and then we reverse the previous pointer, so there will now be a pointer from B to A.</p>
+<div class="highlight"><pre class="chroma">A ← B → C
+  \
+   \
+    D → E</pre></div>
+<p>We now continue, and we arrive at C. So we set mark&copy; = 1, and we also reverse that pointer.</p>
+<div class="highlight"><pre class="chroma">A ← B ← C
+  \
+   \
+    D → E</pre></div>
+<p>At this point we notice that C does not have any other pointer. We can then go backwards thanks to the reversed pointers.</p>
+
+<p>We walk back from C to B, and reverse again the pointer.</p>
+<div class="highlight"><pre class="chroma">A ← B → C
+  \
+   \
+    D → E</pre></div>
+<p>Object B does not have more pointers either, so we walk back one more step, and reverse that pointer too.</p>
+<div class="highlight"><pre class="chroma">A → B → C
+  \
+   \
+    D → E</pre></div>
+<p>Now we see that A has one more pointer that we didn&rsquo;t explore, so we go towards D following the same procedure.</p>
+
+<p>This seems to work nicely, but there&rsquo;s still one obscure point. Let&rsquo;s consider again the action of reversing the pointer from B to A, during the initial step.</p>
+
+<p>This operation cannot be done without care. First of all, B might not have space for a pointer at all! Secondly, if it does have space (like in the example), then this space is probably already used for a pointer to a different object!</p>
+
+<p>Referring to the example, B has a pointer to the object C. If we changed that pointer and link it to A, then we would not be able to reach C!</p>
+
+<p>In fact, this is a common problem that arises in algorithms that are based on work-lists (also called, to-do lists). It is often called <strong>off-by-1 problem</strong>.</p>
+
+<p>The solution is to reverse the pointer of the second to last visited object. For example, when we arrive at C, we change the pointer B→C into A←B, and also use a temporary pointer to remember that we are onto B, because we will later need to add a pointer B←C.</p>
+
+<p>Finally, it&rsquo;s worth knowing that the same trick is used to manage the free-list, in the sweep phase.</p>
+
+<p>What is <strong>the main advantage of Mark and Sweep</strong>? One of its best features is that <strong>it does not change the pointers in memory</strong>.</p>
+
+<p>In different words, objects are not actually moved around, within the memory. Some are marked as deleted, by adding those locations in the free-list, but those who are not will still be in the same memory slots, pointed by the same pointers are before.</p>
+
+<p>This is a nice-to-have feature in languages that have explicit pointers. For example, in C pointers are explicit and exposed to the developer. Therefore, one could build a Garbage Collector for C using the Mark and Sweep algorithm. This has indeed been done.</p>
+
+<p>Instead, if you wanted to use a different algorithm for Garbage Collector in C, one that changes pointers and object locations, you would really give a hard time to everybody who uses your Garbage Collector! When it starts, it would change the pointers that the programmer has used in his code!</p>
+
+<p>What about <strong>the disadvantages of Mark and Sweep</strong>? The main problem it has is <strong>memory segmentation</strong>.</p>
+
+<p>The whole idea of using the free-list is such that the computer&rsquo;s memory becomes very fragmented. Thus, at times it can be difficult to find a contiguous part of the free memory where to allocate some larger object.</p>
+
+<h2 id="stop-and-copy-algorithm">Stop and Copy Algorithm</h2>
+
+<p>This is another strategy for Automatic Memory Management. Its main idea is to split memory in two parts, both logically and physically.</p>
+
+<ul>
+<li>The <em>old space</em>, that&rsquo;s used to allocate objects.</li>
+<li>The <em>new space</em>, reserved to Garbage Collector operations (explained in a moment).</li>
+</ul>
+
+<p>In addition, this system keeps track of a special pointer, called <strong>heap pointer</strong>. This points to the first free block of memory in the heap.</p>
+
+<p>Basically, every block of memory below the heap pointer is already used. Everything above it, instead, is available space. Clearly, every time a new object is stored in memory, the heap pointer is shifted (up), according to the size of the object.</p>
+
+<p>The Garbage Collector is activated when the old space gets full. Then, the algorithm:</p>
+
+<ol>
+<li>Finds all reachable objects in the old space.</li>
+<li>Copies all of them into the new space.</li>
+<li>Switches the roles: new space becomes old space and vice versa.</li>
+<li>Resumes the program.</li>
+</ol>
+
+<p>This logically very easy steps are such that all garbage objects are left behind in the old space, and they will be overwritten soon. On the other hand, all reachable objects are copied into the new space (that will then become the old space), and can still be used.</p>
+
+<h3 id="comments-1">Comments</h3>
+
+<p>Even though Stop and Copy seems a very easy algorithm, there are a lot of tricky details worth knowing about, as for Mark and Sweep.</p>
+
+<p>The peculiar feature of Stop and Copy, is that, in order to copy all objects in the new space, we need to move them and <strong>find and fix all pointers in/out</strong>. It&rsquo;s not obvious how to do that, because when we find an object, we can&rsquo;t see all pointers that points to it (whereas it&rsquo;s easy to see the ones that goes out).</p>
+
+<p>To solve this problem, the trick is to use a <strong>forwarding pointer</strong>: when we copy an object, we mark it as &ldquo;copied&rdquo; and also add a pointer from the original object to its copy in the new space. This way, if another object had a pointer to the object we moved, it will be able to find the new copy using the forwarding pointer.</p>
+
+<p>Another important point is: <strong>how to implement the traversal without using extra space</strong>?</p>
+
+<p>The trick here is to <strong>partition the new space into three contiguous regions</strong>:</p>
+
+<ul>
+<li>The <em>empty region</em>, where we allocate new objects. There&rsquo;s a pointer <code>alloc</code> to the first block in this region.</li>
+<li>The <em>scan region</em>, where we have objects that have been copied but not scanned for their pointers. There&rsquo;s a pointer <code>scan</code>, for the first block of this region.</li>
+<li>The <em>start region</em>, where there are objects that have been copied and scanned.</li>
+</ul>
+
+<p>To make a parallelism with mark and sweep, we can think of <strong>the scan region as the work list</strong>.</p>
+
+<h3 id="algorithm">Algorithm</h3>
+
+<p>Let&rsquo;s take a look at the pseudo-code for the Stop and Copy Algorithm.</p>
+<div class="highlight"><pre class="chroma">While scan != alloc
+  1. Let O be the object at the scan pointer
+  2. For each pointer p contained in O
+    a. Find O&#39; that p points to
+    b. If O&#39; does not have a forwarding pointer:
+       1. Copy O&#39; to new space
+       2. Update alloc pointer
+       3. Set 1st word of old O&#39; to point to the new copy of O&#39;
+       4. Mark old O&#39; as copied
+       5. Change p to point to the new copy of O&#39;
+    c. Else set p in O equal to the forwarding pointer
+  3. Increment scan pointer to the next object</pre></div>
+<p>There are two other important points to note:</p>
+
+<ul>
+<li>We must be able to tell how large an object is (like with a function <em>sizeof</em>), and also in which words of the memory reserved to each object there are pointers. However, we can safely assume that <strong>the Compiler knows all of this</strong>.</li>
+<li>When performing Garbage Collection, we must check if any of those objects is referred by a pointer in the stack. Therefore, we must scan the entire stack and update all pointers. This can be an expensive operation.</li>
+</ul>
+
+<p>Finally, it&rsquo;s good to know that <strong>Stop and Copy is considered the most efficient Garbage Collection Algorithm</strong>:</p>
+
+<ul>
+<li>Allocation is very cheap (just increment the pointer).</li>
+<li>Collection is relatively cheap, and is very cheap if there&rsquo;s a lot of garbage, because the algorithm only touches the reachable objects.</li>
+</ul>
+
+<p>On the other hand, Stop and Copy can only be used in languages that do not expose pointers to the programmers. For example, it cannot be used in C because during Garbage Collection pointers are moved all around in memory, and would mess up the rest of the program.</p>
+
+<h2 id="reference-counting-algorithm">Reference Counting Algorithm</h2>
+
+<p>This is yet another Automatic Memory Management technique, and also the last one we will study in this article.</p>
+
+<p>The basic idea is that instead of waiting for the memory to be almost full and only then start the Garbage Collector, the system tries to keep track of how many references each object has, and as soon as the counting is zero for an object - which means that object has become unreachable - it frees the space it occupied in memory.</p>
+
+<p>To do this, obviously there must be an additional field in every object that counts the number of pointers to it.</p>
+
+<p>What this implies, is that every assignment operation in the code must also take care of updating this field for all objects. Clearly, this causes some overhead in the program&rsquo;s execution.</p>
+
+<p>Let&rsquo;s look at one example of how Reference Counting works.</p>
+
+<p>Let <code>rc(x)</code> be the reference count field in object <code>x</code>. Assume we have two pointers <code>x</code>, <code>y</code> that point to two objects in memory <code>O</code>, <code>P</code>.</p>
+
+<p>Now, it&rsquo;s important to notice that during Code Generation we must do a lot of additions in the code. Every assignment <code>x←y</code> in the original code is transformed to the following sequence of 4 instructions.</p>
+<div class="highlight"><pre class="chroma">rc(p) ← rc(p) + 1
+rc(o) ← rc(o) - 1
+if (rc(o) == 0) then free(o)
+x ← y</pre></div>
+<p>As it&rsquo;s easy to see, these 4 instructions are all is needed to perform Garbage Collection based on Reference Counting.</p>
+
+<p>On the bright side, Reference Counting has two pros:</p>
+
+<ul>
+<li>Very easy to implement, for a basic implementation.</li>
+<li>Collects garbage incrementally, without waiting for memory to get full.</li>
+</ul>
+
+<p>On the other side, there are some cons too:</p>
+
+<ul>
+<li>Cannot collect circular structures (because they will always have <code>rc=1</code>, even if they are unreachable from the stack).</li>
+<li>The manipulation of <code>rc(x)</code> makes the code much slower.</li>
+<li>For an optimized version of the algorithm, the implementation becomes really complex.</li>
+</ul>
+
+<p>To solve the problem with circular structures, either the programmer remembers that each time one such structure becomes unreachable, they should change one pointer inside the structure to NULL, so then in a few steps the entire structure will be collected. Or, we should back this technique with another Garbage Collector technique that is run only once in a while.</p>
+
+<h2 id="summary-and-outlook">Summary and Outlook</h2>
+
+<p>In this article we learnt what Automatic Memory Management is, and how&rsquo;s often called: Garbage Collector.</p>
+
+<p>We also studies three of the most well known Garbage Collector algorithms:</p>
+
+<ul>
+<li>Mark and Sweep</li>
+<li>Stop and Copy</li>
+<li>Reference Counting</li>
+</ul>
+
+<p>There are a few points worth reiterating, in my opinion:</p>
+
+<ul>
+<li>There&rsquo;s <strong>no doubt that Garbage Collector helps preventing storage bugs and memory leaks</strong> in complex programs.</li>
+<li>Nonetheless, <strong>it does reduce the control that the programmer has</strong> over what happens in memory.</li>
+<li>Furthermore, the program execution is paused during Garbage Collection. This can cause some trouble, especially in real-time applications.</li>
+<li>Finally, one must remember that Garbage Collection Algorithms aren&rsquo;t perfect. <strong>There&rsquo;s no guarantee that memory bugs are prevented</strong>, no matter what system is in use. Reduced, yes. Avoided completely, forget about it.</li>
+</ul>
+
+<p>As I briefly mentioned in a paragraph in this article, Automatic Memory Management is still an active research topic, and many other techniques have been proposed. For instance, here are some:</p>
+
+<ul>
+<li>Concurrent: Garbage Collector works in background in a separate thread.</li>
+<li>Generational: It does not analyze &ldquo;too often&rdquo; objects that are referred by a lot of places.</li>
+<li>Real-Time: There are limits on the time that the system can be paused during Garbage Collection.</li>
+<li>Parallel: The system uses (and coordinates) many Garbage Collectors at the same time.</li>
+</ul>
+
+<h2 id="references">References</h2>
+
+<p>Alex Aiken&rsquo;s class Compilers at Stanford University. Available as <a href="https://lagunita.stanford.edu/courses/Engineering/Compilers/Fall2014/course/">free MOOC online</a>.</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fhow-compilers-manage-garbage-collection%2f&amp;text=How%20do%20Compilers%20Manage%20Garbage%20Collection%3f&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fhow-compilers-manage-garbage-collection%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fhow-compilers-manage-garbage-collection%2f&amp;title=How%20do%20Compilers%20Manage%20Garbage%20Collection%3f" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fhow-compilers-manage-garbage-collection%2f&amp;title=How%20do%20Compilers%20Manage%20Garbage%20Collection%3f" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fhow-compilers-manage-garbage-collection%2f&amp;title=How%20do%20Compilers%20Manage%20Garbage%20Collection%3f" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fhow-compilers-manage-garbage-collection%2f&amp;description=How%20do%20Compilers%20Manage%20Garbage%20Collection%3f" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

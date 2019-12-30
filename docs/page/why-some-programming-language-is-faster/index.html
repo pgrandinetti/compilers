@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>Why Are Some Programming Languages Faster? | Compilers</title>
+  <meta name="description" content="Thanks to &ldquo;Compilers&rdquo; being the main keyword for this course, we also learned a great deal about Programming Language.
+In a previous article I described what features can differentiate a programming language from the others. In particular:
+ General Purpose vs Domain Specific Language. High vs Low Level Language. Interpreted vs Compiled Language. Procedural vs Functional vs Object Oriented Language. Typed vs Untyped Language. Statically vs Dynamically Typed Language. Static vs Dynamic Scope.">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/why-some-programming-language-is-faster\/",
+          "name": "Why are some programming languages faster?"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "Why Are Some Programming Languages Faster?",
+  "description" : "Thanks to \x26ldquo;Compilers\x26rdquo; being the main keyword for this course, we also learned a great deal about Programming Language.\nIn a previous article I described what features can differentiate a programming language from the others. In particular:\n General Purpose vs Domain Specific Language. High vs Low Level Language. Interpreted vs Compiled Language. Procedural vs Functional vs Object Oriented Language. Typed vs Untyped Language. Statically vs Dynamically Typed Language. Static vs Dynamic Scope.",
+  "inLanguage" : "en",
+  "wordCount":  1198 ,
+  "datePublished" : "2019-10-12T00:00:00",
+  "dateModified" : "2019-10-12T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/why-some-programming-language-is-faster\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="Why Are Some Programming Languages Faster?" />
+<meta property="og:description" content="Thanks to &ldquo;Compilers&rdquo; being the main keyword for this course, we also learned a great deal about Programming Language.
+In a previous article I described what features can differentiate a programming language from the others. In particular:
+ General Purpose vs Domain Specific Language. High vs Low Level Language. Interpreted vs Compiled Language. Procedural vs Functional vs Object Oriented Language. Typed vs Untyped Language. Statically vs Dynamically Typed Language. Static vs Dynamic Scope.">
+<meta property="og:url" content="http://example.org/page/why-some-programming-language-is-faster/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="Why Are Some Programming Languages Faster?" />
+  <meta name="twitter:description" content="Thanks to &ldquo;Compilers&rdquo; being the main keyword for this course, we also learned a great deal about Programming Language.
+In a previous article I described what features can differentiate a …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>Why Are Some Programming Languages Faster?</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  October 12, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>Thanks to &ldquo;Compilers&rdquo; being the main keyword for this course, we also learned a great deal about Programming Language.</p>
+
+<p>In a previous article I described what features can differentiate a programming language from the others. In particular:</p>
+
+<ul>
+<li>General Purpose vs Domain Specific Language.</li>
+<li>High vs Low Level Language.</li>
+<li>Interpreted vs Compiled Language.</li>
+<li>Procedural vs Functional vs Object Oriented Language.</li>
+<li>Typed vs Untyped Language.</li>
+<li>Statically vs Dynamically Typed Language.</li>
+<li>Static vs Dynamic Scope.</li>
+<li>Automatically Managed Memory (Garbage Collector) vs Manual Memory Management.</li>
+</ul>
+
+<p>These are core features design of a language. The person (or the team) that works on that language development, and its compiler, has to make a choice for each of the above points, and even more.</p>
+
+<p>As a result, there are a lot of Programming Languages out there. Each Language has its unique set of features, although, in all honesty, some languages are really similar.</p>
+
+<p>A common question is <strong>what&rsquo;s the fastest programming language</strong>?</p>
+
+<p>First of all, the question asked in this form makes little sense. For a number of reasons:</p>
+
+<ul>
+<li>The quality of your code is more important than the efficiency of the language you use, for 99.9% of applications.</li>
+<li>Actual speed of execution strongly depends on the hardware, and not just on the programming language.</li>
+<li>Even on the same hardware, the current CPUs and RAM are such that in a tiny percentage of cases you will experience a performance difference due to the programming language.</li>
+<li>There are many things that you can&rsquo;t know about how the Compiler modifies your code, to optimize the execution. I talked about them in a previous article.</li>
+</ul>
+
+<p>In different words, much before thinking about the performance of the language you chose, and of its compiler, you should focus on different things, much more important:</p>
+
+<ol>
+<li>Write the highest-quality code you can.</li>
+<li>Use standard, well-known software pattern design. They improve readability and overall maintenance of the code, hence performance.</li>
+<li>Choose well tested, robust, external libraries and packages if you need any.</li>
+</ol>
+
+<p>That said, the main question still stands, and it&rsquo;s an interesting one from a theoretical point of view.</p>
+
+<p><strong>If we could implement the same algorithm, on the same hardware, with all other conditions being the same, in different Programming Languages, which would be the fastest?</strong></p>
+
+<p>To answer that, and in view of all other important points I mentioned, I want to discuss <strong>the top-3 features that impact the efficiency</strong>.</p>
+
+<h2 id="assembled-vs-compiled-vs-interpreted">Assembled vs Compiled vs Interpreted</h2>
+
+<p>In fact, there&rsquo;s little doubt. <em>Assembled code is the fastest</em>.</p>
+
+<p>Speaking from a theoretical point of view, if you could always write your programs in Assembly code, and you could also always write the best Assembly code that&rsquo;s possible, then yes, your Assembly code would always be the fastest.</p>
+
+<p>That&rsquo;s because Assembly code doesn&rsquo;t need to pass through a Compiler. It&rsquo;s directly assembled into CPU instructions. Blazing fast.</p>
+
+<p>Needless to say, that&rsquo;s quite a lot of hypotheses.</p>
+
+<p>First of all, most modern programs would be painful to write in Assembly.</p>
+
+<p>Secondly, very few programmers are trained to write efficient Assembly code. This is a direct consequence of the previous point. Therefore, it&rsquo;s highly possible that a good code, say in C, compiled with a good Compiler becomes more efficient than a poorly written Assembly code.</p>
+
+<p>In other words, if you are not an Assembly developer, then a good Compiler can written better Assembly code than you, even if it&rsquo;s just a software!</p>
+
+<p>If you don&rsquo;t want to write Assembly code, then again, one can make an educated statement: <strong>Compiled code is the second fastest</strong> (among the three types we are discussing).</p>
+
+<p>Briefly explained, the reason is that Compilers produce so-called &ldquo;target code&rdquo;, that&rsquo;s basically machine code. On the other hand, Interpreters add one more layer between the execution environment for your program, and the Operating System, and that slows things down a bit.</p>
+
+<h2 id="abstraction">Abstraction</h2>
+
+<p>Why is C that fast?</p>
+
+<p>As a programming language, C doesn&rsquo;t offer you anything special.</p>
+
+<ul>
+<li>There are no class and inheritance.</li>
+<li>There is no dynamic typing.</li>
+<li>Arrays boundaries are not checked (you don&rsquo;t know the length of an array a-priori).</li>
+<li>There&rsquo;s nothing cleaning up memory after you (you must do it manually).</li>
+</ul>
+
+<p>In other words, C code is just a little bit more abstract than Assembly code. This allows a very good C developer to write highly efficient code.</p>
+
+<p>On the other hand, C code is not really safe. Every time you perform an operation on the computer memory, for example using memcpy, it&rsquo;s not even checked what was before in that memory locations, and if there&rsquo;s any overlap. Trust the programmer is C&rsquo;s spirit.</p>
+
+<p>Other languages provide more abstraction and more security.</p>
+
+<p>To start with, all OOP Languages allow us to define complex objects and new types, along with the operation that one can use on them.</p>
+
+<p>Then, things like the Java Virtual Machine (or Python&rsquo;s interpreter) make the program execution overall much safer. But, they do spend some time to perform security checks, during the execution itself.</p>
+
+<p>It must be said that Just-In-Time compilers exist for many languages, and they give great performance improvements. But that&rsquo;s an entirely different topic.</p>
+
+<h2 id="tie-with-the-application">Tie with the Application</h2>
+
+<p>If you work on an application and could write for it a C program that takes 1 week to write and runs in 0.1 seconds, or a Python program that takes 1 day to write, and runs in 5 seconds, which option would you choose?</p>
+
+<p>I guess it really depends on the actual application.</p>
+
+<p>If the program is meant to run once a day, then maybe it doesn&rsquo;t matter how fast it is.</p>
+
+<p>But if you must run it 100.000+ times a day, on several machines, then the CPU-time on these machines would be very different if you sue C or if you use Python. And so would be the total power consumption of your computers, which means money. In this case, spending one week writing good C code can save you lots of money.</p>
+
+<p>The point I am making here is that execution speed is often a relative concept. Other factors play an important role, such as how much speed do you really need, what&rsquo;s the benefit of some speed improvement, as well as the trade-off between execution speed and development speed.</p>
+
+<h2 id="but-so-which-programming-language-is-the-fastest">But so, Which Programming Language is the Fastest?!</h2>
+
+<p>I purposefully avoided to give a firm answer on this question in the previous part of this article, because I think this is not the correct design question to ask when building something.</p>
+
+<p>That said, if you really can&rsquo;t resist, just know that C is usually taken as reference point.</p>
+
+<p>That means that performances of new languages are evaluated by comparing execution of standard algorithms with the runtime of the same algorithms implemented in C.</p>
+
+<p>According to many sources (that you can google yourself) C, Rust, C++ and Fortran are always at the top of the many ratings for the fastest programming language.</p>
+
+<p>As additional study, I warmly recommend to check you the link in the references to the page Bad Code Can Be Written In Any Language.</p>
+
+<p>To conclude. <em>Which programming language is fastest? Should we care? How could we know?</em> (from <a href="https://benchmarksgame-team.pages.debian.net/benchmarksgame/which-programs-are-fastest.html">The Benchmarks Game</a>).</p>
+
+<h2 id="references">References</h2>
+
+<p>My article <a href="http://example.org/page/what-are-the-differences-in-programming-languages/">What are the differences between programming languages?</a>.</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fwhy-some-programming-language-is-faster%2f&amp;text=Why%20Are%20Some%20Programming%20Languages%20Faster%3f&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fwhy-some-programming-language-is-faster%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fwhy-some-programming-language-is-faster%2f&amp;title=Why%20Are%20Some%20Programming%20Languages%20Faster%3f" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fwhy-some-programming-language-is-faster%2f&amp;title=Why%20Are%20Some%20Programming%20Languages%20Faster%3f" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fwhy-some-programming-language-is-faster%2f&amp;title=Why%20Are%20Some%20Programming%20Languages%20Faster%3f" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fwhy-some-programming-language-is-faster%2f&amp;description=Why%20Are%20Some%20Programming%20Languages%20Faster%3f" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

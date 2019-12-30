@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>http://example.org/</loc>
+    <lastmod>2019-12-29T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/code-generation-for-a-new-programming-language/</loc>
+    <lastmod>2019-10-14T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/</loc>
+    <lastmod>2019-10-14T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/design-a-new-formal-grammar/</loc>
+    <lastmod>2019-10-13T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/do-compilers-depend-on-the-architecture/</loc>
+    <lastmod>2019-10-13T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/how-compilers-optimize-code-1/</loc>
+    <lastmod>2019-10-13T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/how-compilers-optimize-code-2/</loc>
+    <lastmod>2019-10-13T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/implementation-recursive-descent-parser/</loc>
+    <lastmod>2019-10-13T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/implementation-semantic-analysis/</loc>
+    <lastmod>2019-10-13T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/how-compilers-manage-garbage-collection/</loc>
+    <lastmod>2019-10-12T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/source-code-optimization-in-compilers/</loc>
+    <lastmod>2019-10-12T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/why-some-programming-language-is-faster/</loc>
+    <lastmod>2019-10-12T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/how-to-design-a-parser/</loc>
+    <lastmod>2019-10-11T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/how-to-design-semantic-analysis/</loc>
+    <lastmod>2019-10-11T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/where-compilers-use-finite-automata/</loc>
+    <lastmod>2019-10-11T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/where-compilers-use-regular-expressions/</loc>
+    <lastmod>2019-10-11T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/how-to-design-grammars/</loc>
+    <lastmod>2019-10-10T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/how-computer-runs-code/</loc>
+    <lastmod>2019-10-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/how-to-generate-runnable-code/</loc>
+    <lastmod>2019-10-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/introduction/</loc>
+    <lastmod>2019-10-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/what-is-semantic-analysis-in-compilers/</loc>
+    <lastmod>2019-10-03T14:41:56+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/what-is-a-programming-language-parser/</loc>
+    <lastmod>2019-10-02T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/how-to-build-a-new-programming-language/</loc>
+    <lastmod>2019-10-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/what-is-a-programming-language-grammar/</loc>
+    <lastmod>2019-09-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/what-are-the-differences-in-programming-languages/</loc>
+    <lastmod>2019-09-29T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/why-so-many-programming-languages/</loc>
+    <lastmod>2019-09-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/page/can-i-get-a-job-in-compilers/</loc>
+    <lastmod>2019-09-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://example.org/categories/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/tags/</loc>
+  </url>
+  
+</urlset>

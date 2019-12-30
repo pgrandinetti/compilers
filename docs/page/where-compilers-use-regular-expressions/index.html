@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>Where Do Compilers Use Regular Expressions? | Compilers</title>
+  <meta name="description" content="The first step in a modern compiler is the so-called Lexical Analysis. This is a piece of software that takes the source code in input (i.e., the code that must be compiled) and generates a list of tokens.
+The Lexical Analyzer in a Compiler performs two tasks:
+ Divide the input string (that&rsquo;s the source code) into its units, such as variables, operators, keywords, etc. These are called lexemes. Assign each lexeme to its actual class.">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/where-compilers-use-regular-expressions\/",
+          "name": "Where do compilers use regular expressions?"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "Where Do Compilers Use Regular Expressions?",
+  "description" : "The first step in a modern compiler is the so-called Lexical Analysis. This is a piece of software that takes the source code in input (i.e., the code that must be compiled) and generates a list of tokens.\nThe Lexical Analyzer in a Compiler performs two tasks:\n Divide the input string (that\x26rsquo;s the source code) into its units, such as variables, operators, keywords, etc. These are called lexemes. Assign each lexeme to its actual class.",
+  "inLanguage" : "en",
+  "wordCount":  2608 ,
+  "datePublished" : "2019-10-11T00:00:00",
+  "dateModified" : "2019-10-11T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/where-compilers-use-regular-expressions\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="Where Do Compilers Use Regular Expressions?" />
+<meta property="og:description" content="The first step in a modern compiler is the so-called Lexical Analysis. This is a piece of software that takes the source code in input (i.e., the code that must be compiled) and generates a list of tokens.
+The Lexical Analyzer in a Compiler performs two tasks:
+ Divide the input string (that&rsquo;s the source code) into its units, such as variables, operators, keywords, etc. These are called lexemes. Assign each lexeme to its actual class.">
+<meta property="og:url" content="http://example.org/page/where-compilers-use-regular-expressions/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="Where Do Compilers Use Regular Expressions?" />
+  <meta name="twitter:description" content="The first step in a modern compiler is the so-called Lexical Analysis. This is a piece of software that takes the source code in input (i.e., the code that must be compiled) and generates a list of …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>Where Do Compilers Use Regular Expressions?</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  October 11, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>The first step in a modern compiler is the so-called <strong>Lexical Analysis</strong>. This is a piece of software that takes the source code in input (i.e., the code that must be compiled) and generates a list of tokens.</p>
+
+<p>The Lexical Analyzer in a Compiler performs two tasks:</p>
+
+<ol>
+<li>Divide the input string (that&rsquo;s the source code) into its units, such as variables, operators, keywords, etc. These are called <em>lexemes</em>.</li>
+<li>Assign each lexeme to its actual class. Classes are, for instance, <code>identifier</code>, <code>keyword</code>, <code>operator</code>, etc.</li>
+</ol>
+
+<p>This means that each Token in the final list (generated by the Lexical Analyzer) is a pair <code>&lt;lemexe, class&gt;</code>.</p>
+
+<p>In practical terms, and simplifying just a little bit, the first step corresponds to splitting the source code into pieces according to blank spaces, line feeds, tabs and whitespaces in general. When that&rsquo;s done, each of the extracted pieces must be assigned to a class, and this what the second step does.</p>
+
+<p><em>The second step within Lexical Analysis is performed using Regular Expressions, so that the sequence of characters that forms each lexeme is matched with a token class.</em></p>
+
+<p>The easiest case you can imagine is when the lexeme <code>if</code> is extracted in the first step, and then in the second step this lexeme is matched with the regular expression</p>
+<div class="highlight"><pre class="chroma">keyword : &#34;if&#34; | &#34;else&#34; | &#34;for&#34; | &#34;while&#34; | &#34;return&#34; | ... // many more</pre></div>
+<p>Which you can implement in Python as</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">re</span>
+<span class="n">pattern</span> <span class="o">=</span> <span class="s1">&#39;r^(if|else|for|while|return)$&#39;</span>
+<span class="n">st</span> <span class="o">=</span> <span class="s1">&#39;if&#39;</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">st</span><span class="p">)))</span>  <span class="c1"># &gt;&gt; True</span></code></pre></div>
+<p>And so, it will know that &ldquo;keyword&rdquo; is the class for if. Now let&rsquo;s see a more useful example.</p>
+
+<h2 id="example">Example</h2>
+
+<p>Let&rsquo;s consider this piece of code.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="k">if</span> <span class="p">(</span><span class="n">x</span><span class="o">==</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;x is three&#34;</span><span class="p">);</span></code></pre></div>
+<p>First, we must put ourselves into the Lexical Analyzer shoes. As input, we receive the following string</p>
+<div class="highlight"><pre class="chroma">if (x == 3)\n    printf(&#34;x is three&#34;);\n</pre></div>
+<p>Newlines are encoded as the character <code>\n</code>. Let&rsquo;s ignore for the moment all issues concerning encoding, and assume everything is Unicode and that the Analyzer is aware of that. A reasonable output will be the following list of tokens.</p>
+<div class="highlight"><pre class="chroma">&lt;&#34;if&#34; , keyword&gt;
+&lt;&#34;(&#34; , openPar&gt;
+&lt;&#34;x&#34; , identifier&gt;
+&lt;&#34;==&#34; , operator&gt;
+&lt;&#34;3&#34; , integer&gt;
+&lt;&#34;)&#34; , closedPar&gt;
+&lt;&#34;printf&#34; , keyword&gt;
+...</pre></div>
+<p>To produce this output, the Lexical Analyzer must:</p>
+
+<ol>
+<li>Split the source code into units (and this will be a list of strings such as <code>if</code>, <code>(</code>, <code>x</code>, &hellip;).</li>
+<li>Assign each of these strings to a class.</li>
+</ol>
+
+<p>Here is where <strong>Regular Expressions come into play</strong>: the act of assigning strings to a class is done with a pattern-matching operation, where each string is matched to a regular expression.</p>
+
+<p>Conceptually, this is similar to matching the string <code>if</code> with the pattern <code>if|while|for|...</code>.</p>
+
+<p>Regarding the above example, you should have at least one question. <strong>What happens to whitespaces</strong>?</p>
+
+<p>The answer is: <em>it depends on the language</em>. For example, in Python white spaces are quite an important part of the language and when I checked the official Python documentation about Lexical Analysis I discovered that there are special tokens called <code>NEWLINE</code>, <code>INDENT</code>, <code>DEDENT</code>. If you don&rsquo;t know Python, just know that correct indentendation is mandatory.</p>
+
+<h2 id="take-home-messages">Take-home messages</h2>
+
+<p>The examples contain a few concepts that are extremely important to remember.</p>
+
+<p>First, and foremost, <strong>during the Lexical Analysis everything is a character (or a string)</strong>. The Lexical Analyzer receives a stream of characters and has to figure out all the rest by itself (tokens, classes, etc.).</p>
+
+<p>Secondly, <strong>the objective of the Lexical Analysis is to generate a list of pairs <code>&lt;lexeme, class&gt;</code></strong>. Formally, each of these pairs is called <strong>Token</strong>. A lexeme is a piece of the source code (that is, a substring of the entire source code) that is matched to one of the classes defined by the language&rsquo;s grammar.</p>
+
+<p>Thirdly, lexemes are usually extracted from the source code according to rules that are specific to the language. Such rules are typically built around white spaces. After that, <strong>each lexeme is assigned to a class, using regular expressions</strong>.</p>
+
+<p>One more point worth remembering is that a lexeme can match more than one class. To know what class is right in that particular place of the source code, the Lexical Analyzer needs to look a bit further down in the source code. This is called <strong>lookahead</strong>. Lookahead is BAD, but necessary. One objective when designing a new language is <strong>to minimize the lookahead needed</strong>.</p>
+
+<p>Finally, there is a question of <strong>why can&rsquo;t regular expressions be used to express the whole programming language</strong>, instead of the lexeme-matching part only? The reason is that <strong>regular expressions are not powerful enough</strong> for that. Their expressivity is limited (quite weak, actually), and therefore you could not build a real programming language with them. Programming languages are built with a different tool, Context-Free Grammars.</p>
+
+<p>So, regular expressions are not powerful enough. What does that mean?</p>
+
+<h2 id="regular-expressions-finally">Regular Expressions, Finally!</h2>
+
+<p>Let&rsquo;s start with two points that are very important to understand the whole subject, but that are often postponed (or omitted, even) in many books and classes.</p>
+
+<ol>
+<li>When dealing with programming languages, <strong>we work inside an Alphabet</strong>. An Alphabet is a set of characters. For example {&ldquo;0&rdquo;, &ldquo;1&rdquo;} is called the binary alphabet. Once we define our alphabet, everything we write in the source code can only be made of sequence of characters taken from within the alphabet.</li>
+<li><strong>Regular expressions define a language over the alphabet</strong>. A language is simply a subset of all possible strings that you can form with that alphabet.</li>
+</ol>
+
+<p>Let&rsquo;s make the concepts more concrete with one quick example.</p>
+
+<p>Consider the binary alphabet {&ldquo;0&rdquo;, &ldquo;1&rdquo;}. What are the strings that you can write using this language? They are all sequences of characters that, in each position, have either &ldquo;0&rdquo; or &ldquo;1&rdquo;. So, &ldquo;0101010&rdquo; is a valid string in this language, so is &ldquo;01110001&rdquo; and so is &ldquo;1&rdquo;.</p>
+
+<p>When you define a regular expression, let&rsquo;s say</p>
+<div class="highlight"><pre class="chroma">Ones = 1*</pre></div>
+<p>then you are also defining the <strong>Regular Language</strong> called &ldquo;Ones&rdquo;. The &ldquo;*&rdquo; symbol is used to say &ldquo;take what&rsquo;s before this symbol and use it zero or more times&rdquo;.</p>
+
+<p>The difference between Regular Expressions and Regular Languages may seem subtle, so let&rsquo;s clarify it.</p>
+
+<p>The language Ones is both:</p>
+
+<ol>
+<li>A set of strings,</li>
+<li>A subset of all strings that you could form with the alphabet.</li>
+</ol>
+
+<p>In particular, Ones is the set of strings, of any length, made by &ldquo;1&rdquo; characters only. So, &ldquo;11&rdquo; is a valid string in this language, and so is &ldquo;1111&rdquo;. But &ldquo;1011&rdquo; is not valid. It&rsquo;s clear that the strings valid in this language form a subset of all strings you can build with the binary alphabet.</p>
+
+<p>Let&rsquo;s another example, more realistic. ASCII is a well known Alphabet. You can form a lot of languages with this Alphabet. For instance, the set of all valid C programs is a language over ASCII (although not a regular language, because, as I said before, you can&rsquo;t express something as complex as C code with regular expressions only).</p>
+
+<p>Before you continue reading, fix these terms in your working memory:</p>
+
+<ul>
+<li><strong>Alphabet</strong> (a set of characters).</li>
+<li><strong>Language</strong> (a subset of all strings that you can form mixing characters in the Alphabet).</li>
+<li><strong>Regular Language</strong> (a language that can be expressed with regular expressions).</li>
+<li><strong>Sentence</strong> (a valid string in the language).</li>
+</ul>
+
+<p>At this point you have already learnt what Regular Expressions do: <strong>they express constraints in the way you can mix characters from an Alphabet</strong>. And therefore they restrict the way you can build strings from that Alphabet.</p>
+
+<p>That&rsquo;s what Regular Expressions are: constraints. And as such, they limit the choices that you can make in the Alphabet to form sentences (strings).</p>
+
+<p>Looking from another angle, <strong>Regular Expressions are also a way to check whether a given sentence is a valid string for that language</strong>. And, as you know by this point, this is why they are used in Compilers.</p>
+
+<h2 id="how-to-define-a-regular-expression">How to define a Regular Expression</h2>
+
+<p>Now you have already grasped all concepts and let&rsquo;s say you want to write down your own list of regular expressions that describe the classes of the new programming language you are building.</p>
+
+<p>There are a few things you have to add to your knowledge.</p>
+
+<p>First of all, just to make the formalism funnier, you should use in your notes <strong>the meaning function</strong> $L$, that takes a regular expressions and gives the set of valid sentences.</p>
+
+<p>Then you should be aware of two basic cases.</p>
+
+<ol>
+<li>The $\epsilon$ regular expression. It generates a set with the empty sentence only, so $L(\epsilon) = {\text{&ldquo;&rdquo;}}$.</li>
+<li>The single-char regular expression. For each character <code>c</code> in the alphabet, $L(\text{&lsquo;c&rsquo;}) = {\text{&ldquo;c&rdquo;}}$, that means the regular expression defined by one character simply defines the one sentence given by that same character.</li>
+</ol>
+
+<p>To make the second point more concrete, imagine that is equivalent to write in Python the following regexp:</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">re</span>
+<span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^c$&#39;</span>
+<span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">some_string</span><span class="p">)</span>
+<span class="c1"># some_string == &#39;c&#39; would be an easier test!</span></code></pre></div>
+<p>One additional piece of notation you will have to know is that the <code>+</code> symbol, when used between two regular expressions, means <code>OR</code>. So <code>c+d</code> is a regular expression that says &ldquo;accept either the single character <code>c</code> or the single character <code>d</code>, nothing else&rdquo;. It&rsquo;s not uncommon to use the pipe symbol, <code>|</code>, for the same reason. You&rsquo;d have in such a case <code>c | d</code>.</p>
+
+<p>Along with the two basic cases, you should be aware of <strong>three compound operations</strong> that can be used to form more complex regular expressions. Given two regular expressions, <code>A</code> and <code>B</code>, we have:</p>
+
+<ol>
+<li>$L(A+B) = L(A) \bigcup L(B)$.</li>
+<li>$L(AB) = \{ab\, |\, a \in L(A),\,  b \in L(B)\}$.</li>
+<li>$L(A^*) = \bigcup_{i\geq0}L(A^i)$, where $A^i=AA&hellip;A$ (that is, $A$ repeated $i$ times).</li>
+</ol>
+
+<p>As surprising as it may sound, the two basic rules and the three compound operations are all you need to form regular expression of any complexity. Let&rsquo;s see a couple of examples, and everything will be clear.</p>
+
+<h2 id="example-1">Example</h2>
+
+<p>A few lines above I spoke about &ldquo;all sentences you can form with the binary alphabet&rdquo;. I was being very imprecise, and not formal at all in my description.</p>
+
+<p>So, how can you catch all strings that can be generated with the binary alphabet, in one single regular expression?</p>
+
+<p>What about the following one?</p>
+<div class="highlight"><pre class="chroma">(1 + 0)*</pre></div>
+<p>Let&rsquo;s analyze this regexp. By definition of the <code>*</code> operation we have</p>
+
+<p>$$
+(1 + 0)^* = \bigcup_{i\geq 0}(1 + 0)^i
+$$</p>
+
+<p>Let&rsquo;s make clear what we already know:</p>
+
+<ul>
+<li>The exponential operation means to repeat the regular expression, in this case $(1+0)$, $i$-times.</li>
+<li>$1+0$ means: take the character <code>1</code> or the character <code>0</code> (same as <code>0|1</code>).</li>
+</ul>
+
+<p>So when $i$ equals to $2$ the original regular expression is equivalent to</p>
+<div class="highlight"><pre class="chroma">(1+0)(1+0)</pre></div>
+<p>that means: in the first position take either $1$ or $0$; in the second position take either $1$ or $0$.</p>
+
+<p>Since the star-operation is for $i$ from zero to infinity, this means that we are taking strings of any length (from zero to infinity) where at each position we make the choice given by the regexp <code>(1+0)</code>. And <strong>that&rsquo;s exactly the entire alphabet</strong>.</p>
+
+<p>In fact, if you take any character in the alphabet and use the <code>+</code> notation between them, and then build the star-operation, you will have the whole set of possible strings that can be formed with those characters.</p>
+
+<p>For instance, if the Alphabet is $\{0, 1, 2\}$ then</p>
+<div class="highlight"><pre class="chroma">(0 + 1 + 2)*</pre></div>
+<p>will be the set of every possible sentence you can make with those three characters.</p>
+
+<h2 id="example-2">Example</h2>
+
+<p>A famous example, used in many textbooks and classes, is about a real programming language, Pascal, and how floating point numbers are defined there. Let&rsquo;s check it out.</p>
+<div class="highlight"><pre class="chroma">num           : digits opt_fraction opt_exponent
+digits        : digit+
+digit         : &#39;0&#39; + &#39;1&#39; + &#39;2&#39; + &#39;3&#39; + &#39;4&#39; + &#39;5&#39; + &#39;6&#39; + &#39;7&#39; + &#39;8&#39; + &#39;9&#39;
+opt_fraction  : (&#39;.&#39; digits) + eps
+opt_exponent  : (&#39;E&#39; + (&#39;+&#39; + &#39;-&#39; + eps) digits) + eps</pre></div>
+<p>The whole definition is made by five regular expressions. Let&rsquo;s understand each of them.</p>
+
+<p>First thing you should notice is that the definitions are somehow nested. You can read the whole things this way:</p>
+
+<ul>
+<li>A <code>number</code> is made by <code>digits</code> followed by an <code>optional fraction</code> followed by an <code>optional exponent</code>.</li>
+<li>Digits are made by one or more <code>digit</code> characters.</li>
+<li>Each digit is one character among ten choices (the ten digits, indeed).</li>
+<li>The optional fraction is made by a dot <code>.</code> followed by some digits.</li>
+<li>The optional exponent is made by the character <code>E</code>, followed by one character among <code>+</code> and <code>-</code> followed by digits.</li>
+</ul>
+
+<p>If you stop for a moment and think about this definition, you will see that it includes things like</p>
+<div class="highlight"><pre class="chroma">1137
+173.18319
+14.189E43
+19E-10</pre></div>
+<p>These are all valid <code>num</code>, according to the regular expression. We would say that <strong>these strings are accepted by the regular language</strong> defined by the regular expression.</p>
+
+<p>It is worth mentioning one more point. You might have noticed the <code>+ eps</code> part in the regular expressions above. You already know that <code>+</code> means OR (in the sense of the logically inclusive operator), hence it should be easy to see that <code>+ eps</code> means &ldquo;either what is before or the <code>eps</code>-regexp&rdquo;. Since <code>eps</code> is the empty regular expression, then this all notation means that the argument is optional. It not a coincidence that they called them optional fraction and optional exponent!</p>
+
+<p>In modern regular expression tools there is an easier way to express optional strings, and is by adding a trailing <code>?</code> character. So, the fourth regular expression above would become</p>
+<div class="highlight"><pre class="chroma">opt_fraction  : (&#39;.&#39; digits)?</pre></div>
+<p>with the same meaning as before.</p>
+
+<h2 id="two-more-important-details">Two more important details</h2>
+
+<p>I believe you have two questions at this point.</p>
+
+<ol>
+<li>The list of regular expressions is typically very long. What happens if a sentence matches more than one regular expression in this list?</li>
+<li>On the other hand, what happens if a sentence does not match any regular expression in the list?</li>
+</ol>
+
+<p>The answer to the first question is rather simple: <strong>the order matters</strong>. More precisely, the first regular expression (from the top to the bottom) that is matched by the sentence is considered the right one.</p>
+
+<p>The second question requires a bit of thinking. First of all, what does it mean that none of the regular expressions is matched? It means <strong>there&rsquo;s a mistake in the code</strong>. Like a typo on the keyboard, such as <code>wihle</code> instead of <code>while</code>.</p>
+
+<p>In general there can be all sorts of mistakes in the code. For a compiler, a <strong>good error-handling procedure is extremely important</strong>.</p>
+
+<p>Taking advantage of the top-down priority rule that I said before, a very common trick is to place at the bottom of the regular expression lists a few more regular expressions that try to catch possible mistakes made by the programmer. Since they are at the bottom, they will only be used when none of the &ldquo;real&rdquo; regular expressions is matched, and then the error can be handled in a custom way.</p>
+
+<h2 id="what-s-next">What&rsquo;s next</h2>
+
+<p>Lexical Analysis is just the first step in writing a compiler for a programming language. The remaining steps are Parsing, Semantic Analysis, Optimization (optional) and Code Generation.</p>
+
+<p>A good understanding of regular expressions is a necessary tool to have not only to implement a Lexical Analyzer, but also to get a better understanding of how programming languages work, the algorithmic behind compilers and/or interpreters.</p>
+
+<p>Programming languages are the most used working tools by programmers and software developers, that makes a good understanding of them so important. If you know how they work inside, you are likely to write better code!</p>
+
+<h2 id="references">References</h2>
+
+<p>Python Lexical Analysis <a href="https://docs.python.org/3/reference/lexical_analysis.html">documentation page</a>.</p>
+
+<p>The Dragon Book. Compilers: Principles, Techniques and Tools. <a href="https://en.wikipedia.org/wiki/Compilers:_Principles,_Techniques,_and_Tools">Wikipedia page</a> (of the book).</p>
+
+<p>Alex Aiken&rsquo;s class Compilers at Stanford University. Available as <a href="https://lagunita.stanford.edu/courses/Engineering/Compilers/Fall2014/course/">free MOOC online</a>.</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fwhere-compilers-use-regular-expressions%2f&amp;text=Where%20Do%20Compilers%20Use%20Regular%20Expressions%3f&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fwhere-compilers-use-regular-expressions%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fwhere-compilers-use-regular-expressions%2f&amp;title=Where%20Do%20Compilers%20Use%20Regular%20Expressions%3f" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fwhere-compilers-use-regular-expressions%2f&amp;title=Where%20Do%20Compilers%20Use%20Regular%20Expressions%3f" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fwhere-compilers-use-regular-expressions%2f&amp;title=Where%20Do%20Compilers%20Use%20Regular%20Expressions%3f" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fwhere-compilers-use-regular-expressions%2f&amp;description=Where%20Do%20Compilers%20Use%20Regular%20Expressions%3f" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

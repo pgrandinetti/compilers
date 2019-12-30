@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>How Compilers Optimize the Source Code (Part II) | Compilers</title>
+  <meta name="description" content="In Part I of this class we learned a great deal about how Compilers do Local Optimization.
+Local Optimization is the process of improving the performance of each basic block of code, isolated from the rest of the code. A basic block is a subset of the program that doesn&rsquo;t contain label, except possibly in the first instruction, and doesn&rsquo;t contain jump, except possibly in the last instruction.
+In Part II of the class on How Compilers Optimize the Source code, we will be studying Global Optimization and Data-Flow Analysis.">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/how-compilers-optimize-code-2\/",
+          "name": "How compilers optimize the source code ( part i i)"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "How Compilers Optimize the Source Code (Part II)",
+  "description" : "In Part I of this class we learned a great deal about how Compilers do Local Optimization.\nLocal Optimization is the process of improving the performance of each basic block of code, isolated from the rest of the code. A basic block is a subset of the program that doesn\x26rsquo;t contain label, except possibly in the first instruction, and doesn\x26rsquo;t contain jump, except possibly in the last instruction.\nIn Part II of the class on How Compilers Optimize the Source code, we will be studying Global Optimization and Data-Flow Analysis.",
+  "inLanguage" : "en",
+  "wordCount":  3635 ,
+  "datePublished" : "2019-10-13T00:00:00",
+  "dateModified" : "2019-10-13T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/how-compilers-optimize-code-2\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="How Compilers Optimize the Source Code (Part II)" />
+<meta property="og:description" content="In Part I of this class we learned a great deal about how Compilers do Local Optimization.
+Local Optimization is the process of improving the performance of each basic block of code, isolated from the rest of the code. A basic block is a subset of the program that doesn&rsquo;t contain label, except possibly in the first instruction, and doesn&rsquo;t contain jump, except possibly in the last instruction.
+In Part II of the class on How Compilers Optimize the Source code, we will be studying Global Optimization and Data-Flow Analysis.">
+<meta property="og:url" content="http://example.org/page/how-compilers-optimize-code-2/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="How Compilers Optimize the Source Code (Part II)" />
+  <meta name="twitter:description" content="In Part I of this class we learned a great deal about how Compilers do Local Optimization.
+Local Optimization is the process of improving the performance of each basic block of code, isolated from the …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>How Compilers Optimize the Source Code (Part II)</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  October 13, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>In Part I of this class we learned a great deal about how Compilers do Local Optimization.</p>
+
+<p>Local Optimization is the process of improving the performance of each basic block of code, isolated from the rest of the code. A basic block is a subset of the program that doesn&rsquo;t contain label, except possibly in the first instruction, and doesn&rsquo;t contain jump, except possibly in the last instruction.</p>
+
+<p>In Part II of the class on How Compilers Optimize the Source code, we will be studying Global Optimization and Data-Flow Analysis. These subjects will complete the picture about Optimization.</p>
+
+<h2 id="what-is-global-optimization">What is Global Optimization?</h2>
+
+<p>Let me start with a clarification. Despite its name, Global Optimization refers to optimization techniques applied to a control-flow graph.</p>
+
+<p>A control-flow graph is a formal description of a whole function, or method, in the program. More about this in one minute.</p>
+
+<p>Thus, despite the adjective &ldquo;global&rdquo;, this type of optimization doesn&rsquo;t deal with optimization techniques for the program as a whole. Those are called instead Inter-Procedural Optimization techniques, and are quite rare even in strong Compilers.</p>
+
+<p>Why are they rare? Because Compilers tend to perform Optimization following a <strong>tradeoff between complexity (cost) and benefit</strong>.</p>
+
+<p>For instance, Local Optimization gives the best ratio cost/benefit, because most of the techniques are quite simple to apply and, when applied iteratively, they give great improvement. We saw all such concepts in the last article.</p>
+
+<p>On the contrary, Inter-Procedural Optimization is extremely complex, and it&rsquo;s not quite clear in advance how much benefit it can give. This is why the fanciest optimization techniques that are published in research papers are rarely put into practice.</p>
+
+<p>Global Optimization stands somewhere in the middle. It&rsquo;s definitely more costly than Local Optimization, but it can give more benefits too. And it&rsquo;s surely less costly than Inter-Procedural techniques. This is why <strong>Global Optimization is implemented by many strong Compilers</strong>.</p>
+
+<h2 id="data-flow-analysis">Data-Flow Analysis</h2>
+
+<p>Formally speaking, <strong>Data-Flow analysis is the study of how a given property propagates through the Control-Flow graph</strong>.</p>
+
+<p>An example will help clarify the concept.</p>
+
+<p>Let&rsquo;s consider a procedure made of four basic blocks.</p>
+
+<p>The first block is always executed, and is made of two instructions.</p>
+<div class="highlight"><pre class="chroma">x := 3
+b &gt; 0</pre></div>
+<p>The second block is executed on the conditional jump <code>b &gt; 0</code> (on register <code>b</code>), and has two instructions as well:</p>
+<div class="highlight"><pre class="chroma">y := z+w
+x := 4</pre></div>
+<p>The third block is executed on a jump that is mutually exclusive with the condition related to the second block, and it has only one instruction:</p>
+<div class="highlight"><pre class="chroma">y := 0</pre></div>
+<p>The fourth and final block has one instruction and it&rsquo;s always executed.</p>
+<div class="highlight"><pre class="chroma">a := 2*x</pre></div>
+<p>The key detail that the optimizer should note is that if the second block didn&rsquo;t contain the assignment to register <code>x</code>, then we could propagate the value <code>3</code> assigned to <code>x</code> in the first block straight down to the fourth and last block. This would give a nice performance improvement.</p>
+
+<p>However, the assignment <code>x := 4</code> is in the second block, so we can&rsquo;t ignore it.</p>
+
+<p>Nonetheless, there&rsquo;s a second case when that assignment would be irrelevant. It happens when the second block is never entered, due to the conditional jump. In this case again, we could propagate the value <code>3</code> for the register <code>x</code>.</p>
+
+<p>Thus, the key question is - <strong>How to be sure that is OK to propagate a constant value for a register</strong>?</p>
+
+<p>This kind of reasoning, which is also an optimization technique, is called global constant propagation.</p>
+
+<p>Constant Propagation is an example of a &ldquo;property&rdquo; that we want to know whether it propagates through the entire control-flow graph, that means through the entire procedure. And, as I said, this is what Data-Flow Analysis studies.</p>
+
+<p>To clarify even further, the &ldquo;property&rdquo; in the example is the equality <code>x := 3</code>. We would like to prove that this property holds true everywhere in the control-flow graph, so that we can optimize the code in various places.</p>
+
+<p>Of course, constant propagation is not the only goal of Global Optimization. However, most Global Optimization techniques share some common traits:</p>
+
+<ul>
+<li>The optimization is based on knowing that some property X holds true at a particular point in the program&rsquo;s execution.</li>
+<li>Proving the property X holds true everywhere else down in the procedure requires to know the entire program, or at least the whole Control-Flow Graph for that procedure.</li>
+<li>For many &ldquo;questions&rdquo; (that is, properties to prove of disprove), it is OK to be conservative. It&rsquo;s better to say &ldquo;don&rsquo;t know&rdquo; and to give up with that optimization path, rather than to make a mistake.</li>
+</ul>
+
+<p>With that clarified, let&rsquo;s continue studying global constant propagation, that is not only a very common technique, but also a good learning tool.</p>
+
+<h2 id="global-constant-propagation">Global Constant Propagation</h2>
+
+<p>Let&rsquo;s start with a picture of the Control-Flow Graph for the previous example.</p>
+<div class="highlight"><pre class="chroma">       X := 3
+       B &gt; 0
+      /     \
+     /       \
+ Y := Z+W    Y := 0
+ X := 4       /
+    \        /
+     \      /
+     A := 2*X</pre></div>
+<p>As earlier said, the question we want to answer is - <strong>How to determine if a given property holds true for a single variable X, at all points in the program?</strong></p>
+
+<p>In the example we considered the equality <code>x := 3</code> as the &ldquo;property&rdquo; to prove (or disprove).</p>
+
+<p>Let&rsquo;s start with a formal, as well as easy to understand, statement.</p>
+
+<p><em>To replace a use of <code>x</code> by a constant <code>k</code>, it must hold true that on every path to the use of <code>x</code> the last assignment to <code>x</code> is <code>x := k</code>.</em></p>
+
+<p>The above sentence can be read in the following way:</p>
+
+<ol>
+<li>Look at all points in the program where x is used.</li>
+<li>If we can prove that <code>x := k</code> was the last assignment to <code>x</code> in every sequence of instructions that lead to those points,</li>
+<li>Then the property <code>x := k</code> holds true in the control-flow graph.</li>
+</ol>
+
+<p>Unfortunately, step 2 is quite difficult to prove. We need a <strong>conceptual framework around the problem</strong>, in order to clarify it.</p>
+
+<p>Let&rsquo;s start with some definitions. Define three values that the variable X can have at any point in the program.</p>
+
+<ul>
+<li>┴ (read: &ldquo;bottom&rdquo;), when the statement at that point in the program will never execute.</li>
+<li><code>C</code> (read: &ldquo;constant&rdquo;), when we believe or we have proven that <code>x</code> is a constant.</li>
+<li>T (read: &ldquo;top&rdquo;), when we don&rsquo;t know whether <code>x</code> is a constant or not. This is the safe condition.</li>
+</ul>
+
+<p>Now let&rsquo;s look again at the control-flow graph, and assign these values <strong>in-between each pair of statements</strong>.</p>
+
+<ol>
+<li>At the beginning, we don&rsquo;t know what values <code>x</code> has, so we say <code>x</code> is top.</li>
+<li>After the assignment <code>x := 3</code> we know for sure that <code>C</code> is the value to assign.</li>
+<li>After the branch we definitely know that <code>x</code> is still <code>C</code>.</li>
+<li>In the left branch, after the assignment to <code>y</code> we know that <code>x</code> is still <code>C</code>.</li>
+<li>In the right branch, after the assignment to <code>y</code> we know <code>x</code> is still <code>3</code>, so it&rsquo;s <code>C</code>.</li>
+<li>After the assignment <code>x := 4</code>, <code>x</code> is <code>C</code> but with value <code>4</code>.</li>
+<li>Before the final block, <code>x</code> can be either 3 or 4, depending on which block was executed. So we must say that <code>x</code> is Top.</li>
+<li>After the assignment <code>a := 2*x</code>, we are still unsure about <code>x</code> so we must say that <code>x</code> is Top.</li>
+</ol>
+
+<p>It&rsquo;s really important to notice that the assignments to Top, C or Bottom happen <strong>in between instructions</strong>. We must determine the value for <code>x</code> before and after each instructions, including the first and the last ones.</p>
+
+<p>Once we have the global constant information, it&rsquo;s very easy to perform the optimization. We just have to inspect the value (top, bottom, C) associated with a statement that uses <code>x</code>. If <code>x</code> is a constant, then we can replace it with that value.</p>
+
+<p>The crucial question is <strong>how to compute the property Top/C/Bottom in a systematic way</strong>? In the example above we did it manually, but of course this is not a sensible approach, especially for large procedures.</p>
+
+<p>Here&rsquo;s where Data-Flow Analysis enters the game.</p>
+
+<p>The most effective way, for me, to understand Data-Flow Analysis algorithms is to try to come up with a solution before looking at the actual solution.</p>
+
+<p>Let&rsquo;s put what we already know in writings:</p>
+
+<ol>
+<li>We want to know whether a given condition (or property) about the value of a register holds true at a given point in the program. For instance, at line 5, is <code>x</code> equal to 3?</li>
+<li>Given that we don&rsquo;t have any oracle, the only pieces of information we can use are the instructions themselves. Each instruction changes something in the state of the program. For example, the assignment <code>x := 3</code> means that before and after every subsequent instruction <code>x</code> is equal to 3, until a different assignment to <code>x</code> is found.</li>
+<li>We need a systematic way to propagate information down through the control-flow graph. Each piece of information must also be &ldquo;merged&rdquo; with others, according to the current state of the program.</li>
+</ol>
+
+<p>The third point above is the key, conceptually, that unlock the path towards the general strategy. <strong>We must devise rules that dictate how pieces of information are merged to produce new knowledge</strong>.</p>
+
+<p>A concrete case, to help understanding. When we find the statement <code>x := 3</code> we start propagating this information down. If then we find the statement <code>x := 0</code>, we must merge the two information and create a new one. In this (simple) case we will start propagating the new information that <code>x</code> is equal to zero.</p>
+
+<p>If we manage to build a set of rules that handle every possible case, then we will have a systematic (automatic) way to propagate information in the control-flow graph. As a side objective, we would like to have rules that are quite simple.</p>
+
+<p>Luckily for us, someone has already devised such a set of rules. Let&rsquo;s study them!</p>
+
+<p>First, a couple of definitions.</p>
+
+<p>For each statement <code>s</code>, we compute information about the variable <code>x</code> before and after <code>s</code> executes, with the following function:</p>
+
+<ul>
+<li><code>C(x, s, in)</code> ⇒ value of <code>x</code> before <code>s</code></li>
+<li><code>C(x, s, out)</code> ⇒ value of <code>x</code> after <code>s</code></li>
+</ul>
+
+<p>Also, let&rsquo;s agree on calling <code>p1, ..., pn</code> all predecessors of a statement <code>s</code>. There can be more than one if <code>s</code> comes after a branch in the graph.</p>
+
+<p>Now we are ready to take at look at the systematic rules. There are 8 of them.</p>
+
+<h3 id="rule-no-1">Rule No 1</h3>
+
+<p><em>If Exists i such that C(x, pi, out) = Top, for i=1,&hellip;,n, then C(x, s, in) = Top</em></p>
+
+<p>This rule just says that if we don&rsquo;t know the value of <code>x</code> in at least one of the paths that lead to <code>s</code>, then we don&rsquo;t know the value of <code>x</code> before <code>s</code> executes.</p>
+
+<p>Remember that &ldquo;Top&rdquo; is the safety value, for when we aren&rsquo;t sure about the actual value.</p>
+
+<h3 id="rule-no-2">Rule No 2</h3>
+
+<p><em>If exist i, j such that C(x, pi, out) = c1, C(x, pj, out) = c2, and c1 != c2, then C(x, s, in) = Top</em></p>
+
+<p>Basically, this rule says that if two branches that lead to the same statement <code>s</code> assign to <code>x</code> different values, then we cannot be sure of the value <code>x</code> has before executing <code>s</code>, so we must say it&rsquo;s Top.</p>
+
+<h3 id="rule-no-3">Rule No 3</h3>
+
+<p><em>If C(x, pi, out) = c or C(x, pi, out) = bottom, for every i=1,&hellip;,n, then C(x, s, in) = c</em></p>
+
+<p>This rule says that if all branches that lead to <code>s</code> assign to <code>x</code> the same value, then that exact value has to be <code>x</code>&rsquo;s value before <code>s</code> executes. In case one or more of them it&rsquo;s bottom, this means that branch is never reached and so it doesn&rsquo;t change the evaluation.</p>
+
+<h3 id="rule-no-4">Rule No 4</h3>
+
+<p><em>If C(x, pi, out) = bottom, for every i=1,&hellip;,n, then C(x, s, in) = Bottom</em></p>
+
+<p>Rule 4 says that if all branches leading to statement <code>s</code> carry over the value Bottom, then also <code>s</code> will continue carrying over the same value.</p>
+
+<p>The first 4 rules relates the output of a statement to the input of the next statement. We also need rules to relate the input of a statement to the output of the same statement. This is what the next 4 rules are about.</p>
+
+<h3 id="rule-no-5">Rule No 5</h3>
+
+<p><em>If C(x, s, in) = bottom, then C(x, s, out) = Bottom</em></p>
+
+<p>Rule 5 is quite clear: if statement <code>s</code> is never reached, and hence the value before its execution is Bottom, then after its execution we should consider the same value.</p>
+
+<h3 id="rule-no-6">Rule No 6</h3>
+
+<p>The next rule refers to a statement of the form <code>x := c</code>, that is, an assignment.</p>
+
+<p><em>C(x := c, s, out) = c, if c is a constant</em></p>
+
+<p>It&rsquo;s worth noting that Rule 5 has higher priority than Rule 6. So if the &ldquo;in&rdquo; of a statement is Bottom, we will say that the &ldquo;out&rdquo; is bottom too, applying Rule 5, regardless of whether Rule 6 could be applied or not.</p>
+
+<h3 id="rule-no-7">Rule No 7</h3>
+
+<p>Rule 7 complements Rule 6, by defining the behavior for every assignment that is not in the simple form <code>x := c</code>, but a more complex <code>x := f(...)</code>.</p>
+
+<p><em>C(x := f(&hellip;), s, out) = Top</em></p>
+
+<h3 id="rule-no-8">Rule No 8</h3>
+
+<p>Finally, a rule that deals with assignment to a different variable altogether.</p>
+
+<p><em>If x != y, then C(y=&hellip;, s, in) = C(y=&hellip;, s, out)</em></p>
+
+<p>This rule basically says - if we don&rsquo;t touch <code>x</code> at all in the statement, then propagate whichever value we had before.</p>
+
+<h3 id="global-constant-propagation-algorithm">Global Constant Propagation Algorithm</h3>
+
+<p>Now that we know the 8 rules, we are ready to design the systematic way to propagate information in the control-flow graph: an algorithm.</p>
+<div class="highlight"><pre class="chroma">1. For every entry statement to the program s, set C(x, s, in) = Top.
+2. Set C(x, s, in) = C(x, s, out) = Bottom, everywhere else.
+3. Repeat:
+  i. Find statement s that does not satisfy at least one among Rules 1-8.
+  ii. If didn&#39;t find any such statement, STOP.
+  iii. Apply one of the Rules 1-8 to s.</pre></div>
+<p>After we are done executing this algorithm, we&rsquo;ll end up with correct values (Top, c, or Bottom) before and after each statement of the program, and then we can make the correct reasoning about it.</p>
+
+<h2 id="loop-analysis">Loop Analysis</h2>
+
+<p>This topic is probably the most interesting within Data-Flow Analysis. Let&rsquo;s first get a sense of what the problem is with an informal description.</p>
+
+<p>First of all, we are still working towards the same objective: <strong>we want to decide what&rsquo;s the value of <code>x</code> before a statement</strong>.</p>
+
+<p>To do so, as we saw, we need to know the value of <code>x</code> after all the predecessors of such a statement. Let&rsquo;s assume that one of such predecessors is actually deeper down in the control-flow graph, because there&rsquo;s a loop in the program. This is a fairly common case, if you think about it.</p>
+
+<p>In this situation, it&rsquo;s not obvious how to determine the value of <code>x</code> after that one predecessor, because to compute it we would need to know its predecessors too, but at least one of them depends on the same statement that we are considering, due to the loop in the code!</p>
+
+<p>Now, let&rsquo;s look at some real code:</p>
+<div class="highlight"><pre class="chroma">x := 3
+if b &gt; 0 jump R
+
+L:
+y := z + w
+jump end_if
+
+R:
+y := 0
+jump end_if
+
+end_if:
+a = 2*x
+if a &gt; b jump R
+// else exit</pre></div>
+<p>The control-flow graph for this procedure has <code>a</code> loop on the right side, from statement <code>a &gt; b</code> back to <code>y := 0</code>.</p>
+
+<p>Concretely, in order to know whether <code>x</code> is constant before the statement <code>y := 0</code>, we need to know the value of <code>x</code> at his two predecessors:</p>
+
+<ul>
+<li><code>x := 3</code></li>
+<li><code>a := 2*x</code></li>
+</ul>
+
+<p>But the information for the variable depends on the predecessors of that statement, including <code>y := 0</code> itself! The situation is such that, to answer the question, we must &ldquo;unwire&rdquo; this odd <strong>recursive enigma</strong>.</p>
+
+<p>There is <strong>an elegant solution</strong> to this problem. In fact, it&rsquo;s a standard technique applied in many areas of mathematics.</p>
+
+<p>It consists of <strong>assigning an initial value (a guess) to the variables</strong>. It&rsquo;s fine if such value is not expected to be the final and correct value. This is what the initial assignment as Bottom is for, in the algorithm given in the previous section.</p>
+
+<p>After that initial assignment, the iterative algorithm will make all loops &ldquo;converge&rdquo; to the real solution, when there are no more updates that can be done.</p>
+
+<p>The concept of &ldquo;convergence&rdquo;, in this case, means that at some point during the iterative procedure all the variables will stand on the same value: they will not change anymore. And this stable configuration will also be the final solution, as well as the final state of the algorithm.</p>
+
+<p>Before continuing, it&rsquo;s worth making one point clear. <strong>The constant propagation algorithm is already designed to take into account loops, thanks to the initialization to Bottom of all unknown values</strong>.</p>
+
+<p>On the other hand, the soundness of the algorithm is guaranteed by the convergence of the same.</p>
+
+<p>I understand that the &ldquo;convergence&rdquo; concept seems a bit like a magic black box. I want to study it more in detail, and that&rsquo;s the subject of the next (and conclusive) section.</p>
+
+<h2 id="orderings">Orderings</h2>
+
+<p>The values we&rsquo;ve talked so far, Top, Constants, Bottom, are &ldquo;abstract&rdquo; values. They are abstract because each of them can be one of many &ldquo;concrete&rdquo; values that are actually in the machine&rsquo;s memory.</p>
+
+<p>We can dictate an ordering over there three values, as it follows:</p>
+
+<p>$$
+\text{Bottom} \ge \text{Constants} \ge \text{Top}
+$$</p>
+
+<p>It&rsquo;s important to note that there&rsquo;s no ordering between two constants. Basically, comparing 1 and 2 in this ordering gives an indefinite result, and we must fallback on Top as the &ldquo;safety value&rdquo;.</p>
+
+<p>Quite clearly, this is a choice that we make. It could have been a different ordering, but we are about to see why this one was purposefully chosen.</p>
+
+<p>It&rsquo;s worth adding one more definition. Let&rsquo;s talk about the <strong>Least Upper Bound</strong> (lub) in this ordering, as the &ldquo;biggest&rdquo; among two argument.</p>
+
+<p>For example:</p>
+
+<ul>
+<li>$lub(Bottom, 1) = 1$, because every constant is &ldquo;bigger&rdquo; than Bottom in the ordering.</li>
+<li>$lub(Bottom, Top) = Top$.</li>
+<li>$lub(1, 2) = Top$, as said above.</li>
+</ul>
+
+<p>The great thing about this definition is that we can rewrite Rules 1 to 4 using this new definition. For example Rule 3 is equivalent to the following one:</p>
+
+<p>$$
+C(x, s, in) = lub\{C(x, p, out),\, \text{such that p is a predecessor of s}\}
+$$</p>
+
+<p>And the good things are not over! In fact, the existence of <strong>this ordering also proves the convergence of the algorithm</strong>! Let&rsquo;s see why.</p>
+
+<p>If we look carefully at all rules, then we see that the function $C(x, s, **)$ can only &ldquo;increase&rdquo; the propagated value: it starts at the value Bottom and can increase to Constant, and then can increase to Top.</p>
+
+<p>This means that each piece of information can change at most twice. And therefore the algorithm will always terminate.</p>
+
+<p>And by continuing the same reasoning, we can also see that <strong>the complexity of the constant propagation algorithm is linear with the number of values that we want to compute</strong>.</p>
+
+<p>This is another important (good) property to keep in mind, about constant propagation.</p>
+
+<h2 id="other-topics">Other Topics</h2>
+
+<p>Global Optimization is a very active research field. Scientists and engineers from all over the world work hard to find new optimization techniques, while trying to make the most out of the tradeoff between cost and benefit.</p>
+
+<p>On the one hand, the subjects we have studied (Local Optimization, in the previous article, and Data-Flow Analysis, Global Constant Propagation, Loop Analysis and Orderings, in this article) are only the surface of everything there is to learn about Optimization in Compilers.</p>
+
+<p>On the other hand, in my opinion, it would be pointless to go through a lot of optimization techniques here. The student who&rsquo;s really interested in taking this subject to the next level should definitely go ahead and start reading research papers.</p>
+
+<p>For those among us that are really interested in other topics, I want to suggest a sensible starting point.</p>
+
+<p>Let&rsquo;s think about the consequences of applying Global Constant Propagation. Once we&rsquo;ve done propagating the constant, it&rsquo;s quite possible that some statement in the program become useless. For example,</p>
+<div class="highlight"><pre class="chroma">x := y + z</pre></div>
+<p>Can be removed if constant propagation proves that <code>y := x</code> and <code>z := 0</code> at that point in the program. Removing a whole statement is one of the most beneficial optimization steps you can do, and therefore is very important.</p>
+
+<p>Thus, the question is - <strong>how can we assess whether a statement can be removed or not?</strong></p>
+
+<p>This topic is called <strong>Liveness Analysis</strong>, and it&rsquo;s also addressed with a Data-Flow Analysis, not too different from the one we studied for Constant Propagation. It&rsquo;s definitely a good starting point for you next step!</p>
+
+<h2 id="summary-and-outlook">Summary and Outlook</h2>
+
+<p>Optimization in Compilers design is a fascinating subject!</p>
+
+<p>It&rsquo;s also very complex, so much that the most advanced optimization techniques are too expensive in terms of implementation and do not give benefits proportionally to their complexity.</p>
+
+<p>From a higher perspective, Optimization is the second to last step in the implementation of a Compiler. It should come right before Code Generation, although, as we&rsquo;ve seen, most optimization techniques are applied on an Intermediate Language.</p>
+
+<p>So, the most likely sequence is that after Semantic Analysis (the last front-end step), there&rsquo;s a first Code Generation step, that generates code in the Intermediate Language, then Optimization kicks in. And after that, finally, the target code (in machine language) is generated in a further Code Generation step.</p>
+
+<h2 id="references">References</h2>
+
+<p>My article <a href="http://example.org/page/source-code-optimization-in-compilers/">Source Code Optimization in Compilers</a>.</p>
+
+<p>My article <a href="http://example.org/page/how-compilers-optimize-code-1/">How do Compilers Optimize the Source Code (Part I)</a>.</p>
+
+<p>Alex Aiken&rsquo;s class Compilers at Stanford University. Available as <a href="https://lagunita.stanford.edu/courses/Engineering/Compilers/Fall2014/course/">free MOOC online</a>.</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fhow-compilers-optimize-code-2%2f&amp;text=How%20Compilers%20Optimize%20the%20Source%20Code%20%28Part%20II%29&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fhow-compilers-optimize-code-2%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fhow-compilers-optimize-code-2%2f&amp;title=How%20Compilers%20Optimize%20the%20Source%20Code%20%28Part%20II%29" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fhow-compilers-optimize-code-2%2f&amp;title=How%20Compilers%20Optimize%20the%20Source%20Code%20%28Part%20II%29" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fhow-compilers-optimize-code-2%2f&amp;title=How%20Compilers%20Optimize%20the%20Source%20Code%20%28Part%20II%29" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fhow-compilers-optimize-code-2%2f&amp;description=How%20Compilers%20Optimize%20the%20Source%20Code%20%28Part%20II%29" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

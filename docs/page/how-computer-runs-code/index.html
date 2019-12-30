@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>How Does the Computer Run Code? | Compilers</title>
+  <meta name="description" content="This article is positioned between the front-end compilation (to decide whether a source code is correct or not) and the back-end compilation (to generate machine-runnable code and optimization). Before taking the leap, I want to understand the machine&rsquo;s internal organization, in order to truly grasp what to run code means.
+Here&rsquo;s what I am going to discuss:
+ Memory organization. Word Alignment. Activation and lifetime of procedures.  Understanding Static vs Dynamic A key distinction, that one should really understand deeply, exists between what happens during compilation time, and what happens at runtime.">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/how-computer-runs-code\/",
+          "name": "How does the computer run code?"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "How Does the Computer Run Code?",
+  "description" : "This article is positioned between the front-end compilation (to decide whether a source code is correct or not) and the back-end compilation (to generate machine-runnable code and optimization). Before taking the leap, I want to understand the machine\x26rsquo;s internal organization, in order to truly grasp what to run code means.\nHere\x26rsquo;s what I am going to discuss:\n Memory organization. Word Alignment. Activation and lifetime of procedures.  Understanding Static vs Dynamic A key distinction, that one should really understand deeply, exists between what happens during compilation time, and what happens at runtime.",
+  "inLanguage" : "en",
+  "wordCount":  3719 ,
+  "datePublished" : "2019-10-08T00:00:00",
+  "dateModified" : "2019-10-08T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/how-computer-runs-code\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="How Does the Computer Run Code?" />
+<meta property="og:description" content="This article is positioned between the front-end compilation (to decide whether a source code is correct or not) and the back-end compilation (to generate machine-runnable code and optimization). Before taking the leap, I want to understand the machine&rsquo;s internal organization, in order to truly grasp what to run code means.
+Here&rsquo;s what I am going to discuss:
+ Memory organization. Word Alignment. Activation and lifetime of procedures.  Understanding Static vs Dynamic A key distinction, that one should really understand deeply, exists between what happens during compilation time, and what happens at runtime.">
+<meta property="og:url" content="http://example.org/page/how-computer-runs-code/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="How Does the Computer Run Code?" />
+  <meta name="twitter:description" content="This article is positioned between the front-end compilation (to decide whether a source code is correct or not) and the back-end compilation (to generate machine-runnable code and optimization). …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>How Does the Computer Run Code?</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  October 8, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>This article is positioned between the front-end compilation (to decide whether a source code is correct or not) and the back-end compilation (to generate machine-runnable code and optimization). Before taking the leap, I want to understand the machine&rsquo;s internal organization, in order to truly grasp what to run code means.</p>
+
+<p>Here&rsquo;s what I am going to discuss:</p>
+
+<ul>
+<li>Memory organization.</li>
+<li>Word Alignment.</li>
+<li>Activation and lifetime of procedures.</li>
+</ul>
+
+<h2 id="understanding-static-vs-dynamic">Understanding Static vs Dynamic</h2>
+
+<p>A <strong>key distinction</strong>, that one should really understand deeply, exists between what happens during compilation time, and what happens at runtime. It&rsquo;s common to call the former static, and the latter dynamic.</p>
+
+<p>Generally speaking, when the compiler makes a completely informed decision about something, we say that&rsquo;s a static operation. It basically means that the compiler has all the information it needs, can see the full picture and ensure that the operation is correct.</p>
+
+<p>Let&rsquo;s look at one example. Let&rsquo;s consider statically typed programming languages that are not OOP and therefore do not support inheritance. In this case, the compiler is in charge to check that every operation is correctly typed, that is, the objects used in that operation are consistent in terms of their types. The compiler is fully capable of doing this, because it knows the type of each object currently defined in the program, and also knows the rules that govern how types can be used each next to another. This is what happens, for example, in the C language. It&rsquo;s also how the programming language I designed works (see the references at the end).</p>
+
+<p>What&rsquo;s dynamic then? The easiest example I can think of is with I/O operations. Let&rsquo;s take a look at the following Java snippet.</p>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kn">import</span> <span class="nf">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">Scanner</span><span class="p">;</span>
+
+<span class="kd">class</span> <span class="nf">MainClass</span> <span class="p">{</span>
+    <span class="kd">public</span> <span class="nf">static</span> <span class="kt">void</span> <span class="nf">main</span> <span class="p">(</span><span class="n">String</span> <span class="nf">args</span><span class="p">[])</span> <span class="p">{</span>
+        <span class="n">Scanner</span> <span class="nf">sc</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">);</span>
+         <span class="kt">int</span> <span class="nf">x</span> <span class="o">=</span> <span class="n">sc</span><span class="p">.</span><span class="na">nextInt</span><span class="p">();</span>  <span class="c1">// ask the user to enter from keyboard
+</span><span class="c1"></span>        <span class="c1">// do something smart with x...
+</span><span class="c1"></span>    <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+<p>This code would be compiled correctly by the Java Compiler, and it&rsquo;s indeed well written. However, the compiler has no way to know if the user will enter a sequence of digits or not. There&rsquo;s nothing that forbids her to type, for instance:</p>
+<div class="highlight"><pre class="chroma">&gt;&gt; 123R31</pre></div>
+<p>This is not a valid integer, therefore the method nextInt() of the class Scanner will fail. In Java- terms, it will raise an exception.</p>
+
+<p>The compiler cannot possibly know in advance what the dynamic type resulting from the method nextInt() is. Or, to better says it, nextInt() will always expect an integer, or fail brutally. This happens at runtime.</p>
+
+<p>I want to show you another example of dynamic operation, a bit more sophisticated. Let&rsquo;s consider again a Java snippet.</p>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">class</span> <span class="nf">A</span> <span class="p">{</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+
+<span class="kd">class</span> <span class="nf">B</span> <span class="kd">extends</span> <span class="nf">A</span> <span class="p">{</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+
+<span class="kd">class</span> <span class="nf">MainClass</span> <span class="p">{</span>
+    <span class="kd">public</span> <span class="nf">static</span> <span class="kt">void</span> <span class="nf">main</span> <span class="p">(</span><span class="n">String</span> <span class="nf">args</span><span class="p">[])</span> <span class="p">{</span>
+        <span class="n">A</span> <span class="nf">obj1</span><span class="p">;</span> <span class="c1">// static type of identifier &#34;obj1&#34; is A
+</span><span class="c1"></span>        <span class="n">obj1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">A</span><span class="p">();</span>
+        <span class="n">B</span> <span class="nf">obj2</span><span class="p">;</span> <span class="c1">// static type of identifier &#34;obj2&#34; is B
+</span><span class="c1"></span>        <span class="n">obj2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">B</span><span class="p">();</span>
+        <span class="n">obj1</span> <span class="o">=</span> <span class="n">obj2</span><span class="p">;</span> <span class="c1">// valid assignment thanks to inheritance
+</span><span class="c1"></span>        <span class="c1">// now the dynamic type of obj1 will be B
+</span><span class="c1"></span>        <span class="p">...</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+<p>If you know a bit of Java (or pretty much any other OOP language), the example should explain itself. When you create a variable of type A, that will be the static type for that variable for the rest of the program. However, if A has any subclass, then you can assign to the same variable objects of any of such subclasses. If you do that, then <strong>the runtime type (dynamic type) of the identifier will be different from its static type</strong>.</p>
+
+<h2 id="program-execution-memory-and-operating-system">Program execution, Memory and Operating System</h2>
+
+<p>The other important concepts we should master are about how the Operating System (OS) interacts with the program we compiled and now want to execute.</p>
+
+<p>What happens when someone starts using a computer and wants to run a software?</p>
+
+<p>That software can be pretty much anything. It can be your internet browser, a video player, a simple program you just wrote and want to test out. How does the machine deal with it? In happens in a few steps.</p>
+
+<p>First, the OS allocates space in memory for this program. Depending on what OS you are using, and what type of environment your program is run in (like a virtual environment, or directly the machine registers), the allocated space can be protected or not.</p>
+
+<p>For example, it&rsquo;s well known that Java programs are run into the Java Virtual Machine, and therefore offers some more protection with respect to C programs, for instance, from a security point of view.</p>
+
+<p>Secondly, the code for the program is loaded into the allocated memory. Again this is just the principle and the execution of such principle may happen in various forms.</p>
+
+<p>For example, a program that you compiled down to the machine level (for example a C or Assembly program), might be loaded directly into the computer&rsquo;s memory. On the other hand, a program that was compiled in some form of bytecode, like Java programs are, will be loaded into the Virtual Machine that only later interacts with the computer&rsquo;s memory and overall system.</p>
+
+<p>The third and final step (final as far are this discussion is concerned) is to jumpstart at the entry point of the program. You can imagine the OS having a pointer to the first operation that must be executed and moving it right to where the program asks.</p>
+
+<p>For example, in C programs that would be the function main. In Java programs, that would be the main method inside the class you set as executable. In Python programs, the entry point is the first line of the file that you give as argument to the interpreter.</p>
+
+<p>Once the entry point is decided, code is run sequentially line after line. That is, of course, unless some branching or jump instruction is met. In that case, well, I cannot really predict what will happen!</p>
+
+<h3 id="memory-visualization">Memory Visualization</h3>
+
+<p>There&rsquo;s a final detail I consider worth keeping in mind. And it&rsquo;s about how the machine memory is <em>physically</em> organized.</p>
+
+<p>In truth, this is all about a convention that has traditionally been applied all over textbooks and papers: memory is depicted from the low addresses to the high ones.</p>
+
+<p><img src="/images/memory1.png" alt="Computer memory view" width="280px"></p>
+
+<p>Clearly, in a real machine it&rsquo;s not even guaranteed that these spaces of memory are contiguously allocated. This is why we use logical names for variables, instead of hexadecimal addresses!</p>
+
+<p>From the figure you can also see that memory is split in two parts. The first part is where the code is loaded and it&rsquo;s said to be loaded starting from the lowest address (again, this is a convention). Also, this is a fixed-size part, unless you&rsquo;re on a very atypical architecture.</p>
+
+<p>Then, there&rsquo;s the part that will contain data of the program. For every meaningful program that&rsquo;s run, this part of the memory changes very frequently during the execution. You allocate new variables, modify them, create complex structures or objects, and much more.</p>
+
+<p>Next, we are going to see that the Data part of the memory can be described more in detail.</p>
+
+<h2 id="activations-and-lifetime">Activations and Lifetime</h2>
+
+<p>Now that we know what happens in the OS when the user request a program to be run, we can start looking at how it is run.</p>
+
+<p>The first thing to do, for the sake of this discussion, is to make two assumptions:</p>
+
+<ol>
+<li>The code is run sequentially. Don&rsquo;t be mistaken by this definition: it totally allows jumps and branches, and it simply means there&rsquo;s a well defined order with which statements are executed.</li>
+<li>When a procedure (aka function, method) is completed the control immediately returns to the point where that procedure was called.</li>
+</ol>
+
+<p>These two seem very intuitive and &ldquo;permissive&rdquo; assumptions. And indeed are valid for a wide range of programs. However, they also cut off some. In particular, <strong>all multithreading programs do not fulfill these constraints!</strong></p>
+
+<p>It&rsquo;s also worth introducing two definitions, when talking about procedures.</p>
+
+<ol>
+<li>We use the word <strong>activation of P</strong> to simply describe the activation mean of a procedure P. It involves all we said earlier, like memory and code allocation, entry point.</li>
+<li>The <strong>lifetime of an activation</strong> of P is made of
+
+<ul>
+<li>All steps required to execute P,</li>
+<li>All steps required by sub-procedures invoked by P.</li>
+</ul></li>
+</ol>
+
+<p>At times you can also hear or read about the <strong>lifetime of a variable</strong>, say x. In such case, this term refers to all the steps where x is correctly defined in the code. Or, if you will, all the steps included from the moment x is initialized till the moment it&rsquo;s destroyed (deallocated).</p>
+
+<h2 id="activation-tree-and-stack">Activation Tree and Stack</h2>
+
+<p>The very important observation we have to draw from the previous concepts is the following: <strong>if a procedure P calls a procedure Q, then Q must terminate before P does.</strong></p>
+
+<p>On a more general level, this observation implies that all activations in a program can be represented by a tree data structure. Why? Because they are correctly nested, and therefore it&rsquo;s always possible to find a parent-to-child relation.</p>
+
+<p>Things can get arbitrarily complex, of course. For example the same procedure P can be child of multiple parent procedure. But this would happen in different parts of the tree, so it&rsquo;d be all good.</p>
+
+<p>Or, one more example, procedure P can be a child of procedure Q, which can then be child of P, recursively. That would also be fine with a tree structure.</p>
+
+<p>Thus, we use the term <strong>Activation Tree</strong> to refer to the nested levels of activations that happen in the whole program.</p>
+
+<p>Just knowing the overall distribution of activation, with a tree structure, might not be enough. Generally speaking, it&rsquo;s also very useful to keep track of what are the activations that are currently active.</p>
+
+<p>For example, if the main program calls a procedure P and that, before terminating, calls a procedure Q, then P and Q are currently active. The fact that the Activation Tree also contains a procedure R that might be activated in some future it&rsquo;s quite irrelevant.</p>
+
+<p>This is why it&rsquo;s good to keep track of the currently active procedures. Thanks to the property I announced earlier (that when a procedure has been called then it must return before the caller returns), it&rsquo;s enough to keep a stack data structure. We call it <strong>Activations Stack</strong>.</p>
+
+<p>As you can imagine, a procedure is pushed onto this stack every time is activated, and is popped off the stack when it returns. This mechanism guarantees correctness of the nested calls. By this point in the class you should be fluent enough with stack to see that!</p>
+
+<p>Finally, the Activations Stack <strong>is stored in the Data part of the program&rsquo;s memory</strong>. Hold this concept in your mind for a minute, as we&rsquo;ll get back to it very soon.</p>
+
+<h2 id="activation-frames">Activation Frames</h2>
+
+<p>After all this talk about activations, we&rsquo;ve finally arrived to the most natural question. <strong>What information do activations carry with them?</strong></p>
+
+<p>First of all, let&rsquo;s give the concept a name. We use the word <strong>Activation Frame</strong>, or sometimes <strong>Activation Record</strong>, to describe the set of information that activations bring on the table.</p>
+
+<p>These frames need to carry with them quite a lot of information. For example, if a procedure F calls a procedure G, then the record for G will have to contain a mix of information about F and G. Why? Well, that&rsquo;s for a number of reasons. Consider, for instance, that F is suspended in the moment it calls G. Therefore, information about how to reactivate F must be contained in G&rsquo;s activation frame.</p>
+
+<p>There&rsquo;s no universal recipe on how to design the Activation Frame. In practice, there are many small differences and nuances that change in each compiler.</p>
+
+<p>Generally speaking though, Activation Frames contain the following four blocks:</p>
+
+<ol>
+<li>The return value (initially empty, of course).</li>
+<li>The arguments.</li>
+<li>The link to the caller.</li>
+<li>The address to the return (basically, the line of code that must be executed after the procedure returns).</li>
+</ol>
+
+<p>A few more concepts worth sticking into our minds:</p>
+
+<ul>
+<li>Even though the four blocks are logically independent, they really are just one big block of memory inside the machine. The fact that they are contiguously allocated plays an important role, because their content can be accessed much faster this way.</li>
+<li>After a procedure returns its activation frame can be kept in memory for quite some time. And it can be useful for a number of purposes. For instance, the return value of this sub-procedure will be needed. In this case, it&rsquo;s very important to know that the result value is (e.g.) the first block of its activation record, so it can be accessed by the calling procedure very efficiently.</li>
+<li>Strong compilers try to save Activation Records as much as possible in the registers of the CPU, especially method result and method arguments. No need to say it, this is done for the sake of efficiency. Registers are the fastest locations to access, in pretty much all architectures&rsquo; memory.</li>
+</ul>
+
+<p>Last, but definitely not least, there&rsquo;s a very important concept I want to underline.</p>
+
+<p>It&rsquo;s crucial to understand that <strong>all we discussed so far happens at compile time</strong>. So, the compiler must be able to determine the layout of the activation records, and generate code that can access any sub-block in any of such records.</p>
+
+<p>In conclusion, and the message that you should really remember, <strong>the Activation Frame layout and the Code Generation module must be designed together</strong>.</p>
+
+<p>We haven&rsquo;t seen an inch of what Code Generation means yet, but that&rsquo;s on the roadmap for future articles!</p>
+
+<h2 id="globals-and-heap">Globals and Heap</h2>
+
+<p>Globals and Heap are two things you and I are used to see, and to use when reading or writing programs.</p>
+
+<p>But just in case:</p>
+
+<ul>
+<li>Globals are variables that are visible throughout the program, in all files. For example, a Java&rsquo;s object private attributes are not globals. You don&rsquo;t have their definitions available outside of the class. On the other hand, a Matlab variable declared as &ldquo;global&rdquo; is… global!</li>
+<li>Heap is the name used to describe the portion of the memory where objects and data are dynamically allocated while the program runs, on-demand. Keep in mind that the same term is also used to indicate a specific type of tree data structure, but that doesn&rsquo;t concern us, for the time being.</li>
+</ul>
+
+<p>I want to discuss with you how Globals and Heap are handled by the compiler, in terms of where and how they are allocated into memory.</p>
+
+<p>The best way, in my opinion, is to think about this logically and draw our own conclusions. You&rsquo;ll be surprised (or maybe not!) to discover how well our intuition will work!</p>
+
+<p>As we said, globals must be accessible everywhere in the program. This means that they memory address should not change during execution. It could change, in theory, but that would make memory management awfully complicated.</p>
+
+<p>Thus, <strong>the compiler creates a statically allocated memory</strong> that is devoted to store globals. By convention, this is said to be at the top of the Data part of the memory. Remember, though, that &ldquo;top&rdquo; means low-addresses. And below it there is the Activation Stack, with all Activation Frames for the currently active procedures. Here is how you can look at it.</p>
+
+<p><img src="/images/memory2.png" alt="Computer memory view" width="280px"></p>
+
+<p>In reality though, there is a bunch of other things that make sense to store in a &ldquo;global&rdquo; place, not just global variables. This is why compiler&rsquo;s people more frequently talk about <strong>static data</strong> part of the memory. What&rsquo;s in there vary from compiler to compiler, but the idea is that such part of the memory is right below the Code part, and contains all statically allocated data.</p>
+
+<p>In addition to static memory, each program needs a number of dynamically allocated memory slots. In some cases these slots live with the procedure: it means they can be deallocated when the procedure returns. In such case it may make sense to just use the activation frame.</p>
+
+<p>In more cases though, objects allocated by a procedure must survive the procedure itself. In other words, <strong>that data must be available even after the procedure terminates</strong>. An example? Just about the return object of any function.</p>
+
+<p>This is where the Heap enters the game.</p>
+
+<p>The Heap is like a big bucket where objects can be dynamically created, allocated, destroyed and deallocated. A little secret: it&rsquo;s called &ldquo;heap&rdquo; because the data structure compilers use most commonly for it is really a Heap.</p>
+
+<p>The Heap is represented by convention below the Activation Stack. So, to summarize, here&rsquo;s a list of what we find in the memory from the low to the high addresses:</p>
+
+<ol>
+<li>The code area. Contains the code, and for many languages it&rsquo;s a fixed size, read-only area.</li>
+<li>Static area. Contains data (not code) with fixed address, like global variables. It&rsquo;s fixed size, and can be writable.</li>
+<li>Stack area. Contains the stack of activation frames for the currently active procedures.</li>
+<li>Heap area. Contains everything else really, including all allocated area. In C this can be managed via <code>malloc</code> and <code>free</code>, in Java via <code>new</code> (and garbage collection).</li>
+</ol>
+
+<p>There&rsquo;s a final, very interesting point, that I believe is worth discussing.</p>
+
+<p>From all we discussed so far, it&rsquo;s clear that both the Activation Stack and the Heap grow and shrink during the program execution. But what happens then if they step on each other&rsquo;s feet?</p>
+
+<p>As you can imagine, that would be quite bad. Indeed, it&rsquo;s something to avoid at all costs.</p>
+
+<p>Sometimes the simplest and most elegant solution is also the best one. In this case, the idea is to initialize Stack and Heap at the opposite sides of the memory&rsquo;s boundaries, and <strong>let them grow one towards the other.</strong></p>
+
+<p>This is the final picture you should remember.</p>
+
+<p><img src="/images/memory3.png" alt="Computer memory view" width="280px"></p>
+
+<p>At any moment during the program&rsquo;s execution, if the pointer to the next space available for the Stack becomes equal to the pointer to the next space available for the Heap, then it really means <strong>the program has run out of memory</strong>. This is when you&rsquo;d see some Error or Exception such as Out-Of-Memory-Error, and the program would be aborted.</p>
+
+<h2 id="alignment">Alignment</h2>
+
+<p>Alignment is the last subject I want to discuss in this article, even though just briefly. It&rsquo;s a concept that lives at the very lowest level, from the point of view of machines&rsquo; architecture, but it&rsquo;s nonetheless quite important to understand, in my opinion.</p>
+
+<p>Let&rsquo;s start from some very basic concepts:</p>
+
+<ul>
+<li>Modern machines are built either with a 32- or a 64-bits architecture.</li>
+<li>A <strong>word of memory</strong> is made of 4 bytes (that is, 32 bits) in a 32-bits architecture, and is made of 8 bytes in a 64-bits architecture.</li>
+<li><strong>Any machine&rsquo;s memory is accessible either per byte or per word</strong>. Not really per bit, in general.</li>
+</ul>
+
+<p>With that said, alignment is really just about a single definition.</p>
+
+<p><em>We say that some data is word aligned if it begins at a word boundary.</em></p>
+
+<p>For example, if you want to allocate an object that needs 32 bits in memory, and your machine is on a 64-bit architecture, then your data would be aligned if:</p>
+
+<ul>
+<li>It starts at the bit 0 (in which case it&rsquo;d take till bit 31), or</li>
+<li>It starts at the bit 64 (in which case it&rsquo;d take till bit 95), or</li>
+<li>It starts at the bit 128,</li>
+<li>Etc&hellip;</li>
+</ul>
+
+<p>Basically, the first bit where data &ldquo;starts&rdquo; must coincide with the first bit of a new word, in memory.</p>
+
+<p>What happens when data is scattered around in memory and not well word-aligned? Two nasty consequences may happen:</p>
+
+<ul>
+<li>The program will not execute at all, or not correctly. This is a rare event though.</li>
+<li>The program will run much more slowly than you&rsquo;d expect. The drop in performance can be very large. This is the most common case.</li>
+</ul>
+
+<p>The question, as always, is <strong>why is that?</strong> The reasons are related with deep hardware considerations. The way CPUs are built, and logically connected with registers and memory inside the architecture. And I am really talking about electrical connections! Sadly for me, I have a very poor knowledge about this subject, so that&rsquo;s all I can tell you!</p>
+
+<p>The takeaway message is that word alignment is so important that often compilers leave a lot of empty (unused) space in memory, to make sure most of data is word aligned.</p>
+
+<p>Thus, you also start understanding that writing the back-end part of a Compiler, the part that deals with Code Generation and Optimization, <strong>is intimately related to the architecture that the program is supposed to be run on</strong>. This is why you have many different C compilers, and many different JDKs. These are subjects for the next article!</p>
+
+<h2 id="take-home-messages">Take-home messages</h2>
+
+<p>This article may seem like a collection of randomly chosen subjects. Believe me, that&rsquo;s not the case. I illustrated many different concepts, true, but they will all be useful in the upcoming articles. We spoke about very low level concepts, related to how Compilers organize the memory that has to be dedicated to the program&rsquo;s execution.</p>
+
+<p>The most important concepts in my opinion are the following ones:</p>
+
+<ul>
+<li>Everything that the Compiler is able to decide with certainty is static. It&rsquo;s a decision taken at compilation time, and the Compiler if fully capable of understanding its consequences. If not, then there&rsquo;s some dynamic variability that can cause issues, at runtime.</li>
+<li>Compilers allocate memory for the program&rsquo;s execution. The top of such space contains the Code for the program, and it&rsquo;s statically allocated.</li>
+<li>The key data structures for the correct execution and memory management are Activation Frames. They must be designed together with the Code Generation module, because the two are very strictly connected.</li>
+<li>The dynamic allocated memory is called Heap and contains Activation Stack and the actual dynamic Memory (heap, or bucket). They grow one towards the other.</li>
+</ul>
+
+<h2 id="what-s-next">What&rsquo;s next</h2>
+
+<p>Now that we know quite well what has to happen in the computer&rsquo;s memory during the program execution, we are ready to jump to the Code Generation.</p>
+
+<p>This is going to be a fascinating subject. Basically, the goal is to take the original source code, and whatever data structure was produced by the Parser and by the Semantic Analysis, and literally translate that source code in something that the machine can understand, and run!</p>
+
+<p>See you there!</p>
+
+<h2 id="references">References</h2>
+
+<p>Alex Aiken&rsquo;s class Compilers at Stanford University. Available as <a href="https://lagunita.stanford.edu/courses/Engineering/Compilers/Fall2014/course/">free MOOC online</a>.</p>
+
+<p>My article <a href="http://example.org/page/why-so-many-programming-languages/">Why There Are So Many Programming Languages</a> (Talks about front-end, back-end compilation).</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fhow-computer-runs-code%2f&amp;text=How%20Does%20the%20Computer%20Run%20Code%3f&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fhow-computer-runs-code%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fhow-computer-runs-code%2f&amp;title=How%20Does%20the%20Computer%20Run%20Code%3f" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fhow-computer-runs-code%2f&amp;title=How%20Does%20the%20Computer%20Run%20Code%3f" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fhow-computer-runs-code%2f&amp;title=How%20Does%20the%20Computer%20Run%20Code%3f" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fhow-computer-runs-code%2f&amp;description=How%20Does%20the%20Computer%20Run%20Code%3f" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

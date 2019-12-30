@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>Why There Are So Many Programming Languages? | Compilers</title>
+  <meta name="description" content="Why hasn&rsquo;t anyone invented yet a Programming Language that would catch them all?
+Such question has stuck in my brain for quite some time, and none of the answers I found online were convincing. Then, I found an essay/video by Prof. Aiken, who teaches a class on Compilers at Stanford&rsquo;s Computer Science faculty.
+His point was so interesting that I want to elaborate it further.
+The &ldquo;cost&rdquo; of a Programming Language Let&rsquo;s start with a question that apparently hasn&rsquo;t got anything to do with the original question: What&rsquo;s the most expensive thing about a Programming Language?">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/why-so-many-programming-languages\/",
+          "name": "Why there are so many programming languages?"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "Why There Are So Many Programming Languages?",
+  "description" : "Why hasn\x26rsquo;t anyone invented yet a Programming Language that would catch them all?\nSuch question has stuck in my brain for quite some time, and none of the answers I found online were convincing. Then, I found an essay\/video by Prof. Aiken, who teaches a class on Compilers at Stanford\x26rsquo;s Computer Science faculty.\nHis point was so interesting that I want to elaborate it further.\nThe \x26ldquo;cost\x26rdquo; of a Programming Language Let\x26rsquo;s start with a question that apparently hasn\x26rsquo;t got anything to do with the original question: What\x26rsquo;s the most expensive thing about a Programming Language?",
+  "inLanguage" : "en",
+  "wordCount":  1022 ,
+  "datePublished" : "2019-09-28T00:00:00",
+  "dateModified" : "2019-09-28T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/why-so-many-programming-languages\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="Why There Are So Many Programming Languages?" />
+<meta property="og:description" content="Why hasn&rsquo;t anyone invented yet a Programming Language that would catch them all?
+Such question has stuck in my brain for quite some time, and none of the answers I found online were convincing. Then, I found an essay/video by Prof. Aiken, who teaches a class on Compilers at Stanford&rsquo;s Computer Science faculty.
+His point was so interesting that I want to elaborate it further.
+The &ldquo;cost&rdquo; of a Programming Language Let&rsquo;s start with a question that apparently hasn&rsquo;t got anything to do with the original question: What&rsquo;s the most expensive thing about a Programming Language?">
+<meta property="og:url" content="http://example.org/page/why-so-many-programming-languages/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="Why There Are So Many Programming Languages?" />
+  <meta name="twitter:description" content="Why hasn&rsquo;t anyone invented yet a Programming Language that would catch them all?
+Such question has stuck in my brain for quite some time, and none of the answers I found online were convincing. …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>Why There Are So Many Programming Languages?</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  September 28, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>Why hasn&rsquo;t anyone invented yet a Programming Language that would <strong>catch them all</strong>?</p>
+
+<p>Such question has stuck in my brain for quite some time, and none of the answers I found online were convincing. Then, I found an essay/video by Prof. Aiken, who teaches a class on Compilers at Stanford&rsquo;s Computer Science faculty.</p>
+
+<p>His point was so interesting that I want to elaborate it further.</p>
+
+<h2 id="the-cost-of-a-programming-language">The &ldquo;cost&rdquo; of a Programming Language</h2>
+
+<p>Let&rsquo;s start with a question that apparently hasn&rsquo;t got anything to do with the original question: What&rsquo;s the most expensive thing about a Programming Language?</p>
+
+<p>Let&rsquo;s say you were to create a new Programming Language today, and finishing up its development by tomorrow (a bit optimistic, I know). Now, what would the most expensive, and most difficult thing you have to do?</p>
+
+<p>Prof. Aiken makes a very interesting point here. He says that:</p>
+
+<p><em>The most expensive thing of a Programming Language is the time it takes to programmers to learn it.</em></p>
+
+<p>If you work in more than one programming language, then you know it&rsquo;s a lot of time indeed. However, <strong>when a language is young</strong> and there are only few programmers using it, <strong>it can evolve very quickly</strong> because it&rsquo;s easy to keep just a few developers updated with the novelties. Also, young languages are backed by small but extremely tight communities. This is another big boost to its development.</p>
+
+<p><img src="/images/timeToLearn.png" alt="Language Complexity vs Time to Learn" /></p>
+
+<p>Think about well established languages, say Java and Python. For each of them there are hundreds of thousands of programmers using it, and therefore these languages evolve much more slowly. How much time there is between two consecutive Java, or Python, releases?</p>
+
+<p>Thus, famous and solid programming languages are <strong>slower to adapt</strong> to new needs that arise from new technologies.</p>
+
+<p>Therefore, quite paradoxically, <strong>creating a new language is a faster way</strong> to support such new needs, as well as gathering new users and creating a new community of programmers around the new language.</p>
+
+<p>I&rsquo;d like to share two examples from my own daily practice at work.</p>
+
+<h2 id="a-new-language-just-for-statistician">A new language, just for statistician?</h2>
+
+<p>Let&rsquo;s consider R, the &ldquo;language for statisticians&rdquo;. It&rsquo;s an extension of an old language, called S, created at the Bell Labs. R, instead, was originally implemented at the University of Auckland, New Zealand.</p>
+
+<p>Would you say it is not possible to support statistics computation in Python, Java or C? Of course it is. And actually there&rsquo;s a well known package for Python, <code>scipy.stats</code>, oriented towards statistics.</p>
+
+<p>However, adapting Java or C in order to make them easy-to-use for statisticians would require a lot of time. In this sense, the scipy.stats package is a perfect example: even though it works well (and let&rsquo;s assume it&rsquo;s well designed internally), its interface for the programmer (that is, the syntax and the libraries) is nowhere as neat as R&rsquo;s interface. I personally find <code>scipy.stats</code> really clumsy to use for statistics. R is almost perfect.</p>
+
+<p>This is why R got a big traction (and quite some hype around it). All well deserved in my opinion. For example, it&rsquo;s the only programming language used in the fantastic Data Science specialization offered on Coursera by the Johns Hopkins University.</p>
+
+<p>So, all good for a long while. What happened then? In my opinion, things went a bit out of control.</p>
+
+<p>R&rsquo;s aficionados thought - Hey why don&rsquo;t we get out of the statisticians world? We can use R for a lot of other things!</p>
+
+<p>The result was a bunch of pseudo- software products written in R. Today, you can really find anything in R: web servers, http and websocket clients, maybe even some GUI library.</p>
+
+<p>The undeniable fact is that R wasn&rsquo;t designed for these applications. This, along with the fact that they weren&rsquo;t built by professional software developers, makes these software products not very well designed, again in my modest opinion.</p>
+
+<p>At any rate, the simple evidence is that R has evolved into a <strong>full-fledged programming language</strong>, regardless of the quality of the libraries for things outside of the statistic scope. Hence, we have a new general-purpose programming language alongside the more classic C++, Java, etc.</p>
+
+<p>If you think R&rsquo;s story is an exception, then think again! Lots of other Programming Languages have seen the same happening to them.</p>
+
+<h2 id="a-new-language-just-for-automation">A new language, just for automation?</h2>
+
+<p>A language I&rsquo;ve worked with for a long time is Matlab. It&rsquo;s a proprietary programming language, owned by MathWorks, that was designed to seamlessly integrate with a set of other software tools developed by the same company. Main use cases: dynamic system simulations, automotive and feedback control.</p>
+
+<p>Even though these applications are not too common within the Computer Science world, and even though Matlab is not too common of a language either, I think it&rsquo;s a good example in this context.</p>
+
+<p>Matlab is, once more, in my opinion, not the best programming language out there, if used for general-purpose software development. Memory management, OOP, and many other features are almost senseless therein.</p>
+
+<p>However, <strong>it&rsquo;s just perfect for dynamic systems simulations and control applications</strong>. And that&rsquo;s why is the de-facto tool in this industry.</p>
+
+<p>If you think that numpy + scipy is a good competitor, then, well, I bet you&rsquo;ve never really used Matlab.</p>
+
+<p>Matlab&rsquo;s story is quite similar to R&rsquo;s. A great product, enormously useful to people working in the related field. MathWorks built something really great.</p>
+
+<p>But then people started doing the weirdest thing with it, and things went, ironically, out of control!</p>
+
+<h2 id="conclusions">Conclusions</h2>
+
+<p>Programming Languages history is a fascinating topic! From FORTRAN, for which arguably the first real Compiler was built, to C - simply put, a milestone in the Computer Science history.</p>
+
+<p>Modern languages history is also very interesting, and also heavily influenced by the new trends and technologies that become public every day.</p>
+
+<p>Ultimately, the constant rise of new needs for such technologies, and the big amount of time it would take for &ldquo;old&rdquo; languages to adapt and address these needs, are the reasons why we have so many programming languages out there.</p>
+
+<h2 id="references">References</h2>
+
+<p>R programming language: <a href="https://en.wikipedia.org/wiki/R_(programming_language)#History">A Brief History</a> (Wikipedia page).</p>
+
+<p>MATLAB programming language: <a href="https://en.wikipedia.org/wiki/MATLAB#History">A Brief History</a> (Wikipedia page).</p>
+
+<p>Prof. Aiken <a href="http://theory.stanford.edu/~aiken/">personal page</a> at Stanford University.</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fwhy-so-many-programming-languages%2f&amp;text=Why%20There%20Are%20So%20Many%20Programming%20Languages%3f&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fwhy-so-many-programming-languages%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fwhy-so-many-programming-languages%2f&amp;title=Why%20There%20Are%20So%20Many%20Programming%20Languages%3f" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fwhy-so-many-programming-languages%2f&amp;title=Why%20There%20Are%20So%20Many%20Programming%20Languages%3f" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fwhy-so-many-programming-languages%2f&amp;title=Why%20There%20Are%20So%20Many%20Programming%20Languages%3f" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fwhy-so-many-programming-languages%2f&amp;description=Why%20There%20Are%20So%20Many%20Programming%20Languages%3f" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>Implementation of a Recursive Descent Parser | Compilers</title>
+  <meta name="description" content="We learned a great deal about Parsing algorithms in previous articles of this course. In one sentence, a Parser is a software that receives a list of Token objects and decide whether such a list fulfills the constraints given by a Formal Grammar.
+In other words, within a Compiler, the Parser is the element that makes sure the grammatical rules are respected.
+At the organization level, the Parser is the second step in front-end compilation, after Lexical Analysis, but before Semantic Analysis.">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/implementation-recursive-descent-parser\/",
+          "name": "Implementation of a recursive descent parser"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "Implementation of a Recursive Descent Parser",
+  "description" : "We learned a great deal about Parsing algorithms in previous articles of this course. In one sentence, a Parser is a software that receives a list of Token objects and decide whether such a list fulfills the constraints given by a Formal Grammar.\nIn other words, within a Compiler, the Parser is the element that makes sure the grammatical rules are respected.\nAt the organization level, the Parser is the second step in front-end compilation, after Lexical Analysis, but before Semantic Analysis.",
+  "inLanguage" : "en",
+  "wordCount":  7022 ,
+  "datePublished" : "2019-10-13T00:00:00",
+  "dateModified" : "2019-10-13T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/implementation-recursive-descent-parser\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="Implementation of a Recursive Descent Parser" />
+<meta property="og:description" content="We learned a great deal about Parsing algorithms in previous articles of this course. In one sentence, a Parser is a software that receives a list of Token objects and decide whether such a list fulfills the constraints given by a Formal Grammar.
+In other words, within a Compiler, the Parser is the element that makes sure the grammatical rules are respected.
+At the organization level, the Parser is the second step in front-end compilation, after Lexical Analysis, but before Semantic Analysis.">
+<meta property="og:url" content="http://example.org/page/implementation-recursive-descent-parser/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="Implementation of a Recursive Descent Parser" />
+  <meta name="twitter:description" content="We learned a great deal about Parsing algorithms in previous articles of this course. In one sentence, a Parser is a software that receives a list of Token objects and decide whether such a list …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>Implementation of a Recursive Descent Parser</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  October 13, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>We learned a great deal about Parsing algorithms in previous articles of this course. In one sentence, a Parser is a software that receives a list of Token objects and decide whether such a list fulfills the constraints given by a Formal Grammar.</p>
+
+<p>In other words, within a Compiler, the Parser is the element that makes sure the grammatical rules are respected.</p>
+
+<p>At the organization level, the Parser is the second step in front-end compilation, after Lexical Analysis, but before Semantic Analysis. As we&rsquo;ve already discussed in depth, front-end compilation is the part of the Compiler that makes sure the source code is well written, both syntactically and semantically.</p>
+
+<p>Often, the Lexer and Parser are implemented at the same time (in the same software module), in particular because many implementation patterns are the same for the two of them. Instead, I built them as two separate modules.</p>
+
+<p>The reason is the same as the whole objective of this entire course: <strong>to practice and understand as many details as possible</strong>.</p>
+
+<p>Thus, in this article I will tell you how I implemented a Parser for the Grammar described in the previous article. I will try to keep it self-contained, even though it goes without saying that you should also read the latter, to have a better understanding of this one.</p>
+
+<p>The parser I built is a <strong>Top-Down, Leftmost, Recursive Descent Parser for a LL(1) Grammar</strong>. This means that the implementation uses recursive functions, and it does not use backtracking. The latter point comes thanks to the LL(1) property, and it&rsquo;s definitely a nice thing to have.</p>
+
+<p>Before to start, I want to clarify what is the input and what the output of the Parser module. This is also very useful to clarify the role of the Lexer.</p>
+
+<h2 id="feed-input-to-the-parser">Feed Input To The Parser</h2>
+
+<p>From a purely logical point of view, I recommend you to think about the Parser like a large module in your overall project. This project is called Compiler.</p>
+
+<p>Like in any normal software architecture, a module expects some input. In the case of the Parser module, it&rsquo;s expecting <strong>a list of Tokens as input</strong>. What&rsquo;s that? Let&rsquo;s take a look.</p>
+
+<p>First of all, the list of Tokens is the output of the Lexical Analysis module. Strictly speaking, this is all you need to know about the Lexer. Let&rsquo;s see what the list of tokens looks like, to better understand a few concepts.</p>
+
+<p>A list of Tokens is a list of pairs, where each pair is of the form <code>&lt;lexeme, type&gt;</code>.</p>
+
+<ul>
+<li>The <em>lexeme</em> is a sequence of characters (the actual string contained in the Token).</li>
+<li>The <em>type</em> identifies the type of Token! For example, keyword, variable, number, etc.</li>
+</ul>
+
+<p>Let&rsquo;s take a look at some examples now. Suppose you want to produce a list of Tokens from the following input sentence</p>
+<div class="highlight"><pre class="chroma">x = 3 * y;</pre></div>
+<p>The Lexer should produce something very close to the following list:</p>
+<div class="highlight"><pre class="chroma">&lt;&#34;x&#34;, Variable&gt;,
+&lt;&#34;=&#34;, Equal&gt;,
+&lt;&#34;3&#34;, Number&gt;,
+&lt;&#34;*&#34;, Operator&gt;,
+&lt;&#34;y&#34;, Variable&gt;,
+&lt;&#34;;&#34;, Semicolon&gt;.</pre></div>
+<p>In fact, something very close to this example also happens in the Lexer that I wrote for my own Context Free Grammar. The actual result will be:</p>
+<div class="highlight"><pre class="chroma">&lt;&#34;x&#34;, Var&gt;,
+&lt;&#34; &#34;, Whitespace&gt;,
+&lt;&#34;=&#34;, Equal&gt;,
+&lt;&#34; &#34;, Whitespace&gt;,
+&lt;&#34;3&#34;, Integer&gt;,
+&lt;&#34; &#34;, Whitespace&gt;,
+&lt;&#34;*&#34;, Star&gt;,
+&lt;&#34; &#34;, Whitespace&gt;,
+&lt;&#34;y&#34;, Var&gt;,
+&lt;&#34;;\n&#34;, Endline&gt;.</pre></div>
+<p>Thanks to this simple example you should also get a decent understanding of <strong>how the Lexer works</strong>:</p>
+
+<ol>
+<li>It takes a source file,</li>
+<li>Reads character after character,</li>
+<li>Matches groups of consecutive characters with one of the Token Types that the designer (in this case me) specifies.</li>
+</ol>
+
+<p>The Lexer can also raise an error, if it finds a character that is not allowed by the Alphabet, or if a sequence of character does not match any regular expression defined in the Grammar. In this case, the compilation ends with an error. Instead, if everything goes smoothly then it will return the list of Tokens it has built, which, once again, it&rsquo;s fed as input to the Parser.</p>
+
+<p>Even though the Lexer would probably deserve an entire article for itself, for the moment this is more than enough to understand the remainder of this article!</p>
+
+<p>The only question remaining is <strong>how to actually implement the Token list?</strong></p>
+
+<p>I defined two structures to solve this problem. The first is meant to store information of a single Token, while the second is useful to link Tokens each to another in the right order.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">Token</span><span class="p">{</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">lexeme</span><span class="p">;</span>
+    <span class="k">enum</span> <span class="n">TokenType</span> <span class="n">type</span><span class="p">;</span>
+<span class="p">};</span></code></pre></div>
+<p>TokenType is simply a Enum data structure, which is a basic data type in C. My definition is:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="k">enum</span> <span class="n">TokenType</span> <span class="p">{</span>
+    <span class="c1">// Basic Token Types in the Grammar
+</span><span class="c1"></span>    <span class="n">Comma</span><span class="p">,</span>
+    <span class="n">Lpar</span><span class="p">,</span> <span class="c1">// (
+</span><span class="c1"></span>    <span class="n">Rpar</span><span class="p">,</span> <span class="c1">// )
+</span><span class="c1"></span>    <span class="n">Lbrack</span><span class="p">,</span> <span class="c1">// [
+</span><span class="c1"></span>    <span class="c1">// many more...
+</span><span class="c1"></span><span class="p">};</span></code></pre></div>
+<p>Finally, the TokenList is just another struct, defined as</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">TokenList</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">Token</span> <span class="o">*</span><span class="n">token</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">TokenList</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+<span class="p">};</span></code></pre></div>
+<p>This is <strong>a very common software design pattern</strong>, used to implement linked structures, such as <code>LinkedList</code>. I will discuss it more in detail in a second. For the moment, just fix in mind that the actual output of the Lexer is a pointer to a TokenList structure. In fact, my header file <code>lexer.h</code> exposes a function with this definition:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">TokenList</span><span class="o">*</span> <span class="nf">build_TokenList</span> <span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">fp</span><span class="p">);</span></code></pre></div>
+<p>The first thing the Parser does is to call that function by passing the content of a File, and get in return <strong>a pointer to a TokenList struct</strong>.</p>
+
+<h2 id="output-of-the-parser">Output of the Parser</h2>
+
+<p>I want to discuss with you the output of the Parser right now, before to start discussing its implementation. The reason is that the Parser has to produce a fairly complex data structure, and return it, therefore it&rsquo;s important to ponder this choice at the beginning.</p>
+
+<p>Formally speaking, <strong>the Parser must produce a Parse-Tree</strong>. This is the name conventionally assigned to a data structure, tree-like, that stores information about how Tokens are logically connected in the program. I discussed the Parse-Tree in a previous article, but I think here the easiest is to look at some examples.</p>
+
+<p>Let&rsquo;s consider the following source code:</p>
+<div class="highlight"><pre class="chroma">z = x + y;</pre></div>
+<p>Referring to the Grammar I designed, the Parse-Tree of this 1-liner code should look like the following:</p>
+
+<p><img src="/images/parseTree2.png" alt="Example of Parse Tree" width="300px"></p>
+
+<p>Quite a large stuff, for a 1-liner.</p>
+
+<p>The point here is that the parse-tree must encapsulate the logic of the entire program. So, in order to correct parse an expression (Token <code>expr</code>), and to store it somehow in memory while still having understanding of operator priority, sub-expression, etc, we need the entire branch that starts with the Expr node.</p>
+
+<p>On the other hand, the upper levels in the parse-tree are meant to store the logic of the entire program, which, in my Grammar, is a sequence of <code>line, Endline</code> Tokens.</p>
+
+<p>A different, and more interesting question is - <strong>Is this the optimal way to store the parse-tree in memory?</strong>.</p>
+
+<p>Brilliant question. The answer is definitely no, it&rsquo;s not. In fact, there are plenty of optimization techniques that can be used at this point. Some are relatively easy to understand.</p>
+
+<p>For example, an improvement could be to remove nodes that have just a child, like the <code>line</code> node is in the tree above. It could directly be replaced with the Assign node.</p>
+
+<p>Other techniques are extremely complicated, and arguably even more powerful. I haven&rsquo;t implemented nor studied them yet.</p>
+
+<p>At any rate, I decided I want to build a full, thus redundant, parse-tree in my Parser. Why? Because my objective was to understand in depth the concepts. Premature optimization is usually source of troubles, mistakes and bugs in the code. Thus, I will first work on implementing a general Parser that produces a full parse-tree, and then work on optimization later.</p>
+
+<p>With that decided, now the question is how to implement a data structure that allows to build (and navigate) a parse-tree. The first thing that comes to mind could be a structure like this</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">ParseTree</span> <span class="p">{</span>
+  <span class="k">struct</span> <span class="n">Token</span> <span class="o">*</span><span class="n">data</span><span class="p">;</span>
+  <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">left_child</span><span class="p">;</span>
+  <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">right_child</span><span class="p">;</span>
+<span class="p">};</span></code></pre></div>
+<p>This idea is definitely based on a sound logic: to implement the parse-tree as a root node storing the &ldquo;data&rdquo; Token, along with two pointers to sub-trees.</p>
+
+<p>In fact, this is a very common way to build binary trees in memory. Just store one value for each node, and two pointers that link the current node with its children.</p>
+
+<p>Just to mention the easiest case where this logic is used, do you know how LinkedList are stored in Java (and other languages)? Pretty much in a similar way:</p>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">class</span> <span class="nf">LinkedList</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="nf">data</span><span class="p">;</span>
+  <span class="n">LinkedList</span> <span class="nf">resOfTheList</span><span class="p">;</span>
+  <span class="c1">// public and private methods to follow...
+</span><span class="c1"></span>  <span class="c1">// ...
+</span><span class="c1"></span><span class="p">}</span></code></pre></div>
+<p>The actual definition is more complex, because it also deals with generic, inheritance and whatnot. Things are a bit easier in Java as pointers to objects in the heap are not explicit. But I do want to do things explicitly, to learn the most I can, which is why I chose C as language to implement my design.</p>
+
+<p>After this small digression, you should see a big problem in the data structure. I cannot know a-priori how many children a node in parse-tree has got! This makes very difficult, if not impossible, to define a data structure like the one for binary trees.</p>
+
+<p>I solved this problem by <strong>redesigning the data structure</strong>. A small tweak, and a nice trick. Instead of storing two (or&hellip; infinite) children, I always store only one child, which will also have a pointer to its sibling!</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">ParseTree</span> <span class="p">{</span>
+  <span class="k">struct</span> <span class="n">Token</span> <span class="o">*</span><span class="n">data</span><span class="p">;</span>
+  <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">child</span><span class="p">;</span>
+  <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">sibling</span><span class="p">;</span>
+<span class="p">};</span></code></pre></div>
+<p>If you should need a graphical visualization of this different representation, here it is! Compare it with the previous one, and highlight the differences.</p>
+
+<p><img src="/images/parseTree3.png" alt=Example of Parse Tree with sibling pointers" width="300px"></p>
+
+<p>It should also be clear now why I introduced the example about LinkedList: when you think about it, the &ldquo;sibling&rdquo; pointer is very much like a &ldquo;horizontal&rdquo; LinkedList in the parse-tree. You can navigate such a list of siblings with a code like the following.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">root</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// current node;
+</span><span class="c1"></span><span class="k">while</span> <span class="p">(</span><span class="n">root</span><span class="o">-&gt;</span><span class="n">sibling</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">root</span> <span class="o">=</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="p">;</span>
+  <span class="c1">// do something useful with root...
+</span><span class="c1"></span><span class="p">}</span></code></pre></div>
+<p>Alright! Now, with input and output clarified, let&rsquo;s take a look at how the Parser is implemented, from a high-level point of view and in order to discuss some <strong>software implementation patterns</strong> and a bit of parsing theory.</p>
+
+<h2 id="parser-implementation-overview">Parser Implementation Overview</h2>
+
+<p>Instead of jumping straight into the writing of some complicated code, it&rsquo;s worth spending some time planning ahead how the code should be organized.</p>
+
+<p>In this sense, the header file of a C program is a good representation of the planning. Here&rsquo;s what I will need:</p>
+
+<ul>
+<li>A set of global variables to identify if the Parser completed successfully, or what was the error otherwise.</li>
+<li>A function to allocate a new ParseTree into memory each time it&rsquo;s needed. In modern languages this is not needed, but I chose to use C to have full control over the program, and have my hands on every detail.</li>
+<li>A function to print the entire ParseTree on the standard output (aka, the terminal). Always useful to print out complex data structures, both as exercise and as a debugging tool!</li>
+<li>A function to free the memory taken by the ParseTree, after we have done using it.
+Two &ldquo;interface&rdquo; functions, to create the ParseTree from a pointer to FILE (or string) and from a TokenList.</li>
+</ul>
+
+<p>So, summing up, here is how my header file <em>parser.h</em> looks like.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&#34;lexer.h&#34;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="c1">// main data structure
+</span><span class="c1"></span><span class="k">struct</span> <span class="n">ParseTree</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">Token</span><span class="o">*</span> <span class="n">data</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">ParseTree</span><span class="o">*</span> <span class="n">child</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">ParseTree</span><span class="o">*</span> <span class="n">sibling</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="c1">// Return values
+</span><span class="c1"></span><span class="cp">#define PARSING_ERROR -1
+</span><span class="cp">#define SUBTREE_OK 0
+</span><span class="cp">#define MEMORY_ERROR 1
+</span><span class="cp"></span>
+<span class="c1">// Allocate memory for the ParseTree
+</span><span class="c1"></span><span class="k">struct</span> <span class="n">ParseTree</span><span class="o">*</span> <span class="nf">alloc_ParseTree</span><span class="p">();</span>
+
+<span class="c1">// Print the entire ParseTree at screen
+</span><span class="c1"></span><span class="kt">void</span> <span class="nf">print_ParseTree</span><span class="p">(</span><span class="k">struct</span> <span class="n">ParseTree</span><span class="o">*</span> <span class="n">tree</span><span class="p">);</span>
+
+<span class="c1">// Free memory
+</span><span class="c1"></span><span class="kt">void</span> <span class="nf">free_ParseTree</span><span class="p">(</span><span class="k">struct</span> <span class="n">ParseTree</span><span class="o">*</span> <span class="n">tree</span><span class="p">);</span>
+
+<span class="c1">// Build the ParseTree from a File or directly from a TokenList
+</span><span class="c1"></span><span class="kt">int</span> <span class="nf">build_ParseTree</span> <span class="p">(</span><span class="k">struct</span> <span class="n">TokenList</span><span class="o">*</span> <span class="n">head</span><span class="p">,</span> <span class="k">struct</span> <span class="n">ParseTree</span><span class="o">**</span> <span class="n">tree</span><span class="p">);</span>
+<span class="kt">int</span> <span class="nf">build_ParseTree_FromFile</span> <span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">fileName</span><span class="p">,</span> <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">**</span><span class="n">tree</span><span class="p">);</span></code></pre></div>
+<p>In case you are thinking that the definitions of Token and TokenList are missing, well spotted: I had them into <em>lexer.h</em>. In fact, Token, TokenList and TokenType belong &ldquo;logically&rdquo; to the Lexical Analysis, in my opinion.</p>
+
+<p>Let&rsquo;s now look at the easier functions first, as they are good examples that improve the understanding of how the ParseTree data structure works. These functions are also useful to study a few standard software design patterns.</p>
+
+<h3 id="allocate-a-new-parsetree">Allocate a New ParseTree</h3>
+
+<p>It&rsquo;s easy to imagine that in many, many points during the Parsing operations we will need to create a new ParseTree (or rather, a new sub-ParseTree), save into it some information and then link it to the rest of the tree.</p>
+
+<p>Therefore, it makes sense to write a generic function that allocates the memory for a new ParseTree. The <strong>Modularity development pattern</strong> is really the basic of good software development.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">ParseTree</span><span class="o">*</span> <span class="nf">alloc_ParseTree</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">ParseTree</span><span class="o">*</span> <span class="n">tree</span><span class="p">;</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">ParseTree</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">tree</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">tree</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">tree</span><span class="o">-&gt;</span><span class="n">child</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">tree</span><span class="o">-&gt;</span><span class="n">sibling</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">tree</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+<p>I think this function is easy to understand, even if you are not familiar with memory management in C. Small digression here: I know modern languages are far more advanced, and they very nicely abstract problems such as memory management and allocation. In fact, I mainly use Python and R for my job! That said, my warm suggestion is to learn the concept at least once in your life and practice them with a challenging C project. That&rsquo;s what I am doing, in fact!</p>
+
+<p>In this case, the only thing you need to know is the function <code>malloc</code> and the operator <code>sizeof</code>, C.</p>
+
+<p>The function <code>malloc</code> takes an integer value and finds a location in memory that is available to store that much of space, returning a pointer to such location. If it can&rsquo;t find any space, then it returns NULL, and you are in real trouble. If you don&rsquo;t have anymore space in your machine then it means you have some memory leak, and you must optimize your code.</p>
+
+<p>The operator <code>sizeof</code> simply computes the size of the operand. So, it&rsquo;s perfect to be used within the <code>malloc</code> function, as I did in the code above.</p>
+
+<p>Lastly, it&rsquo;s worth noting that I did explicitly add <code>NULL</code> pointers to the data, child and sibling of the just-created ParseTree. If you don&rsquo;t do that then any call do <code>tree-&gt;child</code> will yield an error, at runtime.</p>
+
+<p>Let me repeat the above sentence in different words. After I create the space in memory for a new ParseTree <code>*tree</code>, using <code>malloc</code>, the other pointers inside tree are not allocated yet. So, if I call <code>tree-&gt;child</code>, to access its child, I will get an error. And what&rsquo;s worse, this error won&rsquo;t be at compilation time, it will be at runtime (that&rsquo;s how the GCC compiler for C works). This type of errors can be very messy to debug, but simply initializing the pointers to <code>NULL</code> solve the problem.</p>
+
+<h3 id="free-parsetree-memory">Free ParseTree Memory</h3>
+
+<p>Let&rsquo;s take a look at how the memory previously allocated for a ParseTree can be freed.</p>
+
+<p>It&rsquo;s important to understand that when we &ldquo;have&rdquo; a ParseTree in the code, what we really have it&rsquo;s just a pointer to its root node. We don&rsquo;t have any information about how big is the entire tree in memory.</p>
+
+<p>We should walk over the entire tree, from child to child, and from sibling to sibling to get that information. Luckily, this is a perfect place to use the <strong>Recursive Data Structure software pattern</strong>. Let&rsquo;s take a look at how I solved this problem.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">free_ParseTree</span><span class="p">(</span><span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">tree</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">sibling</span><span class="p">,</span> <span class="o">*</span><span class="n">child</span><span class="p">;</span>
+    <span class="n">sibling</span> <span class="o">=</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="p">;</span>
+    <span class="n">child</span> <span class="o">=</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">child</span><span class="p">;</span>
+    <span class="n">free_Token</span><span class="p">(</span><span class="n">tree</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">);</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">tree</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">sibling</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="n">free_ParseTree</span><span class="p">(</span><span class="n">sibling</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">child</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="n">free_ParseTree</span><span class="p">(</span><span class="n">child</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
+<p>First of all, the function <code>free_Token(struct Token *tok)</code> that I use within <code>free_ParseTree</code>, was defined in <em>lexer.h</em> and it just frees the memory for a Token data structure.</p>
+
+<p>Now, let&rsquo;s understand what <code>free_ParseTree</code> does.</p>
+
+<ol>
+<li>Get and save pointers to the child and the sibling of the current node.</li>
+<li>Free memory occupied by the Token inside the current node (the <code>tree-&gt;data</code>).</li>
+<li>Also free the memory occupied by the actual pointer <code>*tree</code>. This is done with the C function <code>free</code>.</li>
+<li>Now the tree is totally freed, but luckily we saved the pointers to its child and sibling. So, for the two of them, if the are not <code>NULL</code>, we should simply do the same procedure. &ldquo;Do the same&rdquo;, in computer languages, means to call <strong>the same function recursively</strong>.</li>
+</ol>
+
+<p>I really recommend fixing in mind this development pattern, because it&rsquo;s extremely common with tree-like data structures.</p>
+
+<h2 id="print-a-parsetree-at-screen">Print a ParseTree at Screen</h2>
+
+<p>To print an entire ParseTree in a readable form at screen is somewhat tricky. The first question is, how do I want it to look like?</p>
+
+<p>I was looking for something simple, but also very clear. Something that would let me understand the tree structure at a glance.</p>
+
+<p>I decided for an output like the following:</p>
+<div class="highlight"><pre class="chroma">&lt;Program&gt;
+    &lt;Line&gt;
+        &lt;Assign&gt;
+            &lt;&#34;x&#34;, Var&gt;
+            &lt;&#34;=&#34;, Equal&gt;
+            &lt;Expr&gt;
+                // more nested nodes ...
+    &lt;Endline&gt;
+    &lt;Line&gt;
+        &lt;IfLine&gt;
+            &lt;&#34;if&#34;, If&gt;
+            &lt;IfCond&gt;
+                &lt;Expr&gt;
+                    // nested nodes....
+            &lt;IfBody&gt;
+                // ...
+    &lt;Endline&gt;</pre></div>
+<p>This way, the indentation on the screen of each node will tell how deep is that node in the tree.</p>
+
+<p>Clearly, the indentation level must be a parameter. On the other, for the first level (the Program node) the indentation is always zero. So, I made the interface function print_ParseTree such that it just calls an internal function with the initial indentation.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">print_ParseTree</span><span class="p">(</span><span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">tree</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">print_PT</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
+<p>Like that, I can always call <code>print_ParseTree</code> with only one argument. Now, let&rsquo;s see what the internal function <code>print_PT</code> does.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">print_PT</span><span class="p">(</span><span class="k">struct</span> <span class="n">ParseTree</span><span class="o">*</span> <span class="n">tree</span><span class="p">,</span> <span class="kt">int</span> <span class="n">indent</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">tree</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="c1">// This is a Depth-First print
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">indent</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">char</span> <span class="n">space</span><span class="p">[</span><span class="n">indent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span>
+        <span class="n">memset</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="sc">&#39; &#39;</span><span class="p">,</span> <span class="n">indent</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+        <span class="n">memset</span><span class="p">(</span><span class="n">space</span><span class="o">+</span><span class="n">indent</span><span class="p">,</span> <span class="sc">&#39;\0&#39;</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%s&#34;</span><span class="p">,</span> <span class="n">space</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">print_Token</span><span class="p">(</span><span class="n">tree</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">);</span>
+    <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">sibling</span><span class="p">,</span> <span class="o">*</span><span class="n">child</span><span class="p">;</span>
+    <span class="n">sibling</span> <span class="o">=</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="p">;</span>
+    <span class="n">child</span> <span class="o">=</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">child</span><span class="p">;</span>
+    <span class="n">print_PT</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">indent</span> <span class="o">+</span> <span class="mi">2</span><span class="p">);</span>
+    <span class="n">print_PT</span><span class="p">(</span><span class="n">sibling</span><span class="p">,</span> <span class="n">indent</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
+<p>This function is made by two parts. One is interesting from an algorithmic point of view, the other is interesting because it deals with string objects in C!</p>
+
+<p>First of all, if the function is invoked with a NULL tree, then it simply returns. This case is less silly than you may think, because it&rsquo;s <strong>the basic case of the recursion</strong>. Let me explain better.</p>
+
+<p>As we will see, the function uses the recursive pattern too, therefore it will be called initially with the root of the ParseTree, and then many times with children and siblings. Therefore, checking if <code>tree==NULL</code> it&rsquo;s necessary in order to check whether we arrived at the bottom of the tree (a leaf node).</p>
+
+<p>Thus, basically, you should really think of the function <code>print_PT</code> as if <strong>it can be called anywhere in the middle of the ParseTree</strong>, and not just with the root node.</p>
+
+<p>Now, let&rsquo;s look at the reminder of the function.</p>
+
+<ol>
+<li>To start, something must be done if the indentation level is greater than zero. In fact, it will be zero only in one case, for the root. If it&rsquo;s not zero then I must print some space before printing the current node.
+
+<ol>
+<li>Printing N spaces in C (whatever integer N is), is not that straightforward. So, I first create a char array of indent+1 cells.</li>
+<li>I set the first N = indent cells to a whitespace <code>' '</code></li>
+<li>I set the <code>indent+1</code> cell to <code>'\0'</code>. This is the special character in C that terminates string. If you forget it then the standard function <code>printf</code> won&rsquo;t know where to stop printing! To do these two operations I use the memset standard C function (aka, memory-set).</li>
+<li>Call <code>printf</code> to display the char array with all whitespaces.</li>
+</ol></li>
+<li>Now, regardless of whether some white spaces was printed out or not, print the data of the current node. This data is just a Token object, so I use the <code>print_Token</code> function defined in <em>lexer.h</em>.</li>
+<li>Finally, get pointers to child and sibling of the current node and call the same function recursively. Careful though! For the child, the function must be called with one more level of indentation.</li>
+</ol>
+
+<p>It should be very evident that the <code>print_PT</code> function uses the same recursive logic that we previously saw in <code>free_ParseTree</code>. Only, in this case the indentation level must be handled as a parameter, and increased in some of the nested recursive call.</p>
+
+<p>I believe that a final note about my comment in the code &ldquo;This is a Depth-First print&rdquo; is due, now.</p>
+
+<p><strong>What is Depth-First?</strong> It&rsquo;s a name commonly used to identify <strong>a set of algorithms</strong>. The most common case is the Depth-First Search in a tree. Basically, if you want to know whether a given integer is stored somewhere in a tree of integers, you can start from the root node, then go as deep as you can in one branch and see if you find it. If not, get up one level, switch branch, and again go as deep as you can.</p>
+
+<p>This way, in the worst case, you will have &ldquo;visited&rdquo; the entire tree and can tell for sure whether the integer was therein or not. Depth-First just means that you first go deep, then expand the search.</p>
+
+<p>If you like eating pizza, think of Depth-Search as the most normal way to eat it: cut it into slices and eat each slice entirely, before going to the next slice.</p>
+
+<p>The most common alternative to this algorithm is the <em>Breadth-First Search</em>. Thinking again about the search in a tree, with Breadth-First you start at the root and, as the first thing, you make sure that none of its children contains the integer. Then, for each of those children, you check their children. And so on.</p>
+
+<p>What about the pizza? Imagine cutting the pizza in concentric circles, and eating each circle entirely, before passing on to the next concentric circle.</p>
+
+<p>To print a ParseTree, the Breadth-First approach would make little sense, and it will just produce a messy visualization. That&rsquo;s why I used Depth-First.</p>
+
+<h3 id="parsing-subtrees">Parsing Subtrees</h3>
+
+<p>I explained the general concept of a Recursive Descent Parser in great detail in a previous article, thus, here I will focus on the main concepts and how to implement them.</p>
+
+<p>The overall idea is not too difficult. The Parser looks at the TokenList and &ldquo;consumes&rdquo; one Token at time. For each new Token that it gets, it must choose what production rule in the Grammar corresponds to that Token, if any.</p>
+
+<p>Just in case you forgot, a &ldquo;production rule&rdquo; is a syntactic rule in the Grammar, such as</p>
+<div class="highlight"><pre class="chroma">assign : var &#39;=&#39; expr</pre></div>
+<p>Thus, every time a new Token is popped from the TokenList, the Parser must understand what rule in the Grammar must be used.</p>
+
+<p>Now, the Grammar I designed is LL(1) (see previous article), which means the Parser just needs to look ahead one more Token in the TokenList to understand what&rsquo;s the right production rule.</p>
+
+<p>For example, let&rsquo;s assume the current node under examination is a baseExpr Token. In this case, the Parser will look ahead to the next Token. If it&rsquo;s an open parenthesis then it will choose the production rule</p>
+<div class="highlight"><pre class="chroma">baseExpr    :   &#39;(&#39; expr &#39;)&#39;</pre></div>
+<p>otherwise it will choose the rule</p>
+<div class="highlight"><pre class="chroma">baseExpr    :    obj</pre></div>
+<p>as these two are the only possibilities the Grammar allows. If neither is successful, then the Parser must return a <code>PARSING_ERROR</code>.</p>
+
+<p>The baseExpr Token is not the simplest of the subtree to parse. Nonetheless, I think it&rsquo;s a good example to study and understand various concepts. So, let&rsquo;s do it!</p>
+
+<p>Here is, in words, how the baseExpr subtree must be parsed:</p>
+
+<ol>
+<li>First of all, make some space in memory and allocate a new node that will be the root of the new subtree.</li>
+<li>Now, look ahead at the next token. Let&rsquo;s assume it&rsquo;s an Lpar <code>'('</code> Token.
+
+<ol>
+<li>Create a new node that will contain the <code>Lpar</code> Token.</li>
+<li>Use a general function that checks if the current token is really what we assume it is. This will return either <code>SUBTREE_OK</code> or <code>PARSING_ERROR</code>.</li>
+<li>If it returned <code>PARSING_ERROR</code> then propagate this error (in other words, stop).</li>
+<li>If if was <code>SUBTREE_OK</code> then assign this current node (the <code>Lpar</code> node) as a child of the node created at step 1.</li>
+<li>Now, according to the Grammar there must be an <code>expr</code> Token. This is the only possibility allowed.</li>
+<li>So, make space in memory for an <code>expr</code> node, that will be the root of a new subtree.</li>
+<li>Use a separate function to check that the next few Tokens in the TokenList really form an <code>expr</code> Token. This will return either <code>SUBTREE_OK</code> or <code>PARSING_ERROR</code>.</li>
+<li>If it returned <code>PARSING_ERROR</code> then propagate this error (in other words, stop).</li>
+<li>If it was <code>SUBTREE_OK</code> then assign the node created at step 2.6 as sibling of the <code>Lpar</code> created at step 2.1. Why? Because the Grammar says so: <code>baseExpr : '(' expr ')'</code></li>
+<li>Now, according to the Grammar there must be a <code>Rpar</code> Token, that is a closed parenthesis. Again, this is the only possibility.</li>
+<li>So, create space in memory for a <code>Rpar</code> node and call the same function used at step 2.2.</li>
+<li>If the result is <code>SUBTREE_OK</code> then assign the node created at step 2.11 as sibling of the <code>expr</code> node created at step 2.6. If instead it was <code>PARSING_ERROR</code>, then stop and propagate this error.</li>
+</ol></li>
+<li>If instead the Token wasn&rsquo;t an <code>Lpar</code>, then it must be a <code>obj</code> Token. That&rsquo;s the only possibility allowed by the Grammar.
+
+<ol>
+<li>Allocate in memory a new <code>obj</code> node that will contain the subtree.</li>
+<li>Use a separate function that gets the TokenList and checks whether the next few Tokens form a <code>obj</code> Token or not. This will return either <code>SUBTREE_OK</code> or <code>PARSING_ERROR</code>.</li>
+<li>If the result was <code>PARSING_ERROR</code> then stop and return this error value.</li>
+<li>If it was <code>SUBTREE_OK</code> then assign the node created at step 3.1 as child of the root node for the <code>baseExpr</code> created at step 1.</li>
+</ol></li>
+</ol>
+
+<p>I understand that the example is quite involved, but it does clarify many things. Let&rsquo;s review them together.</p>
+
+<p>First of all, it becomes clear that <strong>for each TokenType is useful to have a function</strong> that checks if the top of the TokenList really contains such Token.</p>
+
+<p>I called these functions with the standard names <code>is_&lt;TokenType&gt;</code>. So, I have a function called <code>is_BaseExpr</code> that implement the example above, another <code>is_Expr</code> that checks for a generic <code>expr</code>, and even a function <code>is_Program</code>, that basically is the entry point of the Parser, and it&rsquo;s also used for the body of the LoopLine, which is defined as <code>loopLine  : 'while' ifCond  loopBody</code>, and <code>loopBody : program</code>.</p>
+
+<p>A very important detail is that each such function <code>is_&lt;TokenType&gt;</code> is responsible to <strong>advance the current head of the TokenList</strong>. For example, let&rsquo;s assume I call the function <code>is_Endline</code>, that simply checks whether the next token in the TokenList is an <code>Endline</code> Token. If the function returns <code>SUBTREE_OK</code>, then, after the execution is finished, the head of the TokenList must not be anymore that <code>Endline</code> Token. We say that <em>the Token has been consumed</em>. For once, this is quite easy to do with in C, by using&hellip; double pointers!</p>
+
+<p>The advantage of having all these functions is twofold. First of all, <strong>the software is much better designed when it&rsquo;s split into small logical pieces</strong>. It helps to maintain the software, improve and test it in future releases.</p>
+
+<p>In second place, you may notice that <strong>production rules are used one into another many times</strong>. For example, the <code>program</code> token is used as entry point but also as <code>loopBody</code>. The <code>ifCond</code> token is used both in <code>ifLine</code> and <code>loopLine</code>. The <code>expr</code> and <code>obj</code> tokens are used everywhere! In addition, the <code>expr</code> token can be nested recursively into another <code>expr</code> Token, under the path Expr, Pred, Term, baseExpr, &lsquo;(&rsquo; Expr &lsquo;)&rsquo;.</p>
+
+<p>So, all in all, it&rsquo;s very useful to have separate functions that can be called one into another (or into themselves recursively), exactly as tokens are used into the Grammar definitions.</p>
+
+<p>If at this point you are slightly confused then don&rsquo;t worry. I am going to clarify many details in the next section, and then provide you with the entire code repository (see the references at the end).</p>
+
+<h2 id="what-do-we-know-so-far">What do we know so far?</h2>
+
+<p>Let&rsquo;s briefly recap the previous sections, as they were quite dense of concepts. Here&rsquo;s a list of the main concepts to fix in mind.</p>
+
+<ul>
+<li>To &ldquo;navigate&rdquo; a parse-tree, like to search an element into it, or to print it out at screen, we should use recursive functions, that is, functions that are called over a root node and internally call themselves over child and sibling nodes of that root.</li>
+<li>The Parser is a software organized in a very modular scheme. That is, a large collection of independent functions, which call each to another in many cases. This software design pattern improves sustainability of the Parser, testing and future additions.</li>
+<li>More about these many functions the Parser is split into. They strictly follow the definition in the Grammar. So if you have a rule in the Grammar such as <code>A  : X Y</code>, then you&rsquo;ll have three functions in the Parser, <code>is_A(...)</code>, <code>is_X(...)</code>, <code>is_Y(...)</code>. Just so that you know, in some books these standard functions may be called <code>match_A</code>, <code>match_X</code>, <code>match_Y</code>.</li>
+<li>The way these functions interact with each other (that is, invoke each other) also strictly follows the definitions in the Grammar. So, using the previous example <code>A : X Y</code>, the function <code>is_A</code> will first create space in memory for a subtree of type <code>A</code>, then will call the function <code>is_X</code> and finally the function <code>is_Y</code>.</li>
+</ul>
+
+<p>That should be enough for a review of the key points so far. Before going further with more technical details though, I really want to underline again the scientific perspective of this whole development.</p>
+
+<p>The point I am trying to make is that, in the entire process, <strong>I have been following a clear methodology</strong>, the one I am now illustrating to you. This is <strong>scientific method</strong>. I absolutely did not jump straight into writing some dubious thousands lines of code, with poor results. I took my time to study parsing theory, and am sharing this knowledge with you.</p>
+
+<h2 id="breaking-it-down-into-pieces">Breaking It Down Into Pieces</h2>
+
+<p>In this final section of the article I am going to give more technical details, and then leave you with the references that include the code repository for the whole project.</p>
+
+<p>To illustrate the concepts, I want to take a bottom-up approach this time. At the very bottom of the Parser we have the task to verify single TokenType and to advance the head of the TokenList.</p>
+
+<p>This is a task that all functions <code>is_&lt;TokenType&gt;</code> will have to perform at least once. The more complex, such as <code>is_Expr</code>, will actually have to do it many times.</p>
+
+<p>Hence, it makes perfect sense to write a function that takes care of this logical step. Let&rsquo;s write it once for all, and then use it multiple times. I called it <code>_single_Token_template</code>, because it&rsquo;s the common template function to verify a single Token!</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">_single_Token_template</span><span class="p">(</span><span class="k">struct</span> <span class="n">TokenList</span> <span class="o">**</span><span class="n">tok</span><span class="p">,</span> <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">**</span><span class="n">new</span><span class="p">,</span> <span class="k">enum</span> <span class="n">TokenType</span> <span class="n">type</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">lexeme</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">*</span><span class="n">tok</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PARSING_ERROR</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">TokenList</span> <span class="o">*</span><span class="n">current</span> <span class="o">=</span> <span class="o">*</span><span class="n">tok</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">current</span><span class="o">-&gt;</span><span class="n">token</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">!=</span> <span class="n">type</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Expecting &lt;%s&gt;, Found &lt;%s&gt;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">type2char</span><span class="p">(</span><span class="n">type</span><span class="p">),</span> <span class="n">type2char</span><span class="p">(</span><span class="n">current</span><span class="o">-&gt;</span><span class="n">token</span><span class="o">-&gt;</span><span class="n">type</span><span class="p">));</span>
+        <span class="k">return</span> <span class="n">PARSING_ERROR</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">lexeme</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">current</span><span class="o">-&gt;</span><span class="n">token</span><span class="o">-&gt;</span><span class="n">lexeme</span><span class="p">,</span> <span class="n">lexeme</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Expecting %s, Found %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">lexeme</span><span class="p">,</span> <span class="n">current</span><span class="o">-&gt;</span><span class="n">token</span><span class="o">-&gt;</span><span class="n">lexeme</span><span class="p">);</span>
+            <span class="k">return</span> <span class="n">PARSING_ERROR</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="k">struct</span> <span class="n">Token</span><span class="o">*</span> <span class="n">newTok</span> <span class="o">=</span> <span class="n">new_Token</span><span class="p">(</span><span class="n">current</span><span class="o">-&gt;</span><span class="n">token</span><span class="o">-&gt;</span><span class="n">lexeme</span><span class="p">,</span> <span class="n">current</span><span class="o">-&gt;</span><span class="n">token</span><span class="o">-&gt;</span><span class="n">type</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">newTok</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">MEMORY_ERROR</span><span class="p">;</span>
+    <span class="p">(</span><span class="o">*</span><span class="n">new</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="n">newTok</span><span class="p">;</span>
+    <span class="p">(</span><span class="o">*</span><span class="n">new</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">child</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="p">(</span><span class="o">*</span><span class="n">new</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">sibling</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="o">*</span><span class="n">tok</span> <span class="o">=</span> <span class="n">current</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span> <span class="c1">// advance head of TokenList
+</span><span class="c1"></span>    <span class="k">return</span> <span class="n">SUBTREE_OK</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+<p>Now, let&rsquo;s break this function into pieces and discuss each of them.</p>
+
+<p>First of all the signature of the function. Clearly, it returns an integer, and this will be one of the globally defined return values (<code>PARSING_ERROR</code>, <code>MEMORY_ERROR</code>, <code>SUBTREE_OK</code>).</p>
+
+<p>What about the input arguments? The first argument is a pointer to a pointer to a TokenList. If you are not used to write C code, this will seem very strange, but in fact it&rsquo;s a very common case.</p>
+
+<p>The key point is that function arguments are always passed by value in C, never by reference. This holds true for pointers too, and it&rsquo;s quite different from what happens in Java or Python, when passing a complex object as argument means to give the reference to that object.</p>
+
+<p>In C, everything is copied into the scope of the function. And you know perfectly well what&rsquo;s a scope, because you studied this course! Therefore the only way to modify an object is to pass a pointer to it. And if that object is a pointer, then one needs to pass a pointer to a pointer&hellip; that&rsquo;s a double pointer.</p>
+
+<p>Also, remember that we do want to modify the TokenList, because we must advance its head to the next token. So, everything hopefully makes sense now.</p>
+
+<p>The second argument is a double pointer to a ParseTree. The same logic applies here too. We want to modify this input argument, for example setting its internal data, child and sibling. Thus, we need a double pointer.</p>
+
+<p>The third and fourth argument are simply the TokenType and the string (character array) that must match with the current head of the list, or an error will be returned.</p>
+
+<p>Now, let&rsquo;s look at the function body, and walk through it.</p>
+
+<p>First, a sanity check. If the head of the list is NULL then this definitely doesn&rsquo;t match the TokenType in input, so I return a <code>PARSING_ERROR</code>.</p>
+
+<p>Then, I check if the type of the Token at the head of the TokenList is equal to the TokenType in input. If it&rsquo;s not then I return a <code>PARSING_ERROR</code>. If it is, the function goes onto the next step.</p>
+
+<p>Now I check whether the lexeme of the Token at the head of the list is equal to the lexeme in input. But I do so only if the latter is not <code>NULL</code>. Why is that? This helps because in case I want to invoke this function only to check the TokenType, I can do that giving NULL as last input. The useful analogy to think about in this case is with Python&rsquo;s optional arguments.</p>
+
+<p>If all of the previous checks passed, then I create space in memory for a new Token (the function <code>new_Token</code> was defined in <em>lexer.h</em>). I want to create an actual new Token, and not link the head of the TokenList, because I don&rsquo;t know what that list will be doing in the future.</p>
+
+<p>Let me clarify the last sentence. When I write a function that is supposed to be used by other modules/functions, I want to make sure that the behavior of it doesn&rsquo;t depend on assumptions about what the called will do. In this case, if I linked the head of the TokenList as the new Token (instead of creating a new one in memory), and then the TokenList is modified of erased by some other piece of code&hellip; everything would fall apart!</p>
+
+<p>This is an important concept in fact. <strong>Write robust functions</strong>, that depend the least possible on future behavior of the caller, and of the arguments they receive.</p>
+
+<p>With that clarified, let&rsquo;s see what happens next. Quite simply, the new Token is assigned as &ldquo;data&rdquo; of the subtree. Also, child and sibling are assigned to NULL, to prevent strange errors as I explained above.</p>
+
+<p>Then, and this is the key moment, before returning a value and exiting the function, the head of the list is advanced. It&rsquo;s worth noting that the function will arrive at this point only when all previous checks were OK.</p>
+
+<p>So, now the question is why is this function useful? Let&rsquo;s see: assume that at some point the Parser is dealing with an Assign Token, and needs to verify if the current Token (the head of the TokenList) is a <code>var</code> type. For that, as I explained to you, there will be a function <code>is_Var(...)</code>. What&rsquo;s this function?</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">is_Var</span> <span class="p">(</span><span class="k">struct</span> <span class="n">TokenList</span> <span class="o">**</span><span class="n">tok</span><span class="p">,</span> <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">**</span><span class="n">new</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">_single_Token_template</span><span class="p">(</span><span class="n">tok</span><span class="p">,</span> <span class="n">new</span><span class="p">,</span> <span class="n">Var</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
+<p>Quite easy, isn&rsquo;t it? The function simply calls the template function with the correct arguments.</p>
+
+<p>Do you need to implement the <code>is_Plus(...)</code> function, to check if the current Token is a <code>plus</code> Operator? Just write:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">is_Plus</span> <span class="p">(</span><span class="k">struct</span> <span class="n">TokenList</span> <span class="o">**</span><span class="n">tok</span><span class="p">,</span> <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">**</span><span class="n">new</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">_single_Token_template</span><span class="p">(</span><span class="n">tok</span><span class="p">,</span> <span class="n">new</span><span class="p">,</span> <span class="n">Plus</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
+<p>Do you want to verify if the current Token is the <code>continue</code> keyword?</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">is_Continue</span> <span class="p">(</span><span class="k">struct</span> <span class="n">TokenList</span> <span class="o">**</span><span class="n">tok</span><span class="p">,</span> <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">**</span><span class="n">new</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">_single_Token_template</span><span class="p">(</span><span class="n">tok</span><span class="p">,</span> <span class="n">new</span><span class="p">,</span> <span class="n">Continue</span><span class="p">,</span> <span class="s">&#34;continue&#34;</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
+<p>Nice and fast! Notice that in the last case I also use the fourth input argument.</p>
+
+<p>I was able to use the template function with almost all basic types, Minus, Div, Lpar, Lbrack, Var, Int, etc. This greatly reduced the amount of code I had to write, and definitely helped keeping things under control.</p>
+
+<p>Obviously, not all <code>is_&lt;TokenType&gt;</code> function can be done in one line. So, let&rsquo;s take back the <code>is_BaseExpr</code> example that we studied in the previous section and see how it&rsquo;s implemented.</p>
+
+<p>Remember, all <code>is_BaseExpr(...)</code> has to do is to make space in memory for the new Token/ParseTree, and then call the other functions as clarified by the production rule</p>
+<div class="highlight"><pre class="chroma">baseExpr     :   obj   |  &#39;(&#39; expr &#39;)&#39;</pre></div>
+<p>Here&rsquo;s the whole function.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">is_BaseExpr</span> <span class="p">(</span><span class="k">struct</span> <span class="n">TokenList</span> <span class="o">**</span><span class="n">tok</span><span class="p">,</span> <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">**</span><span class="n">new</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">status</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">lpar</span><span class="p">,</span> <span class="o">*</span><span class="n">rpar</span><span class="p">,</span> <span class="o">*</span><span class="n">subexpr</span><span class="p">,</span> <span class="o">*</span><span class="n">obj</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">Token</span> <span class="o">*</span><span class="n">newTok</span><span class="p">;</span>
+
+    <span class="n">status</span> <span class="o">=</span> <span class="n">SUBTREE_OK</span><span class="p">;</span>
+
+    <span class="n">newTok</span> <span class="o">=</span> <span class="n">new_Token</span><span class="p">((</span><span class="kt">char</span><span class="p">[</span><span class="mi">1</span><span class="p">]){</span><span class="sc">&#39;\0&#39;</span><span class="p">},</span> <span class="n">BaseExpr</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">newTok</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">MEMORY_ERROR</span><span class="p">;</span>
+    <span class="p">(</span><span class="o">*</span><span class="n">new</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="n">newTok</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">((</span><span class="o">*</span><span class="n">tok</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">token</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">Lpar</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// is a sub expression
+</span><span class="c1"></span>        <span class="n">lpar</span> <span class="o">=</span> <span class="n">alloc_ParseTree</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">lpar</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">MEMORY_ERROR</span><span class="p">;</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">is_Lpar</span><span class="p">(</span><span class="n">tok</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">lpar</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">status</span> <span class="o">!=</span> <span class="n">SUBTREE_OK</span><span class="p">){</span>
+            <span class="n">free_ParseTree</span><span class="p">(</span><span class="n">lpar</span><span class="p">);</span>
+            <span class="k">return</span> <span class="n">status</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="p">(</span><span class="o">*</span><span class="n">new</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">child</span> <span class="o">=</span> <span class="n">lpar</span><span class="p">;</span>
+
+        <span class="n">subexpr</span> <span class="o">=</span> <span class="n">alloc_ParseTree</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">subexpr</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">MEMORY_ERROR</span><span class="p">;</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">is_Expr</span><span class="p">(</span><span class="n">tok</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">subexpr</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">status</span> <span class="o">!=</span> <span class="n">SUBTREE_OK</span><span class="p">){</span>
+            <span class="n">free_ParseTree</span><span class="p">(</span><span class="n">subexpr</span><span class="p">);</span>
+            <span class="k">return</span> <span class="n">status</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">lpar</span><span class="o">-&gt;</span><span class="n">sibling</span> <span class="o">=</span> <span class="n">subexpr</span><span class="p">;</span>
+
+        <span class="n">rpar</span> <span class="o">=</span> <span class="n">alloc_ParseTree</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">rpar</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">MEMORY_ERROR</span><span class="p">;</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">is_Rpar</span><span class="p">(</span><span class="n">tok</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">rpar</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">status</span> <span class="o">!=</span> <span class="n">SUBTREE_OK</span><span class="p">){</span>
+            <span class="n">free_ParseTree</span><span class="p">(</span><span class="n">rpar</span><span class="p">);</span>
+            <span class="k">return</span> <span class="n">status</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">subexpr</span><span class="o">-&gt;</span><span class="n">sibling</span> <span class="o">=</span> <span class="n">rpar</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span>
+        <span class="c1">// just a Obj
+</span><span class="c1"></span>        <span class="n">obj</span> <span class="o">=</span> <span class="n">alloc_ParseTree</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">obj</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">MEMORY_ERROR</span><span class="p">;</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">is_Obj</span><span class="p">(</span><span class="n">tok</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">obj</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">status</span> <span class="o">!=</span> <span class="n">SUBTREE_OK</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">free_ParseTree</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span>
+            <span class="k">return</span> <span class="n">status</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="p">(</span><span class="o">*</span><span class="n">new</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">child</span> <span class="o">=</span> <span class="n">obj</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">status</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+<p>If you (slowly) go through the code you will see that this function simply translates into C code the logic I expressed in words in a previous section, &ldquo;Parsing Subtrees&rdquo;. Enjoy the exercise!</p>
+
+<h2 id="testing-the-parser">Testing The Parser</h2>
+
+<p>No software project is well done without a battery of tests. I didn&rsquo;t follow the so-called <strong>Test Driven Development methodology</strong>, in this case, although I often do in my projects. Nonetheless, I really wanted to create a set of unit tests for the Parser.</p>
+
+<p>Now, testing my Parser was a tricky affair. Made even trickier by the lack of a standard library for unit testing in C. There are some libraries out there, but the only thing in the standard C is the assert module, with its assert.h header file. This file, basically, defines a function <code>assert(...)</code> that check whether its input is logically true.</p>
+
+<p>So, using this very basic tool <strong>I created about 15 unit tests</strong>. Not a lot, I agree, but still something.</p>
+
+<p>How do such tests work? Once again (and hopefully a nice conclusion to this article) I took an explicit approach:</p>
+
+<ol>
+<li>Each test defines its own input source code, that must be parsed.</li>
+<li>It calls the <code>build_ParseTree</code> function from <em>parser.h</em> and gets the resulting status (integer).</li>
+<li>It checks whether the status is as expected (can be <code>SUBTREE_OK</code> when the input source code is alright, but can also be <code>PARSING_ERROR</code> when I purposefully introduce a syntax mistake in the source code for a test).</li>
+<li>Then, if the parsing went fine, it walks through the ParseTree and explicitly checks if nodes and subtrees are as expected in the tree.</li>
+</ol>
+
+<p>Let&rsquo;s take a look at one example. I created a file, named it <code>test_code_1</code> and wrote the following line in it:</p>
+<div class="highlight"><pre class="chroma">readInt x;</pre></div>
+<p>This is a 1-liner source code that should be well parsed. Then, I created a C program in a file called <code>test_1.c</code> and placed the following code into it.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;assert.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&#34;../parser.h&#34;</span><span class="cp">
+</span><span class="cp"></span><span class="c1">// gcc test_1.c ../parser.c ../lexer.c -o test_1.out
+</span><span class="c1"></span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">tree</span><span class="p">,</span> <span class="o">*</span><span class="n">walk</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">status</span><span class="p">;</span>
+
+    <span class="kt">char</span> <span class="k">const</span><span class="o">*</span> <span class="k">const</span> <span class="n">fileName</span> <span class="o">=</span> <span class="s">&#34;./test_code_1&#34;</span><span class="p">;</span>
+
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">alloc_ParseTree</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">tree</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">MEMORY_ERROR</span><span class="p">;</span>
+
+    <span class="c1">// build the Parse Tree
+</span><span class="c1"></span>    <span class="n">status</span> <span class="o">=</span> <span class="n">build_ParseTree_FromFile</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tree</span><span class="p">);</span>
+    <span class="c1">// check if the result is as expected
+</span><span class="c1"></span>    <span class="n">assert</span><span class="p">(</span><span class="n">status</span> <span class="o">==</span> <span class="n">SUBTREE_OK</span><span class="p">);</span>
+
+    <span class="c1">// Now explicitly walk through the tree and check many stuff
+</span><span class="c1"></span>    <span class="n">walk</span> <span class="o">=</span> <span class="n">tree</span><span class="p">;</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">walk</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">Program</span><span class="p">);</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">walk</span><span class="o">-&gt;</span><span class="n">sibling</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">);</span>
+
+    <span class="n">walk</span> <span class="o">=</span> <span class="n">walk</span><span class="o">-&gt;</span><span class="n">child</span><span class="p">;</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">walk</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">Line</span><span class="p">);</span>
+
+    <span class="n">assert</span><span class="p">(</span><span class="n">walk</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">Endline</span><span class="p">);</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">walk</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="o">-&gt;</span><span class="n">child</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">);</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">walk</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="o">-&gt;</span><span class="n">sibling</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">);</span>
+
+    <span class="n">walk</span> <span class="o">=</span> <span class="n">walk</span><span class="o">-&gt;</span><span class="n">child</span><span class="p">;</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">walk</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">Input</span><span class="p">);</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">walk</span><span class="o">-&gt;</span><span class="n">sibling</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">);</span>
+
+    <span class="n">walk</span> <span class="o">=</span> <span class="n">walk</span><span class="o">-&gt;</span><span class="n">child</span><span class="p">;</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">walk</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">ReadIn</span><span class="p">);</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">walk</span><span class="o">-&gt;</span><span class="n">child</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">);</span>
+
+    <span class="n">walk</span> <span class="o">=</span> <span class="n">walk</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="p">;</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">walk</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">Var</span><span class="p">);</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">walk</span><span class="o">-&gt;</span><span class="n">sibling</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">);</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">walk</span><span class="o">-&gt;</span><span class="n">child</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;---------------</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;--- TEST OK ---</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;---------------</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+
+    <span class="n">free_ParseTree</span><span class="p">(</span><span class="n">tree</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">status</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+<p>Following a similar logic, I created more tests, each with its own source code, and tested many things, <strong>found many bugs and solved all of them</strong>. The next bug is always waiting to be found, so if you spot it while looking at my code, please let me know!</p>
+
+<h2 id="summary-and-outlook">Summary and Outlook</h2>
+
+<p>In this article we studied <strong>how to implement a recursive descent parser</strong>.</p>
+
+<p>For once, the coding examples are real! They are part of the code that I wrote to implement the Parsing module in the Compiler I wrote for the programming language I created from the ground.</p>
+
+<p>To practice parsing algorithms you don&rsquo;t need to create a new programming language like I did. In fact, you don&rsquo;t even need to build a full Compiler. There are open source projects that let you focus on the Parser only. You may find some on GitHub.</p>
+
+<p>That said, the whole process of creating a new programming language is, in my opinion, extremely beneficial. In particular, the variety of algorithms, data structures and design patterns make some great pieces of knowledge for every serious computer scientist.</p>
+
+<h2 id="references">References</h2>
+
+<p>My article <a href="http://example.org/page/what-is-a-programming-language-parser/">What Is a Programming Language Parser?</a>.</p>
+
+<p>My article <a href="http://example.org/page/how-to-design-a-parser/">How to design a programming language parser</a>.</p>
+
+<p>My article <a href="http://example.org/page/design-a-new-formal-grammar/">Design of a New Context-Free Grammar</a>.</p>
+
+<p>My <a href="https://github.com/pgrandinetti/compilers">GitHub repository</a> for this course.</p>
+
+<p>Alex Aiken&rsquo;s class Compilers at Stanford University. Available as <a href="https://lagunita.stanford.edu/courses/Engineering/Compilers/Fall2014/course/">free MOOC online</a>.</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fimplementation-recursive-descent-parser%2f&amp;text=Implementation%20of%20a%20Recursive%20Descent%20Parser&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fimplementation-recursive-descent-parser%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fimplementation-recursive-descent-parser%2f&amp;title=Implementation%20of%20a%20Recursive%20Descent%20Parser" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fimplementation-recursive-descent-parser%2f&amp;title=Implementation%20of%20a%20Recursive%20Descent%20Parser" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fimplementation-recursive-descent-parser%2f&amp;title=Implementation%20of%20a%20Recursive%20Descent%20Parser" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fimplementation-recursive-descent-parser%2f&amp;description=Implementation%20of%20a%20Recursive%20Descent%20Parser" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

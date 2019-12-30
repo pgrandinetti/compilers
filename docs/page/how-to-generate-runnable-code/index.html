@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>How To Generate Machine-Runnable Code? | Compilers</title>
+  <meta name="description" content="Software developers are usually interested in writing a few thousands lines of code, and then run that code. They rarely ask deeper questions.
+In this series of articles, I did ask many deep questions. My objective was to learn about Compilers, Programming Languages and also to create a new programming language, to get hands-on practice.
+To summarize, we’ve learnt about:
+ Formal Grammars. Software modules that make a Compiler. Lexical Analysis, Parsing and Semantic Analysis.">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/how-to-generate-runnable-code\/",
+          "name": "How to generate machine runnable code?"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "How To Generate Machine-Runnable Code?",
+  "description" : "Software developers are usually interested in writing a few thousands lines of code, and then run that code. They rarely ask deeper questions.\nIn this series of articles, I did ask many deep questions. My objective was to learn about Compilers, Programming Languages and also to create a new programming language, to get hands-on practice.\nTo summarize, we’ve learnt about:\n Formal Grammars. Software modules that make a Compiler. Lexical Analysis, Parsing and Semantic Analysis.",
+  "inLanguage" : "en",
+  "wordCount":  4831 ,
+  "datePublished" : "2019-10-08T00:00:00",
+  "dateModified" : "2019-10-08T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/how-to-generate-runnable-code\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="How To Generate Machine-Runnable Code?" />
+<meta property="og:description" content="Software developers are usually interested in writing a few thousands lines of code, and then run that code. They rarely ask deeper questions.
+In this series of articles, I did ask many deep questions. My objective was to learn about Compilers, Programming Languages and also to create a new programming language, to get hands-on practice.
+To summarize, we’ve learnt about:
+ Formal Grammars. Software modules that make a Compiler. Lexical Analysis, Parsing and Semantic Analysis.">
+<meta property="og:url" content="http://example.org/page/how-to-generate-runnable-code/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="How To Generate Machine-Runnable Code?" />
+  <meta name="twitter:description" content="Software developers are usually interested in writing a few thousands lines of code, and then run that code. They rarely ask deeper questions.
+In this series of articles, I did ask many deep …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>How To Generate Machine-Runnable Code?</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  October 8, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>Software developers are usually interested in writing a few thousands lines of code, and then run that code. They rarely ask deeper questions.</p>
+
+<p>In this series of articles, I did ask many deep questions. My objective was to learn about Compilers, Programming Languages and also to create a new programming language, to get hands-on practice.</p>
+
+<p>To summarize, we’ve learnt about:</p>
+
+<ul>
+<li>Formal Grammars.</li>
+<li>Software modules that make a Compiler.</li>
+<li>Lexical Analysis, Parsing and Semantic Analysis.</li>
+<li>Memory allocation and management.</li>
+</ul>
+
+<p>Thus, one fundamental question is still left unanswered: <strong>how is the source code (that you wrote) run into the computer eventually?</strong></p>
+
+<h2 id="you-ve-got-a-computer-and-some-code-so-what">You’ve got a computer and some code, so what?</h2>
+
+<p>In the previous article in this series about Compilers, Formal Grammars and Languages, we learned many important concepts about computer architecture, and in particular about the system’s runtime organization:</p>
+
+<ul>
+<li>Memory allocation for the Code of the program.</li>
+<li>Activations and Lifetime of procedures.</li>
+<li>Activation Stack and Frames.</li>
+<li>Heap memory.</li>
+<li>Static data and globals.</li>
+<li>Alignment.</li>
+</ul>
+
+<p>I can’t help but recommending to check that article for deeper insights (see the references at the end of this one).</p>
+
+<p>In summary though, the previous long article explains how the machine’s memory is internally organized by the Compiler that wants to prepare some code for the execution. Overall, you understood that <strong>a strong compiler needs to have a deep knowledge of the architecture the code will be run into.</strong></p>
+
+<p>This is why there exists a lot of different C compilers. C is a language designed to be extremely efficient, therefore C compilers are made ad-hoc for each architecture.</p>
+
+<p>On the other hand, there are much less Java Virtual Machines around. That’s because the Java language is designed to be run into the JVM, not directly on the system’s architecture. It may seem a subtle difference, but it makes a world of difference.</p>
+
+<p>The important message to remember is that <strong>the Code Generation process of a Compiler depends heavily on what architecture the Compiler is made for</strong>. You can’t make a compiler for all kinds of computers, if you want it to be a good compiler.</p>
+
+<p>So, how can we approach this subject when studying Compilers? We can’t study all possible architectures, that’s for sure!</p>
+
+<p>I decided to follow the advice of Stanford’s Prof. Aiken. In his class about Compilers, he uses <strong>the stack machine as a model and as a learning tool</strong>.</p>
+
+<h2 id="stack-machine-overview">Stack Machine Overview</h2>
+
+<p>A stack machine is a type of computer architecture that uses a stack as only storage. That means that the operands for every operation are always at the top of such stack, and that the result of every operation is also pushed on the same stack (after popping the operands, of course).</p>
+
+<p>This is, conceptually as well as practically, extremely different from the more famous registers machines, where the location of each register (and hence, of the data) is explicit.</p>
+
+<p>The hybrid that comes from mixing registers machine and stack machine is called <strong>N register stack machine</strong>. A long name that simply means the top N locations of the stack are actually stored in registers.</p>
+
+<p>We are going to continue this article by using the <strong>1 register stack machine</strong> (that is, N=1). This is a stack machine where the top of the stack is stored in a register, that is conventionally called <strong>accumulator</strong>.</p>
+
+<p>I believe that a simple example will make a lot of details clear. Let’s consider an operator <code>op</code> that takes <code>n</code> operands <code>e1,..., en</code>. The operator can be really anything, even a simple sum. The operands may be complex subexpressions.</p>
+
+<p>Thus, we have an expression to evaluate: <code>op(e1,..., en)</code>. How do we do that in a stack machine?</p>
+
+<ol>
+<li>For each expression <code>ei, i=1, ..., n-1</code> (not the last one).
+
+<ul>
+<li>Compute <code>ei</code> (this saves the result in the accumulator).</li>
+<li>Push the result onto the stack.</li>
+</ul></li>
+<li>For <code>en</code>, simply compute the result (which saves it in the accumulator).</li>
+<li>Pop <code>n-1</code> values from stack, and compute <code>op</code> (because the result of <code>en</code> is already in the accumulator).</li>
+</ol>
+
+<p>The key point to remember is the standard sequence <strong>pop-compute-push</strong>:</p>
+
+<ol>
+<li>Pop something from the stack.</li>
+<li>Use it to compute something else.</li>
+<li>Then push the result onto the stack.</li>
+</ol>
+
+<h2 id="architecture-details-and-instructions">Architecture details and Instructions</h2>
+
+<p>Let’s continue the discussion about Code Generation by taking the stack machine as an architecture model. Other than this, we also need a <strong>set of instructions</strong>.</p>
+
+<p>What are instructions? I use the word instruction to refer to a line of code that it’s executed directly in the architecture. Let me clarify with two examples.</p>
+
+<p>In an assembly code, the line</p>
+<div class="highlight"><pre class="chroma">MV reg1 reg2</pre></div>
+<p>which copies the content of register reg1 into register reg2 is what I’d call instruction.</p>
+
+<p>In a high-level programming language, like Java, the line</p>
+<div class="highlight"><pre class="chroma">int a = 5;</pre></div>
+<p>could also be called “instruction”. However, for high-level constructs I prefer different terminology, such as assignment, operation, expression, etc. So, let’s agree that an instruction is something you run at the lowest level possible.</p>
+
+<p>The set of instructions is decided by the manufacturer of the architecture. For example, Intel CPUs have their own set of instructions, which is a bit different from the instructions available for AMD CPUs, and so on.</p>
+
+<p>What does that mean? It means that, in order to continue our studies, we need to settle on a choice of architecture type, and then use its instruction set. I want to follow Prof. Aiken again here, so let’s take the MIPS architecture and use it as if it was our machine.</p>
+
+<p>The MIPS architecture is a <strong>highly realistic example</strong>, which is why I like this choice. A few details about it, along with important choices:</p>
+
+<ul>
+<li>The register <code>$a0</code> of the MIPS architecture is a standard choice for the accumulator of a stack machine. Any register would work of course, but let’s stick with <code>$a0</code>.</li>
+<li>Let’s assume we keep the entire stack of the stack machine into the MIPS memory. As only exception, remember that <code>$a0</code> is a separate register but it’s also the top of the stack machine.</li>
+<li>In the MIPS processor the stack grows towards the low addresses. I discussed this in detail in the previous article.</li>
+<li>MIPS is a 32-bit architecture, so each word is 4 bytes.</li>
+<li>The stack pointer register <code>$sp</code> points to the first word of unused memory. This means that, since the stack grows towards the low addresses, <strong>the top of the stack is at $sp + 4</strong>.</li>
+<li>MIPS has 32 general purpose registers. However, we will only use <code>$a0</code> (accumulator), <code>$sp</code> (stack pointer), and <code>$t1</code> (a temporary register).</li>
+</ul>
+
+<p>Let’s now see a few instructions that MIPS supports.</p>
+
+<p><em>Load word</em></p>
+
+<p>The syntax is <code>lw reg1 offset(reg2)</code>, where</p>
+
+<ul>
+<li><code>reg1</code> is a memory address.</li>
+<li><code>reg2</code> is also a memory address.</li>
+<li><code>offset</code> is a number (hard-coded).</li>
+</ul>
+
+<p>This instruction takes content of register <code>reg2</code>, sums up the hard-coded <code>offset</code> and interpret the result as a memory location. It copies the content of such location into register <code>reg1</code>.</p>
+
+<p><em>Add</em></p>
+
+<p>The syntax is <code>add reg1 reg2 reg3</code>, and it simply does <code>reg1 ← reg2 + reg3</code></p>
+
+<p><em>Sub</em></p>
+
+<p>Similar to the add instruction, we can write <code>sub reg1 reg2 reg3</code>. Guess what it does.</p>
+
+<p><em>Store word</em></p>
+
+<p>Syntax is <code>sw reg1 offset(reg2)</code>. It stores the 32-bits word currently in <code>reg1</code> in the address located at <code>offset + &quot;content-of-reg2&quot;</code>.</p>
+
+<p><em>Add immediate unsigned</em></p>
+
+<p>It’s used as <code>addiu reg1 reg2 imm</code>, where <code>imm</code> is a hard-coded number. The operations saves in <code>reg1</code> the value <code>&quot;content-of-reg2&quot; + imm</code>. The sum is unsigned, that means the overflow bit is discarded.</p>
+
+<p><em>Load immediate</em></p>
+
+<p>Syntax: <code>li reg1 imm</code>. It simply loads into <code>reg1</code> the hard-coded value <code>imm</code>.</p>
+
+<p><em>Branch if equal</em></p>
+
+<p>Obviously there’s a branch instruction too. It’s used as <code>beq reg1 reg2 label</code>, and it makes the execution flow jump to <code>label</code>, if and only if the content of <code>reg1</code> is equal to the content of <code>reg2</code>.</p>
+
+<p><em>Unconditional jump</em></p>
+
+<p>Jump to some label without any check, with the line <code>b label</code>.</p>
+
+<p>Alright, with as few as eight instructions we are ready to generate machine code for some real complex high-level source code!</p>
+
+<h2 id="code-generation-basic-example">Code Generation - Basic Example</h2>
+
+<p>The easiest way to understand the overall concept, for me, was to start with a very basic example. I want to show you how to generate code for a stack machine first, and for a MIPS architecture second. And the code will be implementing the extremely simple expression:</p>
+<div class="highlight"><pre class="chroma">print (5+7)</pre></div>
+<p>Before starting, it’s worth underlining one point. While we are going to generate code “manually”, the compiler is supposed to do it automatically! We’ll see how to create <strong>templates for automatic code generation later</strong>. For now, let’s stick with the basic example.</p>
+
+<p>Generating the result of the operation <code>5+7</code> is very easy in a stack machine. We have to:</p>
+
+<ol>
+<li>Save the first operand (5) into the accumulator.</li>
+<li>Push the accumulator on the stack.</li>
+<li>Save the second operand (7) into the accumulator.</li>
+<li>Sum the top of the stack and the accumulator.</li>
+<li>Pop the accumulator, assuming that “pop” would also “return” or “print” the result.</li>
+</ol>
+
+<p>So, overall, it’s just a few lines:</p>
+<div class="highlight"><pre class="chroma">acc ← 5
+push acc
+acc ← 7
+acc ← acc + top_of_stack
+pop</pre></div>
+<p>Now let’s see how to do the same in MIPS. First, we have to load the number <code>5</code> in the accumulator, and that’s exactly what the Load-Immediate instruction does.</p>
+<div class="highlight"><pre class="chroma">LI $a0 5</pre></div>
+<p>Then, we have to transfer the value we just stored to the top of the stack, because we need the accumulator for other purposes. Remember, the top of the stack is identified by the content of the register <code>$sp</code> (stack-pointer). Also, we have the Store-Word instruction. So, putting all together:</p>
+<div class="highlight"><pre class="chroma">SW $a0 0($sp)</pre></div>
+<p>Notice that we are applying <code>offset=0</code> to the content of <code>$sp</code>.</p>
+
+<p>Now there’s a tricky thing to think about. We just pushed something onto the stack. Suppose we pushed 1 word, that’s 4 bytes in MIPS. If you want to see some numbers for the sake of clarity, you can imagine that initially <code>$sp = 100</code> (first unused memory location) and after the <code>SW</code> instruction the first unused memory location is not <code>100</code>. It’s <code>96</code> (4 bytes less, since the stack grows towards the low addresses!).</p>
+
+<p>This means that the current value of <code>$sp</code> is not the top of the stack! We have to reset it, and we can do so with the Add-Immediate-Unsigned instruction.</p>
+<div class="highlight"><pre class="chroma">ADDIU $sp $sp -4</pre></div>
+<p>Now let’s load the second operand into <code>$a0</code></p>
+<div class="highlight"><pre class="chroma">LI $a0 7</pre></div>
+<p>At this point, we would be ready to compute the sum. However, MIPS instruction (Add included) only works with registry address, so we first have to load the value at the top of the stack into the temporary register <code>$t1</code>.</p>
+<div class="highlight"><pre class="chroma">LW $t1 4($sp)</pre></div>
+<p>Notice that this time we are using an <code>offset = +4</code>. The reason should be clear. We did reset the stack pointer to <code>$sp=96</code> (following the example above), but the value we stored was 4 bytes above.</p>
+
+<p>Now, finally, everything is ready for the Add instruction.</p>
+<div class="highlight"><pre class="chroma">ADD $a0 $a0 $t1</pre></div>
+<p>which, as we know, will do <code>$a0 ← $a0 + $t1</code>.</p>
+
+<p>We aren’t done yet! The final step is to make a “pop” operation, because we already used the second operand but it’s still onto the stack.</p>
+
+<p>We can simply shift the <code>$sp</code> up by 1 word, so that the word that’s currently occupied by the second operand will be overwritten soon.</p>
+<div class="highlight"><pre class="chroma">ADDIU $sp $sp 4</pre></div>
+<p>Putting all together, the code generated for MIPS is the following.</p>
+<div class="highlight"><pre class="chroma">li $a0 5
+sw $a0 0($sp)
+addiu $sp $sp -4
+li $a0 7
+lw $t1 4($sp)
+add $a0 $a0 $t1
+addiu $sp $sp 4</pre></div>
+<p>We are ready to switch gear and take on some more complex scenario.</p>
+
+<h2 id="template-for-high-level-code-generation">Template for High-Level Code Generation</h2>
+
+<p>As we are approaching the end of this series of articles on Compilers, it should be quite clear that the central blocks of a programming language are the expressions.</p>
+
+<p>Sure, there are a lot of keywords, parentheses, commas, and other stuff. But the “computability power” of the language is given by the expression. This is why Context-Free Grammars are more powerful, in terms of expressivity, than Regular Grammars. I dedicated an entire article to this subject, so I recommend checking it out (see the references at the end).</p>
+
+<p>From Code Generation point of view, generating code for keywords does not sound too difficult. And indeed it is not.</p>
+
+<p>If you want to “translate” your code in another high-level language, there’s probably a one-to-one relation between keywords in the two languages.</p>
+
+<p>If you are going as deep as machine language, then keywords simply do not exist. You must translate the logic. And where is the logic of the program contained? In the expressions!</p>
+
+<p>If you want to object, for example because you think the logic of a program is given by the branching operations (if-then-else), well that’s right. But based on what do you branch? I’ll tell you: based on the result of an expression!</p>
+
+<p>For example, in my programming language (yes, I am building a new programming language as a learning tool for these studies), the branching operation is defined in the grammar as it follows.</p>
+<div class="highlight"><pre class="chroma">ifLine      :   &#39;if&#39; ifCond ifBody
+ifCond      :   &#39;(&#39; expr &#39;)&#39;
+ifBody      :   (line ENDLINE)+ (optElse)?
+optElse     :   &#39;else&#39; (line ENDLINE)+</pre></div>
+<p>And you can see very well that the ifCond Token is nothing more than two parentheses and an expression. <strong>You must evaluate expressions to understand what the code does</strong>.</p>
+
+<p>Let’s then approach the problem in a scientific way and find a solution, as general as possible, to the problem of <strong>code generation for arbitrarily complex expressions</strong>.</p>
+
+<h3 id="how-does-code-generation-work-in-practice">How does Code Generation work in practice?</h3>
+
+<p>This is a subtle point that I want to clarify as soon as possible. What does it mean to “generate code”, practically speaking?</p>
+
+<p>Let’s think again about the sequence of steps in a Compiler.</p>
+
+<p>First, the front-end. The Lexical Analysis generates a sequence of Tokens. Then, the Parser generates a parse tree. Finally, Semantic Analysis performs a number of additional checks, for instance about typing, and uses Symbols Table and Scopes Stack.</p>
+
+<p>Then, the back-end. The Optimization modules takes care of finding improvement in the source code (I haven’t studied that yet with you). And the Code Generator produces a different code, one that can be run.</p>
+
+<p>Thus, the key sentence is <strong>the Code Generator produces a different code</strong>. And this is really all you need to understand. The final product of the compilation is a source code too, very different from the source code that was given as input at the beginning.</p>
+
+<p>You can <strong>imagine Code Generation as a function that takes a bunch of stuff (original source code, parse-tree, Symbol Table, etc.) and produces a string</strong>. Yes, just a string! What is this string? It’s a source code in a different language, <strong>one that can be run</strong>. It can be a string of MIPS code, Python code, C code, and so on. As long as you can run it, you have generated code!</p>
+
+<h2 id="generate-code-for-expressions">Generate Code for Expressions</h2>
+
+<p>Back to expressions. Now that we know Code Generation is like a function, we can confidently talk about the function</p>
+<div class="highlight"><pre class="chroma">cgen(e)</pre></div>
+<p>where <code>e</code> is an expression of some sort. We know that <code>e</code> is valid in the original language, because the original source code has already been checked by the front-end modules.</p>
+
+<p>What is the output of this function? It’s a string, as I said one minute ago. Just checking if you are following along.</p>
+
+<p>There are two extremely important things that <code>cgen</code> must do:</p>
+
+<ul>
+<li><strong>Save the result</strong> of the expression in <code>$a0</code>.</li>
+<li><strong>Preserve the status</strong> of <code>$sp</code> and of the whole stack.</li>
+</ul>
+
+<p>The second point is really crucial. It means that the content of <code>$sp</code> and the content of the stack before <code>cgen(e)</code> is run must be the same after it’s finished. Keep this in mind, seriously.</p>
+
+<p>The actual output of <code>cgen(e)</code> will depend on what <code>e</code> does, of course. The most basic expression is an integer number, in pretty much all programming languages. So, what does cgen produces in this case?</p>
+
+<p>Let’s assume the expression is the integer <code>i</code>. The meaning of this expression is to create this integer number into memory and to keep it there for more useful purposes, hopefully.</p>
+
+<p>So <code>cgen</code> for this expression should generate a string of code that does exactly that. If we are to generate MIPS code then we can use the Load-Immediate instruction.</p>
+<div class="highlight"><pre class="chroma">cgen(i) = &#34;LI $s0 i&#34;</pre></div>
+<p>What would you do with the output string? You would save it into a file and then load it in memory to run. Or you would use it to fill some blank inside a template string. Obviously, the latter is the most common case.</p>
+
+<p>And so we understand what cgen really does. It produces strings of code that must be plugged-in into a bigger file (or template, if you will). Imagine such a template like a form with blank spaces to fill for all expressions.</p>
+
+<p>Just to remind ourselves about two critical concepts, note that:</p>
+
+<ol>
+<li>After <code>cgen(i)</code> has run, the stack is preserved. In fact, it hasn’t been touched at all.</li>
+<li>Same holds true for <code>$sp</code>.</li>
+</ol>
+
+<p>There’s one more key point that I would like to discuss now. We must understand that <strong>the function cgen(i) is executed at compile time</strong>. In other words, it’s run by the compiler. <strong>The code it produces, instead, will be executed at runtime</strong>. In other words, it’s run by the Operating System.</p>
+
+<p>When I said that expressions are the central blocks of a language, I meant literally. They are “blocks” because they can be put together, plugged into more complex expressions, to generate very meaningful “sentences”.</p>
+
+<p>For example, let’s look at the case where the expression to generate code for is not an integer, is a sum. And not just any sum, it’s the sum of two subexpressions!</p>
+
+<p>What are these subexpressions? They can be really anything, potentially. We don’t care too much because we are going to use the usual, simple, recursive scheme that you know by heart at this point.</p>
+
+<p>So, we have <code>e = e1 + e2</code>, and we want to compute <code>cgen(e)</code>. Here’s what has to be done.</p>
+
+<ol>
+<li>Compute the value of <code>e1</code> (this will put the result in <code>$a0</code>).</li>
+<li>Put it on the stack.</li>
+<li>Reset the stack pointer, like a push.</li>
+<li>Compute <code>e2</code>.</li>
+<li>Load the result of <code>e1</code> from the top of the stack into a register <code>$t1</code>.</li>
+<li>Add <code>$a0</code> (that contains the result of e2) and <code>$t1</code>.</li>
+<li>Reset the stack pointer, like a pop.</li>
+</ol>
+
+<p>Here’s how it should look like. I have written down explicitly what’s run at compile time and what at runtime.</p>
+<div class="highlight"><pre class="chroma">cgen(e1+e2) = 
+    cgen(e1) // compute e1, put results in $a0 and preserve the stack - COMPILE TIME
+    SW $a0 0($sp)  // push the result onto the stack  - RUN TIME
+    ADDIU $sp $sp -4  // reset the stack - RUN TIME
+    cgen(e2) // COMPILE TIME
+    LW $t1 4($sp) // load the result of e1, computed at the beginning. The offset=4 works
+                  // because cgen(e2) is assumed to preserve the stack. - RUN TIME
+    ADD $a0 $t1 $a0  // $a0 ← e1 + e2  - RUN TIME
+    ADDIU $sp $sp 4 // reset the stack pointer (like a pop operation) - RUN TIME</pre></div>
+<p>I think there are two takeaway messages a this point:</p>
+
+<ul>
+<li>The code generator for the “sum” expression works like a template. It has some fixed part (the ones executed at runtime) and then some placeholder for the recursive calls <code>cgen(e1)</code> and <code>cgen(e2)</code> that will be injected.</li>
+<li>Stack machine code is highly recursive. This means that, at least for expressions, it can be written as a recursive descent in the parse tree.</li>
+</ul>
+
+<h3 id="generate-code-for-other-grammar-construct">Generate Code for Other Grammar Construct</h3>
+
+<p>Even though expressions are the central blocks of (practically) any language, a Grammar is made by many other pieces. Runnable code must be generated for them too, of course.</p>
+
+<p>Here’s where the idea of templates becomes really helpful.</p>
+
+<p>You have read my previous article on Formal Grammars and therefore you know that the most part of the grammar is made of rules that recursively use simpler rules. For example</p>
+<div class="highlight"><pre class="chroma">ifLine      :   &#39;if&#39; ifCond ifBody</pre></div>
+<p>is a high-level rule that uses two other, simpler rules, <code>ifCond</code> and <code>ifBody</code>. In pretty much the same way, they also “call” other rules.</p>
+<div class="highlight"><pre class="chroma">ifCond      :   &#39;(&#39; expr &#39;)&#39;
+ifBody      :   (line ENDLINE)+ (optElse)?</pre></div>
+<p>After all, this is exactly the concept of Recursive Descent, which you know very well since we used it to implement the Lexical Analysis, the Parser and also some part of the Semantic Analysis!</p>
+
+<p>This logic lets us understand that we can create a few custom code-generator rules for the “final” pieces of the Grammar. These pieces correspond to the leaves in the parse tree. Once we have these rules, we can write templates for the higher level parts of the Grammar, and then plug into them the former ones.</p>
+
+<p>For example, one rule in the Grammar I designed is</p>
+<div class="highlight"><pre class="chroma">output      :   &#39;writeOut&#39; obj</pre></div>
+<p>We could have, in my language, the following, valid line of code:</p>
+<div class="highlight"><pre class="chroma">writeOut 5;</pre></div>
+<p>How would we generate code for a “output” Token then?</p>
+
+<p>First, we generate the code for the keyword <code>writeOut</code>. If we were translating into some really low level language, then this corresponds to some system call to display objects at screen. If we are translating into a high-level language, say Python, we would simply output the string</p>
+<div class="highlight"><pre class="chroma">“print (&lt;fill-template&gt;)”</pre></div>
+<p>To fill the template we look ahead where we find the <code>obj</code> token. What does the Grammar say about this type of Token?</p>
+<div class="highlight"><pre class="chroma">obj         :   var | num | str | bool | null | list | listElem</pre></div>
+<p>So we look even deeper in the parse tree and we discover that this <code>obj</code> is actually an integer (the number <code>5</code>). And now, the magic, we <strong>delegate the task</strong> to a function that generate code for integers.</p>
+
+<p>Overall, you can imagine a function <code>cgen</code> for the output token that is defined in the following way.</p>
+<div class="highlight"><pre class="chroma">cgen(&#34;writeOut obj&#34;) = 
+        &#34;print (&#34;
+        + cgen(obj)
+        + &#34;)&#34;</pre></div>
+<p>The output of this function is a string in Python language.</p>
+
+<h2 id="code-generation-tougher-example">Code Generation - Tougher Example!</h2>
+
+<p>I want to go through a more involved example now, to see and touch for real the concepts we discussed in the previous section.</p>
+
+<p>I want to generate code for the MIPS architecture that realizes the following higher level code.</p>
+<div class="highlight"><pre class="chroma">if (e1 == e2) then e3 else e4</pre></div>
+<p>Here are the logical steps we have to implement.</p>
+
+<ol>
+<li>Generate code that will compute e1 and will put the result in the accumulator <code>$a0</code>.</li>
+<li>Push the result onto the stack.</li>
+<li>Generate code that will compute <code>e2</code> and will put the result in the accumulator <code>$a0</code>.</li>
+<li>Compare the result of <code>e2</code> (currently <code>$a0</code>) with the result of <code>e1</code> (currently at the top of the stack).</li>
+<li>If they are equal jump to some label, where we’ll write the right code.</li>
+<li>If not, jump to some different label.</li>
+<li>Clean stuff and exit.</li>
+</ol>
+
+<p>Also, it’s worth recalling the key concept that <strong>every cgen function is supposed to preserve the status of $sp and of the stack</strong>.</p>
+
+<p>So, the above steps can be written as it follows.</p>
+<div class="highlight"><pre class="chroma">cgen(if e1 = e2 then e3 else e4) = 
+        cgen(e1) // template code that saves the result in $a0
+                  // the next two instructions implement the “push” operation
+        SW $a0 0($sp)
+        ADDIU $sp $sp -4
+        cgen(e2) // now result of e1 is at the top of the stack and result of e2 is in $a0
+                 // to compare the two results we need to load the former in $t1
+        LW $t1 4($sp)
+        ADDIU $sp $sp 4 // pop the stack
+        BEQ $a0 $t1 true_branch  // conditional jump
+        B false_branch // if arrived here then jump in any case</pre></div>
+<p>We must now implement code that goes under the two labels <code>true_</code> and <code>false_branch</code>. They are extremely simple.</p>
+<div class="highlight"><pre class="chroma">false_branch:
+      cgen(e4)
+      B end_if  // unconditional branch
+
+true_branch:
+      cgen(e3)
+      B end_if</pre></div>
+<p>How can we be sure that’s all we need? Once again, we are sure because each cgen function preserves the status of the stack.</p>
+
+<p>We now just miss the <code>end_if</code> part.</p>
+<div class="highlight"><pre class="chroma">end_if:
+    // there’s actually no cleaning to do here, because both cgen(e3) and cgen(e4)
+    // preserve the stack</pre></div>
+<p>It’s worth noting that the bigger function <code>cgen(if... else...)</code> preserves the stack too!</p>
+
+<h2 id="a-mistake-to-avoid">A mistake to avoid</h2>
+
+<p>The whole concept of using a stack, push and pop data to and from it continuously was a bit tricky to understand for me, at first. Why are we doing that? It really seems complicated and unnecessary.</p>
+
+<p>For instance, many architectures, MIPS included, support the <code>move</code> instruction:</p>
+<div class="highlight"><pre class="chroma">MV reg1 reg2</pre></div>
+<p>that simply copies the content currently in register <code>reg2</code> and put it in register <code>reg1</code>.</p>
+
+<p>Couldn’t we use this instruction to implement the <code>sum</code> operation in a much cleaner way? For example:</p>
+<div class="highlight"><pre class="chroma">cgen(e1+e2) = 
+    cgen(e1) // put results in $a0 and preserve the stack - COMPILE TIME
+    MV $t1 $a0  // immediately save it in $t1, without passing by the stack - RUN TIME
+    cgen(e2) // COMPILE TIME
+    ADD $a0 $t1 $a0  // $a0 ← e1 + e2  - RUN TIME</pre></div>
+<p>At this first sight this seems to work, and we don’t need to do all that clumsy resetting of the stack. However, <strong>this code is wrong</strong>.</p>
+
+<p>Why’s that wrong? Consider the nested expression</p>
+<div class="highlight"><pre class="chroma">1 + (2 + 3)</pre></div>
+<p>In this case we would first call the function <code>cgen(e1+e2)</code> with arguments <code>e1 = 1</code> and <code>e2 = (2+3)</code>. That function would first evaluate the expression <code>1</code>, and move its result onto <code>$t1</code>. Then it would need to evaluate <code>e2</code>, which means it would recursively call itself, this time with arguments <code>e1 = 2</code> and <code>e3 = 3</code>. Unfortunately, such recursive call would also use the temporary register <code>$t1</code>, and therefore the value that was moved to <code>$t1</code> in the previous call would now be overwritten, and lost.</p>
+
+<p>If we use the stack instead, the sequence of push/pop operations guarantees that each recursive call only grabs its own data.</p>
+
+<p>Remember this concept because it’s <strong>fundamental to understand the whole Code Generation module</strong>.</p>
+
+<h2 id="summary-and-conclusions">Summary and Conclusions</h2>
+
+<p>In this lengthy article we learnt about <strong>the final part of the compilation</strong> of a source code: Code Generation.</p>
+
+<p>Code Generation is all about creating a string that is a valid program in a different language, one that can be run by the machine. For example, if you are writing a C compiler then your Code Generation module could output a string in Intel Assembly code, that can be run on your computer.</p>
+
+<p>Specifically, we learnt about stack machines and MIPS architecture, a very handy learning tool. If you want to work further on it, keep in mind that <strong>there are many MIPS simulators available online</strong> (see the references at the bottom).</p>
+
+<p>All kinds of combinations are possible. You can have a source code in C and want to generate Assembly code, or MIPS code. Or you can have a Java source code and want to generate JVM bytecode. Or you may have a Python source code and want to generate C code, because you already have a C compiler available. The last case is very common.</p>
+
+<p>Or you can do like me: I designed my own programming language because I decided that Do-It-Yourself was the best way to learn about Compilers.</p>
+
+<ol>
+<li>I designed a LL(1) Context-Free Grammar, then</li>
+<li>I implemented Lexical Analysis, and</li>
+<li>A Parser, and</li>
+<li>A Semantic Analysis module.</li>
+</ol>
+
+<p>Which made my project ready for Code Generation.</p>
+
+<h2 id="what-s-next">What’s next</h2>
+
+<p>I want to be able to run code that it’s written in my Grammar. Hence, I must generate runnable code for it.</p>
+
+<p>Practically speaking, generating MIPS code would not be very useful. The issue, in my opinion, is about <strong>reproducibility</strong>.</p>
+
+<p>The first and foremost purpose of my programming language is learning about Compilers, and to build one. However, if I implemented a Code Generator module that generates MIPS or Assembly code it would probably never even looked at by someone else, and likely be forgotten forever even by myself! Too much hassle for me or anybody else to download my project, let’s say from github, and then having to install a MIPS simulator.</p>
+
+<p>Don’t get me wrong though. I believe going through the effort of building a Code Generator for MIPS is an incredibly valuable learning experience, and it is in my roadmap. But I am going to prioritize a different approach.</p>
+
+<p>I want <strong>to learn very well the concept of Code Generator Templates</strong>. In fact, this is independent of what is the “output” language. It can be MIPS or anything else, the templates’ concept is the same.</p>
+
+<p>Thus, my next step is going to be Code Generation for my own language, in a different high-level language. I am yet to decide what will be the output language; so far the strongest candidates are C and Python.</p>
+
+<h2 id="references">References</h2>
+
+<p>My article <a href="http://example.org/page/how-computer-runs-code/">How Does The Computer Run Code?</a>.</p>
+
+<p>Alex Aiken&rsquo;s class Compilers at Stanford University. Available as <a href="https://lagunita.stanford.edu/courses/Engineering/Compilers/Fall2014/course/">free MOOC online</a>.</p>
+
+<p>My article <a href="http://example.org/page/what-is-a-programming-language-grammar/">What is a Programming Language Grammar?</a>.</p>
+
+<p>MIPS simulators. <a href="http://spimsimulator.sourceforge.net/">Option 1</a> (also used by Stanford’s Prof. Aiken), <a href="http://courses.missouristate.edu/KenVollmar/mars/">Option 2</a>, among many. Google it!</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-generate-runnable-code%2f&amp;text=How%20To%20Generate%20Machine-Runnable%20Code%3f&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fhow-to-generate-runnable-code%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-generate-runnable-code%2f&amp;title=How%20To%20Generate%20Machine-Runnable%20Code%3f" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-generate-runnable-code%2f&amp;title=How%20To%20Generate%20Machine-Runnable%20Code%3f" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-generate-runnable-code%2f&amp;title=How%20To%20Generate%20Machine-Runnable%20Code%3f" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-generate-runnable-code%2f&amp;description=How%20To%20Generate%20Machine-Runnable%20Code%3f" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

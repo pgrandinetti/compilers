@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>How to Design Formal Grammars | Compilers</title>
+  <meta name="description" content="In a previous article of this series we answered basic questions about Formal Grammars:
+ What are they? How are they related to Programming Languages? What are they made of?  Then, we quickly got a glimpse of more profound questions, such as:
+ Are all Grammars the same? What differentiates one Grammar from the others? How can we build a new Grammar?  I did answer them, but in a brief way.">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/how-to-design-grammars\/",
+          "name": "How to design formal grammars"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "How to Design Formal Grammars",
+  "description" : "In a previous article of this series we answered basic questions about Formal Grammars:\n What are they? How are they related to Programming Languages? What are they made of?  Then, we quickly got a glimpse of more profound questions, such as:\n Are all Grammars the same? What differentiates one Grammar from the others? How can we build a new Grammar?  I did answer them, but in a brief way.",
+  "inLanguage" : "en",
+  "wordCount":  3737 ,
+  "datePublished" : "2019-10-10T00:00:00",
+  "dateModified" : "2019-10-10T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/how-to-design-grammars\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="How to Design Formal Grammars" />
+<meta property="og:description" content="In a previous article of this series we answered basic questions about Formal Grammars:
+ What are they? How are they related to Programming Languages? What are they made of?  Then, we quickly got a glimpse of more profound questions, such as:
+ Are all Grammars the same? What differentiates one Grammar from the others? How can we build a new Grammar?  I did answer them, but in a brief way.">
+<meta property="og:url" content="http://example.org/page/how-to-design-grammars/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="How to Design Formal Grammars" />
+  <meta name="twitter:description" content="In a previous article of this series we answered basic questions about Formal Grammars:
+ What are they? How are they related to Programming Languages? What are they made of?  Then, we quickly got a …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>How to Design Formal Grammars</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  October 10, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>In a previous article of this series we answered basic questions about Formal Grammars:</p>
+
+<ul>
+<li>What are they?</li>
+<li>How are they related to Programming Languages?</li>
+<li>What are they made of?</li>
+</ul>
+
+<p>Then, we quickly got a glimpse of more profound questions, such as:</p>
+
+<ul>
+<li>Are all Grammars the same?</li>
+<li>What differentiates one Grammar from the others?</li>
+<li>How can we build a new Grammar?</li>
+</ul>
+
+<p>I did answer them, but in a brief way. To summarize the main points:</p>
+
+<ul>
+<li>Grammars are not all the same. Of course.</li>
+<li>The way you design the grammatical rules is also what determines the expressivity power of a Formal Grammar. So, ultimately, expressivity power is what differentiates one Grammar from another.</li>
+<li>To build a Grammar one must first decide the Alphabet (the set of allowed characters), and then write the production rules.</li>
+</ul>
+
+<p>Now, it&rsquo;s time to go deeper into the details and build a real knowledge around these concepts.</p>
+
+<p>Given that the way you write down the rules is so important, someone in the past has taken care of studying and grouping the sensible ways in which you can build a Grammar.</p>
+
+<p>His name is <strong>Noam Chomsky</strong>, he&rsquo;s an american linguist and he defined the so-called Chomsky Hierarchy, which I am going to talk about next in this article.</p>
+
+<p>At is turns out, the way you write down the rules defines also the <strong>expressivity power of the Grammar</strong>, and different Grammars can be grouped in 4 Types, each type with a different power.</p>
+
+<h2 id="the-chomsky-hierarchy">The Chomsky Hierarchy</h2>
+
+<p>In my opinion, the easiest way to think about the Chomsky Hierarchy is like a Venn diagram.</p>
+
+<p>Venn diagrams express relations between sets. For example, the set of natural numbers is a subset of (included in) the set of real numbers.</p>
+
+<p><strong>The Chomsky Hierarchy is a Venn diagram between Formal Grammars</strong>. More precisely, between four Types of Formal Grammars. These are simply called</p>
+
+<ul>
+<li>Type-0 Grammars,</li>
+<li>Type-1 Grammars,</li>
+<li>Type-2 Grammars,</li>
+<li>Type-3 Grammars,</li>
+</ul>
+
+<p>although they also have some nicknames (which we are going to see).</p>
+
+<p>One point I really want to remark is that the &ldquo;subset&rdquo;-like relation means expressivity, in the case of Grammars. Let me try to clarify this point, with the following example.</p>
+
+<p>Consider the alphabet given by digits and lowercase letters: <code>{a, b, …, z, 0, 1, …, 9}</code>. Then, consider all possible strings that you can make with characters drawn from this alphabet, of any length. They are a lot! Infinite, actually. Let&rsquo;s call the set of all such strings <code>S1</code>.</p>
+
+<p>Now, consider the alphabet given by digits, lowercase and uppercase letters: <code>{a, b, …, z, 0, 1, …, 9, A, B, …, Z}</code>. Then, consider all possible strings that you can make with this alphabet. They are infinite too, like the previous case. Let&rsquo;s call this set <code>S2</code>.</p>
+
+<p>Let&rsquo;s think more deeply for a moment. The set <code>S2</code> ought to be larger than <code>S1</code>! They are both infinite in number, but we can definitely say that <code>S2</code> contains all strings that are in <code>S1</code>, plus many more.</p>
+
+<p>Thus, in a Venn diagram we would put <code>S1</code> within <code>S2</code>, to say that <code>S1</code> is contained in <code>S2</code>. We can also say that <strong>S1 is a subset of S2</strong>.</p>
+
+<p>With Formal Grammars the logic is similar. In fact, Grammars are basically constraints over the strings that you can make with the given Alphabet. Instead of having &ldquo;all possible strings you can form given a alphabet&rdquo;, you will have some limitations on how you can form valid strings.</p>
+
+<p>Therefore, two Grammars specify different sets of limitations. And hence, the sets of sentences you can make with them can be in any of the Venn-type relations.</p>
+
+<p>In particular, the Chomsky Hierarchy is made by <strong>4 Types of Grammars that are recursively included each into another</strong>.</p>
+
+<ol>
+<li>Type-0 Grammars are the most general. In other words, they have the least constraints.</li>
+<li>Type-1 Grammars are a bit more constrained than Type-0, and are a subset of them.</li>
+<li>Type-2 are even more restricted, and are a subset of Type-1 (and therefore also of Type-0).</li>
+<li>Type-3 have the lowest expressivity power. Or, that&rsquo;s the same, the most constrained form of rules. They are included into Type-2 (and therefore into Type-1 and Type-0 too).</li>
+</ol>
+
+<p>Let&rsquo;s now take a closer look at each of these types. Before that though, let me add two pieces of notation that are worth remembering:</p>
+
+<ul>
+<li>A <em>terminal</em> token (or terminal symbol) in a grammar G is a word that cannot be expanded in further levels. For instance, the word <code>for</code> is a terminal token in many programming languages.</li>
+<li>A <em>nonterminal</em> token (or nonterminal symbol) is a part of the grammar that can be expanded further. For instance, the <code>keyword</code> in the previous example is nonterminal, because it can be expanded by replacing it with <code>for</code>, or <code>if</code>, or <code>else</code>, or <code>while</code> (and many others, in fact). Same for the equality statement.</li>
+</ul>
+
+<p>Also, let me introduce the general concept of Grammar, before going into each type of grammar.</p>
+
+<p><em>A Grammar G consists of:</em></p>
+
+<ol>
+<li><em>A finite set N of nonterminal symbols, disjoint with the set of strings that G can form.</em></li>
+<li><em>A finite set T of terminal symbols, disjoint with N.</em></li>
+<li><em>A finite set P of production rules, dictating how symbols are replaced to form a valid string.</em></li>
+<li><em>A start symbol s that belongs to N.</em></li>
+</ol>
+
+<p>Fix in your mind the name <strong>production rules</strong>, which is the correct name for &ldquo;replacement rules&rdquo; I improperly used before.</p>
+
+<p>At this point I believe we have all the pieces of knowledge we need for a deeper study of Grammars!</p>
+
+<h2 id="type-0-grammars">Type-0 Grammars</h2>
+
+<p>Let&rsquo;s start with the most general Grammars. Remember that &ldquo;most general&rdquo; also means &ldquo;less constrained&rdquo;, and also means <strong>higher expressivity power</strong>.</p>
+
+<p>In other words, <strong>Type-0 Grammars are the largest set in the Chomsky Hierarchy</strong>, and they can express the largest set of languages. Such a set is a superset of the languages that you can build with the other types of Grammar.</p>
+
+<p>What characterizes the Grammars of Type-0? Answer: <em>The way production rules are written</em>. In a Type-0 Grammar, each production rule has the form</p>
+<div class="highlight"><pre class="chroma">p : q</pre></div>
+<p>where <code>p</code>, <code>q</code> are sequences of either terminal or nonterminal symbols, and <code>p</code> contains at least one nonterminal.</p>
+
+<p>As you can see, there is <strong>basically no restriction</strong> on how you can write a production rule for a Type-0 Grammar. This is why such grammars are <strong>also called Unrestricted Grammars</strong> (which, in my opinion, is a much easier name to remember!).</p>
+
+<h3 id="turing-digression">Turing-digression</h3>
+
+<p>Feel free to skip this small section and jump to Type-1 Grammar!</p>
+
+<p>A well-known and beautiful result states that <strong>Type-0 Grammars are equivalent to Turing Machines</strong>. In different words, given a Type-0 Grammar <code>G</code> and the language it generates <code>L(G)</code>, there exists some Turing machine capable of recognizing <code>L(G)</code>, and vice versa.</p>
+
+<p>To me, that seemed like a surprising result! In fact, the Turing machine that accomplishes this task is quite easy to imagine. Let <code>w</code> be the input sentence that we have to test (that is, accept or reject). Let&rsquo;s imagine a 2-tapes non-deterministic Turing machine where the first tape contains <code>w</code> and is not modified, and the second tape also contains <code>w</code> but is used for computations. The machine does the following steps:</p>
+
+<ol>
+<li>Start at the beginning (left side) of the second tape</li>
+<li>Choose (non-deterministically) a production rule <code>p : q</code> from the grammar <code>G</code>.</li>
+<li>If <code>p</code> appears somewhere in the second tape then replace it with <code>q</code>, possibly filling empty space by shifting the other characters on the tape.</li>
+<li>Compare the sentence on tape 2 with <code>w</code>. If they are equal then accept <code>w</code>. Otherwise, go back to step 1.</li>
+</ol>
+
+<p>It&rsquo;s quite easy to see that the non-deterministic step 2 will branch many times, so producing all possible sentences that the grammar <code>G</code> can generate. The machine will accept the input if any of its branches accepts it, therefore it will accept it if any sequential application of production rules produces a valid string.</p>
+
+<p>On the other hand, if you think about this Turing Machine for a minute, you will see that it&rsquo;s possible it never stops. This is exactly what happens for so-called <strong>undecidable problems</strong>: the input is accepted if the Turing machine stops, which makes the problem itself recursive enumerable. But the machine might never stops, which also makes the problem &ldquo;undecidable&rdquo;.</p>
+
+<p>Famous examples of undecidable problems are the halting problem and the Post correspondence problem. Just to throw in a formal definition: a formal language is said <em>recursively enumerable</em> if it is a recursively enumerable subset in the set of all possible sentences over the alphabet of the language or, equivalently, if there exists a Turing machines which will enumerate all valid sentences of the language.</p>
+
+<p>If the above sentence sounds mysterious, don&rsquo;t worry, it is not critical for understanding this article and programming language Grammars.</p>
+
+<p>At this point we know that <strong>Turing machines, undecidable problems and Type-0 Grammars express (more or less) the same languages</strong>.</p>
+
+<h2 id="type-1-grammars">Type-1 Grammars</h2>
+
+<p>This type of Grammars is also called <strong>Context-Sensitive Grammars</strong>. The reason for this name is that the way you are allowed to write production rules is to specify what symbols are around the symbol you want to replace. These additional symbols are seen like the &ldquo;context&rdquo; around the symbol to be replaced.</p>
+
+<p>The proper form of the production rules is the following:</p>
+<div class="highlight"><pre class="chroma">pAq : pgq</pre></div>
+<p>where <code>A</code> is a nonterminal symbol, <code>p, q, g</code> are strings of terminals and/or non terminals, and <code>g</code> must be non-empty.</p>
+
+<p>When you think about it, the above rule says that the symbol <code>A</code> can be replaced with the string of symbols <code>g</code>, but only if <code>A</code> appears between the <code>p</code> and <code>q</code> strings of symbols. That&rsquo;s the &ldquo;context&rdquo; of <code>A</code>.</p>
+
+<p>The most famous example of language that can be generated by a context-sensitive grammar (and so it&rsquo;s said <em>context-sensitive language</em>) is</p>
+
+<p>$$
+L = { a^nb^nc^n \, |\, n \geq 1}
+$$</p>
+
+<p>which is the language that contains all strings made in the following way:</p>
+
+<ul>
+<li>the character <code>a</code> repeated any number of times (at least 1 time),</li>
+<li>followed by the character <code>b</code> repeated the same number of times,</li>
+<li>followed by the character <code>c</code> repeated the same number of times.</li>
+</ul>
+
+<p>Valid sentences in such language are</p>
+<div class="highlight"><pre class="chroma">abc
+aabbcc
+aaabbbccc</pre></div>
+<p>At this point, the natural question is what can Type-0 Grammars do, that Type-1 can&rsquo;t?</p>
+
+<p>The answer is relatively easy: there exists some language that you cannot express with a Type-1 Grammar, whereas you can with a Type-0 one.</p>
+
+<p>For example, if you take any undecidable problem (such as the Post correspondence problem), and write the formal grammar that produces valid sentences for that problem, then you would see that such a grammar is Type-0. And <strong>you would not find any way to do the same with a Type-1 Grammar</strong>.</p>
+
+<p><strong>This restriction is reflected in the form of the production rules</strong>, too. In the Unrestricted Grammars, productions can have basically any form <code>p : q</code>, where <code>p</code> and <code>q</code> are strings of terminals and/or nonterminals symbols and <code>p</code> contains at least one non-terminal. On the other hand, in Type-1 grammars, the productions are restricted to the form <code>pAq : pgq</code>.</p>
+
+<p>Once again, <strong>more constraints means more restrictions</strong>, which means less expressivity power. And therefore, the whole set of languages that can be built with all Type-1 Grammars is just a subset of the one generated by Type-0 Grammars.</p>
+
+<h2 id="type-2-grammars">Type-2 Grammars</h2>
+
+<p>This is a very important class of Grammars, from practical point of view. In fact, <strong>this set is where most programming languages grammars belong to</strong>.</p>
+
+<p>Type-2 Grammars are <strong>also said Context-Free Grammars</strong>. As opposed to Context-Sensitive Grammars, in the Context-Free ones the context around a symbol does not play a role in the production rules.</p>
+
+<p>This is a big limitation, and in fact <strong>Context-Free are less powerful than Context-Sensitive Grammars</strong>, yet they are the most used in programming languages definition.</p>
+
+<p>The general form that production rules can take in Context-Free Grammars is</p>
+<div class="highlight"><pre class="chroma">A : g</pre></div>
+<p>where <code>A</code> is a nonterminal symbol and <code>g</code> is a string of terminal and nonterminal symbols. Moreover, <code>g</code> cannot be empty.</p>
+
+<p>You can almost &ldquo;see&rdquo; that Context-Free Grammars are more restricted than the previous two types, because of how production rules look like: you must have a unique symbol on the right-hand side of the rule, and it must be a nonterminal.</p>
+
+<p>The classical example of language that is formed by a Context-Free Grammar (which is said <em>Context-Free Language</em>) is</p>
+
+<p>$$
+L = { a^nb^n\, |\, n \geq 1}
+$$</p>
+
+<p>Valid sentences in this language are</p>
+<div class="highlight"><pre class="chroma">ab
+aabb
+aaabbb</pre></div>
+<p>The question is why this language is Context-Free, whereas I earlier said that $$ L = { a^nb^nc^n | n \geq 1} $$ is Context-Sensitive?</p>
+
+<p>Again, the answer lies in the restrictions and the constraints applied to the production rules.</p>
+
+<p>To express a language with three &ldquo;balanced&rdquo; characters (such as &ldquo;aabbcc&rdquo;) you will need to write down production rules that use context. You will NOT be able to write a Context-Free grammar that does it. Therefore, the language is context-sensitive, but NOT context-free.</p>
+
+<p>To make this point clearer, remember that, instead, <strong>all Context-Free Grammars are also Context-Sensitive</strong>, whereas the vice versa is not true.</p>
+
+<h2 id="type-3-grammars">Type-3 Grammars</h2>
+
+<p>This is <strong>the last layer in the Chomsky Hierarchy</strong>, and therefore the most constrained class. It is also the least powerful class. And also the class that can express the least number of languages. Just repeating the concept in different wordings!</p>
+
+<p>The production rules in these grammars have either of the following forms:</p>
+<div class="highlight"><pre class="chroma">A : aB
+A : Ba</pre></div>
+<p>where <code>A, B</code> are nonterminal symbols and <code>a</code> is a terminal symbol. A Type-3 Grammar must have all production rules either in the first form, or in the second form. The two forms cannot be mixed in the same Grammar: it wouldn&rsquo;t be a Type-3 Grammar then.</p>
+
+<p>In fact, Grammars of this type are very famous: they are <strong>also called Regular Grammars</strong>. The languages they can express are called <em>Regular Languages</em>, and a very well-known formalism to handle them is via <strong>Regular Expressions</strong>, which you have surely used before.</p>
+
+<p>A classic example of regular grammar is</p>
+<div class="highlight"><pre class="chroma">S : aS | bA
+A : cA | eps</pre></div>
+<p>where <code>eps</code> is the empty string. This grammar is equivalent to the regular expression</p>
+<div class="highlight"><pre class="chroma">a*bc*</pre></div>
+<p>Indeed, the language formed by such a grammar consists of all strings with any number of <code>a</code>&rsquo;s, followed by one <code>b</code>, followed by any number of <code>c</code>&rsquo;s.</p>
+
+<p>This grammar is said <em>left-regular</em>. Regular grammars can also be right-regular, for instance</p>
+<div class="highlight"><pre class="chroma">S : Sa | Ab
+A : Ac | eps</pre></div>
+<p>which is very similar to the previous grammar, but inverts the order of the characters and is equivalent to the regular expression</p>
+<div class="highlight"><pre class="chroma">c*ba*</pre></div>
+<h2 id="take-home-messages">Take-home messages</h2>
+
+<p>At this point, after many technical details and strange notations, I feel like it is worth summing up a bit of everything and clearly stating the most important things to remember.</p>
+
+<p>We studied what Formal Grammars are and what they are used for in programming languages:</p>
+
+<ul>
+<li>Formal Grammars are set of rules. These rules define how symbols (words, strings, etc.) can be mixed to form longer sentences that are &ldquo;valid&rdquo; in each Grammar.</li>
+<li>A Grammar also defines a Language. The Language L(G) of a Grammar G is the set of all valid sentences.</li>
+<li>The most critical part of a Grammar is the set of production rules. These rules say how to replace nonterminal symbols in a sentence, with either terminal or other nonterminal symbols. This is done recursively, until the sentence is made by only terminal symbols (in which case the initial sentence is accepted), or the procedure is stuck (in which case the initial sentence is grammatically wrong, and hence rejected).</li>
+</ul>
+
+<p>Then, we studied in detail the Chomsky Hierarchy:</p>
+
+<ul>
+<li>There are 4 Types of Grammars in this hierarchy, from the most powerful one (Type-0, also said Unrestricted), to the least powerful (Type-3, also said Regular Grammars). The other two are called Context-Sensitive (Type-1) and Context-Free (Type-2).</li>
+<li>These four types are subset each to another: Type-1 is a subset of Type-0; Type-2 is a subset of Type-1 (and hence of Type-0); Type-3 is a subset of Type-2 (and hence of Type-0 and Type-1).</li>
+<li>In the Grammars world, &ldquo;more powerful&rdquo; means less constrained and therefore capable of expressing more languages. The constraints are about how production rules can be written.</li>
+<li>Type-2 Grammars, the Context-Free Grammars, are the ones used to create new programming languages. The reason is that there are efficient algorithms to parse grammars of this type.</li>
+<li>Type-3 Grammars, the Regular Grammars, have application in a very wide range of subjects, and are very often implemented as Regular Expressions.</li>
+</ul>
+
+<h2 id="common-issues-in-formal-grammars">Common issues in Formal Grammars</h2>
+
+<p>If everything went smoothly so far, then I might have given you the wrong impression. To <strong>properly define a useful Grammar is quite a task</strong>.</p>
+
+<p>The problem is that, unless you are very careful at how you define each production rule, chances are you will end up with a unparsable Grammar, for example a Type-0 Grammar. It would certainly be powerful.. in theory! In practice, you could not write a general parser for it, and therefore nobody could write a program in its language. Or maybe you could write one (e.g., the Earley algorithm), but it would be so inefficient that nobody would not use it.</p>
+
+<p>There are many tricks and pitfalls that one must be aware of, when defining a Grammar. I am going to discuss with you two common issues.</p>
+
+<h3 id="ambiguity-and-operators-precedence">Ambiguity and Operators Precedence</h3>
+
+<p>Let me start by making one point clear: <strong>ambiguity is BAD</strong>.</p>
+
+<p>A Grammar is ambiguous when the same input sentence can result in two (or more) different parse trees. This is just too much for a compiler, because it would have to guess which of the two parse trees must be translated into executable code.</p>
+
+<p>In fact, ambiguity is a much more common issue than you would think. Let&rsquo;s consider a simple grammar that defines addition and multiplication between integer numbers, where <code>int</code> is the only terminal token.</p>
+<div class="highlight"><pre class="chroma">E  : E + E
+   | E * E
+   | (E)
+   | int</pre></div>
+<p>Basically, this Grammar says:</p>
+
+<p><em>an expression is either the sum of two expressions, or a multiplication of two expressions, or an open parenthesis followed by an expression followed by a closed parenthesis, or an integer number.</em></p>
+
+<p>So far, so good. Now let&rsquo;s consider the input sentence</p>
+<div class="highlight"><pre class="chroma">9 * 5 + 2</pre></div>
+<p>This simple input has two parse trees. One where the first rule applied is <code>E*E</code>, and one where it&rsquo;s <code>E+E</code>.</p>
+
+<p>It&rsquo;s worth noticing that the problem is not having two different sequence of derivations that lead to the same parse tree. This would not be a problem at all. The issue is that there are two completely different parse trees for this input, and both are valid.</p>
+
+<p>In fact, there are many tricks that can help solve this problem in a Grammar. For example, in this case, one must add a production rule in order to clarify whether the <code>+</code> or the <code>*</code> has the priority. The new Grammar would be</p>
+<div class="highlight"><pre class="chroma">E  : E&#39; + E
+   | E&#39;
+E&#39; : int * E&#39;
+   | int
+   | (E) * E&#39;
+   | (E)</pre></div>
+<p>The new Grammar is <strong>ambiguous-free</strong>, and does what we intuitively want: prioritize multiplications over additions.</p>
+
+<h3 id="left-recursion">Left Recursion</h3>
+
+<p>Guess what: <strong>left recursion is quite BAD</strong>. Perhaps less bad than ambiguity, but you should really avoid left recursion too.</p>
+
+<p>Let me explain what it is with an example.</p>
+
+<p>Suppose you want to define a simple grammar for all sentences that start with the character <code>b</code> and continue with as many characters a as desired. You could write the following.</p>
+<div class="highlight"><pre class="chroma">S : Sa | b</pre></div>
+<p>In theory, this works. A possible derivation could be:</p>
+<div class="highlight"><pre class="chroma">S → Sa → Saa → Saaa → ... → Saa...a → baa...a</pre></div>
+<p>However, in practice, if you want to parse the input sentence and build the parse tree from the leftmost character to the rightmost one, then you will have an infinite loop. Why? Because you start by calling some procedure that parses according to the definition of <code>S</code>, and the first thing it does is to search for one more <code>S</code> (hence, calling the same procedure).</p>
+
+<p>With a bit of general notation, the grammar</p>
+<div class="highlight"><pre class="chroma">S : S a1 | … | S an | b1 | ... | bm</pre></div>
+<p>is a left-recursive grammar that produces all strings starting with one character among <code>b1, ..., bm</code> and then follows with any number of characters among <code>a1, ..., an</code>.</p>
+
+<p>To make it non-left-recursive, one can rewrite it as</p>
+<div class="highlight"><pre class="chroma">S : b_1 S&#39; | ... | b_m S&#39;
+S&#39; : a_1 S&#39; | ... | a_n S&#39; | eps</pre></div>
+<p>which produces exactly the same set of strings (can be easily proved) and is not left-recursive.</p>
+
+<p>There is a trickier case that can lead to left-recursion, when the recursion is not immediate. For example, the following grammar has a non-immediate left-recursion issue.</p>
+<div class="highlight"><pre class="chroma">S : Aa | b
+A : Ac | Sd | eps</pre></div>
+<p>Why non-immediate? Because the left-recursion becomes evident only after more than one derivation, in this case <code>S → Aa → Sda</code>.</p>
+
+<p>There are ways to get rid of this left-recursion type too. But for this, I will just refer you to the Dragon Book (see references at the end) and the Algorithm 4.19: Eliminating Left-Recursion therein.</p>
+
+<p>For the sake of clarity, I also want to mention that left-recursion is an issue only in top-down parsing algorithms, whereas it&rsquo;s not a big deal in bottom-up parsing. The article about parsing algorithm is for the next time, though!</p>
+
+<h2 id="what-s-next">What&rsquo;s next</h2>
+
+<p>When I first decided to dive deep into the Formal Grammars world, my motivation was because I wanted to build my own programming language. There are a lot of tools out there that allows you to build a new programming language in a semi-automatic way, but I wanted to go down deep till the bones of the subject.</p>
+
+<p>Of course, a complete knowledge of everything I said in this article is not needed for the most part of your daily practical tasks (unless you work on Domain Specific Language application).</p>
+
+<p>Nonetheless, I do believe that having a broader knowledge about programming languages help coders, software engineers and architects and, why not, well-rounded scientists in making a better job.</p>
+
+<p>Plus, it&rsquo;s truly a fascinating subject!</p>
+
+<h2 id="rerefences">Rerefences</h2>
+
+<p>The Dragon Book. Compilers: Principles, Techniques and Tools. <a href="https://en.wikipedia.org/wiki/Compilers:_Principles,_Techniques,_and_Tools">Wikipedia page</a> (of the book).</p>
+
+<p>The Chomsky Hierarchy, <a href="https://en.wikipedia.org/wiki/Chomsky_hierarchy">Wikipedia Page</a>, as starting point to follow many links inside it.</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-design-grammars%2f&amp;text=How%20to%20Design%20Formal%20Grammars&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fhow-to-design-grammars%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-design-grammars%2f&amp;title=How%20to%20Design%20Formal%20Grammars" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-design-grammars%2f&amp;title=How%20to%20Design%20Formal%20Grammars" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-design-grammars%2f&amp;title=How%20to%20Design%20Formal%20Grammars" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-design-grammars%2f&amp;description=How%20to%20Design%20Formal%20Grammars" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

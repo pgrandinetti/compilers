@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>How to Design Semantic Analysis | Compilers</title>
+  <meta name="description" content="In a previous article in this series, we learnt what is the Semantic Analysis module of a Compiler.
+The key points to remember are:
+ Semantic Analysis is the third step in front-end compilation (after Lexical Analysis and Parsing). It&rsquo;s meant to catch all errors that weren&rsquo;t caught by the first two steps. It&rsquo;s the last step in front-end compilation, so it&rsquo;s also the last point where a source code can be rejected.">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/how-to-design-semantic-analysis\/",
+          "name": "How to design semantic analysis"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "How to Design Semantic Analysis",
+  "description" : "In a previous article in this series, we learnt what is the Semantic Analysis module of a Compiler.\nThe key points to remember are:\n Semantic Analysis is the third step in front-end compilation (after Lexical Analysis and Parsing). It\x26rsquo;s meant to catch all errors that weren\x26rsquo;t caught by the first two steps. It\x26rsquo;s the last step in front-end compilation, so it\x26rsquo;s also the last point where a source code can be rejected.",
+  "inLanguage" : "en",
+  "wordCount":  6272 ,
+  "datePublished" : "2019-10-11T00:00:00",
+  "dateModified" : "2019-10-11T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/how-to-design-semantic-analysis\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="How to Design Semantic Analysis" />
+<meta property="og:description" content="In a previous article in this series, we learnt what is the Semantic Analysis module of a Compiler.
+The key points to remember are:
+ Semantic Analysis is the third step in front-end compilation (after Lexical Analysis and Parsing). It&rsquo;s meant to catch all errors that weren&rsquo;t caught by the first two steps. It&rsquo;s the last step in front-end compilation, so it&rsquo;s also the last point where a source code can be rejected.">
+<meta property="og:url" content="http://example.org/page/how-to-design-semantic-analysis/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="How to Design Semantic Analysis" />
+  <meta name="twitter:description" content="In a previous article in this series, we learnt what is the Semantic Analysis module of a Compiler.
+The key points to remember are:
+ Semantic Analysis is the third step in front-end compilation (after …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>How to Design Semantic Analysis</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  October 11, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>In a previous article in this series, we learnt what is the Semantic Analysis module of a Compiler.</p>
+
+<p>The key points to remember are:</p>
+
+<ul>
+<li>Semantic Analysis is the third step in front-end compilation (after Lexical Analysis and Parsing).</li>
+<li>It&rsquo;s meant to catch all errors that weren&rsquo;t caught by the first two steps.</li>
+<li>It&rsquo;s the last step in front-end compilation, so it&rsquo;s also the last point where a source code can be rejected.</li>
+</ul>
+
+<p>In the first article about Semantic Analysis (see the references at the end) we saw what types of errors can still be out there after Parsing. These are the ones that Semantic Analysis must catch.</p>
+
+<p>Now it&rsquo;s time to go deeper into the details! We need to learn how to prototype and design the Semantic Analysis module within a Compiler. In order to do so, we must understand:</p>
+
+<ul>
+<li>What data structures and algorithms are commonly used for these objectives.</li>
+<li>How symbols are handled within Semantic Analysis.</li>
+<li>What&rsquo;s typing, and why is important.</li>
+<li>How to handle complex language constructs, such as the ones in OOP languages.</li>
+</ul>
+
+<h2 id="data-structures-in-semantic-analysis-algorithms">Data Structures in Semantic Analysis Algorithms</h2>
+
+<p>In my opinion, an accurate design of data structures counts for the most part of any algorithm. In different words, <strong>your strategy may be brilliant, but if your data storage is bad the overall result will be bad too</strong>.</p>
+
+<p>Luckily, choosing a data structure is not too difficult in most cases. A few principles are worth remembering:</p>
+
+<ul>
+<li>Your algorithm needs to do a lot of searches? Think about hash tables.</li>
+<li>Your algorithm is recursive? You may need a stack, somewhere.</li>
+<li>Your data is naturally ordered? Consider a balanced binary tree (maybe a red-black tree).</li>
+</ul>
+
+<p>In my experience, if you truly master Arrays, Lists, Hash Maps, Trees (of any form) and Stacks, you are well ahead of the game. If you also know a few famous algorithms on Graphs then you&rsquo;re definitely good to go.</p>
+
+<p>Now, back to Semantic Analysis.</p>
+
+<p>The first data structure we&rsquo;ll need is something to store information about symbols. Please be aware that I will use the words &ldquo;identifier&rdquo; and &ldquo;variable&rdquo; interchangeably. Both are examples of &ldquo;symbols&rdquo;. To be clear, in the following line</p>
+<div class="highlight"><pre class="chroma">int xyz = 0;</pre></div>
+<p>the string <code>int</code> is a type, the string <code>xyz</code> is the variable name, or identifier. It&rsquo;s also a symbol in this language. In fact, both <code>int</code> and <code>xyz</code> are symbols.</p>
+
+<p>What do we need to know about symbols, when performing Semantic Analysis? Mainly, we need to know that a symbol was defined, before being used. For example, the line</p>
+<div class="highlight"><pre class="chroma">int k = i + j;</pre></div>
+<p>is not valid unless both symbols <code>j</code> and <code>i</code> were defined earlier.</p>
+
+<p>Thus, all we need to start is a data structure that allows us to check if a symbol was already defined. Historically, this is called <strong>Symbol Table</strong>.</p>
+
+<p>Let&rsquo;s think about the operation that we will make most commonly on a Symbol Table:</p>
+
+<ul>
+<li>Each time we encounter a symbol, we <strong>add</strong> it to the table. Optionally, we may want to check whether that symbol was already defined. This can be a useful information to debug, such as &ldquo;Warning: Variable Already Defined!&ldquo;.</li>
+<li>Every time we see an expression (that is a computation), or an assignment, or pretty much any type of statement, we must <strong>verify that all symbols within it are well defined</strong>.</li>
+</ul>
+
+<p>Therefore, we understand that <strong>insertion and search are the two most common operations</strong> we&rsquo;ll make on the Symbol Table.</p>
+
+<p>There are many valid solutions to the problem of <strong>how to implement a Symbol Table</strong>. As I said earlier, when lots of searches have to be done, a hash table is the most obvious solution (as it gives constant search time, on average).</p>
+
+<p>However, we will also have to do a lot of insertion operations. Hence, an <strong>alphabetically ordered Linked List</strong> also comes to mind, so that we can use binary search (that&rsquo;s logarithmic search time) followed by insertion (that&rsquo;s also loogatithmic time operation, in a ordered Linked List). Clearly, if you don&rsquo;t care about performance at this time, then a standard Linked List would also work.</p>
+
+<p>By now you have hopefully spot a problem. In modern languages, symbols are repeated all the time! What about these two methods:</p>
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="kt">int</span> <span class="nf">foo1</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">foo2</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">...</span>
+<span class="p">}</span></code></pre></div>
+<p>The symbol <code>x</code> is used here twice, and in a totally correct way. Semantic Analysis should NOT return a compilation error because of that.</p>
+
+<p>What is going on here? You&rsquo;ve probably heard the word <em>scope</em>, especially if you read my previous article on the differences between programming languages.</p>
+
+<p>A scope is a subsection of the source code that has some local information. These are pieces of information that exist only in that scope. For instance, <strong>each function/method defines its own scope</strong>.</p>
+
+<p>Furthermore, <strong>variables declaration and symbols definition do not generate conflicts between scopes</strong>. That is, the same symbol can be used for two totally different meanings in two distinct functions. This is how pretty much all programming languages work.</p>
+
+<p>The most basic programming languages, such as experimental, configuration or DS (Domain Specific) languages lack the possibility to define multiple scopes. They have only one global scope, therefore a single Symbol Table is enough to compile them. But what about more complex languages, where multiple scopes are very commonly used?</p>
+
+<p>In such cases, a single Symbol Table would not work. Why? Because the same symbol would be overwritten multiple times even if it&rsquo;s used in different scopes (for example, in different functions), and that&rsquo;s definitely not what we want.</p>
+
+<p>Let&rsquo;s think about this issue more deeply. Actually, let&rsquo;s put ourselves in the Semantic Analysis&rsquo; shoes, while it&rsquo;s scanning the source code top-down. Let&rsquo;s imagine we meet a function definition, or some other statement that defines a new scope. What has to be done at this point?</p>
+
+<p>One thing we know for sure. This new scope will have to be terminated before the outer scope (the one that contains the new scope) is closed. For example, a class in Java defines a new scope that is inside the scope of the file (let&rsquo;s call it global scope, for simplicity). On the other hand, any method inside that class defines a new scope, that is inside the class scope.</p>
+
+<p>Thus, a method&rsquo;s scope must be terminated before the class scope ends. Similarly, the class scope must be terminated before the global scope ends. However, two methods scopes are independent. More exactly, a method&rsquo;s scope cannot be started before the previous method scope ends (this depends on the language though; for example, Python accepts functions inside functions).</p>
+
+<p>This type of reasoning should ring a bell in our head: Stack! A stack data structure works with the <strong>Last-In First-Out</strong> policy. It&rsquo;s exactly like a stack, where everything you put on the top for last, is also the first thing to be taken from the top of the stack. The operation on a Stack are called <code>push</code> (insert on top), and <code>pop</code> (extract from top).</p>
+
+<p>Let&rsquo;s see how this would work in Semantic Analysis, with a realistic step by step example, for Python.</p>
+
+<ol>
+<li>Start of the file, push on the stack the global scope.</li>
+<li>Start of a class, push on the stack a new scope for this class.</li>
+<li>Start of a method, push on the stack a new scope.</li>
+<li>End of a method, pop from the stack. As you can see, the top of the stack is the scope that was created at step 3, so we are correctly terminating the scope for this method.</li>
+<li>Start of another method, push on the stack a new scope.</li>
+<li>Start of a new (nested) method, push yet again a new scope.</li>
+<li>End of a method. This has got to be the method defined at step 6, so we are good simply popping from the top of the stack.</li>
+<li>End of a method. This must be the method started at step 5, which now is also what&rsquo;s on the top of the stack, because step 7 removed the nested one. So, pop again.</li>
+<li>End of the class. Guess what, this class&rsquo; scope is exactly found at the top of stack. So, pop.</li>
+<li>End of the file. Pop. Nicely done.</li>
+</ol>
+
+<p>At this point, the only question left is <strong>what are we actually pushing on the top of the stack?</strong> What kind of data do we need there?</p>
+
+<p>For sure we need a Symbol Table, because each scope must have its own. There may be need for more information, and these will depend on the language specification. Therefore, the best thing to do is to define a new class, or some type of container, and use that to save information for a scope. It will have at least a Symbol Table, but maybe more.</p>
+
+<p>In other words, <strong>we use a stack of scopes as data structure</strong>, where each scope is a container (struct-like) with a Symbol Table, and possibly more. This data structure should support the following five operations:</p>
+
+<ul>
+<li><code>enter_scope()</code>, initialize a new scope on the top of the stack.</li>
+<li><code>exit_scope()</code>, terminates the current scope (pop).</li>
+<li><code>find_symbol(x)</code>, searches the symbol <code>x</code> in any scope, and returns the first found.</li>
+<li><code>add_symbol(x)</code>, adds the new symbol to the current top-scope.</li>
+<li><code>check_scope(x)</code>, returns <code>True</code> is the symbol <code>x</code> is defined in the current top-scope.</li>
+</ul>
+
+<h2 id="before-continuing">Before continuing&hellip;</h2>
+
+<p>Before going further, and getting into the intricacies of typing, I want to clarify one point.</p>
+
+<p>I have been saying so far that the Semantic Analysis reads the source code from the top to the bottom. This is not true, and I said it just to ease the reading. Now it&rsquo;s time to clarify this point.</p>
+
+<p><em>Semantic Analysis analyzes the output of the Parsing stage.</em></p>
+
+<p>The three front-end steps are like steps down a staircase. The first, Lexical Analysis, gets the output from the external word, that is the source code. It produces a sequence of Tokens. After that, the original source code is almost forgotten.</p>
+
+<p>The second step, the Parser, takes the output of the first step and produces a tree-like data structure, called Parse Tree.</p>
+
+<p>Thus, the third step (Semantic Analysis) gets as input the output of the Parser, precisely the Parse Tree so hardly built. <strong>All Semantic Analysis work is done on the Parse Tree, not on the source code.</strong></p>
+
+<p>Now we are ready to continue!</p>
+
+<h2 id="handling-symbols-in-advanced-programming-languages-oop">Handling Symbols in Advanced Programming Languages (OOP)</h2>
+
+<p>The general strategy I described in the previous section can be summarized in the following points:</p>
+
+<ol>
+<li>At the beginning of the Semantic Analysis, create a stack of scopes, and push onto it the global scope. In such scope, put all global symbols definitions, such as for types (<code>int</code>, <code>float</code>, etc.).</li>
+<li>Every time a new scope starts in the Parse Tree (for example when a function starts), use the method <code>enter_scope()</code> on the stack of scopes.</li>
+<li>Every time a new symbol is defined (for example in a variable declaration), use the method <code>add_symbol(...)</code> on the stack of scopes. The symbol will be added in the current scope (at the top of the stack).</li>
+<li>Every time we require to check whether an expression is well-defined, use <code>check_scope(...)</code> for every symbol used in the expression.</li>
+<li>Everytime a scope ends (for example, when the current node in the Parse Tree is the end of a function) use <code>exit_scope()</code> on the stack of scopes.</li>
+</ol>
+
+<p>This is in fact a sound strategy. It&rsquo;s also the basic version of strategies implemented in many real compilers. Why basic? Quite simply, many adjustments have to be made to handle the specification of each particular language. That said, <strong>these are the core principles of all Semantic Analysis algorithms</strong>.</p>
+
+<p>One of the main adjustments is about Object Oriented Programming Languages. In many (if not all) of them, class names can be used before they are defined. This clashes against the simple fact that symbols must be defined before being used.</p>
+
+<p>In fact, this reasoning leads us to a very important and generic question. <strong>How to deal with symbols that can be used before being fully defined?</strong></p>
+
+<p>The solutions to this problem is very instructive, and that&rsquo;s why I am focusing on it. The trick is to <strong>perform multiple passes over the Parse Tree</strong>.</p>
+
+<p>For example, during the first pass, Semantic Analysis would gather all classes definition, without spending time checking much, not even if it&rsquo;s correct. It would simply gather all class names and add those symbols to the global scope (or the appropriate scope).</p>
+
+<p>The take-home message here is that <strong>multiple passes over the Parse Tree, or over the source code, are the recommended way to handle complicated dependencies</strong>.</p>
+
+<p>Once again, the focus is on code modularity, easiness to debug and extend. To split a complex task, such as understanding class definitions, into multiple passes over the Parse Tree is a good solution.</p>
+
+<p>Another common problem to solve in Semantic Analysis is how to analyze the &ldquo;dot notation&rdquo;. This exists both in old languages and in more modern OOP languages. For example, in C the dot notation is used to access a struct elements. In Java, dot notation is used to access class members, as well as to invoke methods on objects.</p>
+
+<p>In fact, this is less complicated than it may seem. When Semantic Analysis gets the first part of the expression, the one before the dot, it will already know in what context the second part has to be evaluated. What this really means is that <strong>we must add additional information in the Symbol Table, and in the stack of Scopes</strong>. There isn&rsquo;t a unique recipe for all cases, it does depend on the language specification.</p>
+
+<p>Let&rsquo;s try to understand this better with an example. Let&rsquo;s use Java.</p>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">class</span> <span class="nf">Person</span> <span class="p">{</span>
+  <span class="n">String</span> <span class="nf">name</span><span class="p">;</span>
+  <span class="n">String</span> <span class="nf">lastName</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="nf">age</span><span class="p">;</span>
+  
+  <span class="kd">public</span> <span class="nf">Person</span><span class="p">(</span><span class="n">String</span> <span class="nf">name</span><span class="p">,</span> <span class="n">String</span> <span class="nf">lastName</span><span class="p">,</span> <span class="kt">int</span> <span class="nf">age</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">...</span> <span class="c1">// assign objects fields
+</span><span class="c1"></span>  <span class="p">}</span>
+
+  <span class="kd">public</span> <span class="nf">int</span> <span class="n">getAge</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="na">age</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="c1">// in the main
+</span><span class="c1"></span><span class="n">Person</span> <span class="nf">p1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Person</span><span class="p">(</span><span class="s">&#34;Jane&#34;</span><span class="err">&#39;</span><span class="p">,</span> <span class="s">&#34;Doe&#34;</span><span class="p">,</span> <span class="n">30</span><span class="p">);</span>
+<span class="kt">int</span> <span class="nf">a</span> <span class="o">=</span> <span class="n">p1</span><span class="p">.</span><span class="na">age</span><span class="p">();</span></code></pre></div>
+<p>How does the Compiler know that the final line (the assignment) is well-typed?</p>
+
+<p>This is an overview of what will happen during compilation (and Semantic Analysis, in this case), for that line:</p>
+
+<ol>
+<li>The Compiler sees the declaration of the identifier <code>a</code>. It checks the Symbol Table for the current scope to see if this symbol was already defined. As it&rsquo;s not, it add it into the table.</li>
+<li>The Compiler also sees that the identifier is declared to be <code>int</code>. Therefore, it adds this information in the Symbol Table.</li>
+<li>It then sees that the remainder of the line is an expression. Therefore it starts evaluating it.</li>
+<li>It will see that is an expression with a <code>.</code>. This is the first thing that it will see because the dot is the root of the subtree. Imagine a subtree where the dot is the root, then on the left branch we have <code>p1</code> and on the left we have <code>age()</code>.</li>
+<li>It will analyze the left subtree and understand the context is about the symbol <code>p1</code>. It will search in the Symbol Table within the current scope and find it (if not found, then an error must be reported). It will also get access to all additional information that this symbol has in the Table. For example, it will know that it&rsquo;s an Object of type Person.</li>
+<li>Then it will go search the symbol <code>Person</code>, and it will find it in some outer scope (because class names are defined in higher-level scopes).</li>
+<li>It will get access to all additional information for the symbol <code>Person</code>. For example, it will know that another symbol <code>age</code> is defined for all <code>Person</code> objects, and that is a method without argument that has return type <code>int</code>.</li>
+<li>It will conclude that the code is correctly typed!</li>
+</ol>
+
+<h2 id="how-semantic-analysis-checks-types">How Semantic Analysis Checks Types</h2>
+
+<p>The other big task of Semantic Analysis is about ensuring types were used correctly by whoever wrote the source code. Used, and understood correctly, I dare to say. In this respect, modern and &ldquo;easy-to-learn&rdquo; languages such as Python, Javascript, R really do no help. Let me tell you more about this point, starting with clarifying what such languages have different from the more robust ones.</p>
+
+<h3 id="static-vs-dynamic-typing">Static vs Dynamic Typing</h3>
+
+<p>You&rsquo;ve certainly heard about scripting languages. What are they? What does it mean to write a script? In fact, there&rsquo;s no exact definition of it, but in most cases a script is a software program written to be executed in a special run-time environment.</p>
+
+<p>Some examples: Javascript programs are written to be run in the web browser (well, before NodeJS was created); Python programs are written to be run in the Python interpreter; Bash programs are written to be run in the Unix shell environment.</p>
+
+<p>Pretty much always, scripting languages are <strong>interpreted, instead of compiled</strong>. And this simple fact makes all the difference from our point of view. Generally, a language is interpreted when it&rsquo;s lines of code are run into a special environment without being translated into code machine.</p>
+
+<p>Some examples, again: C is a compiled language; So are C++ and Java. Perl, instead, is an interpreted language. The same holds true for Javascript and Python.</p>
+
+<p>Unfortunately, things are not so much black and white. It turns out most programming languages are both interpreted and compiled. The classic example is Java. A Java source code is <strong>first compiled</strong>, but not into machine code, rather into a special code called bytecode, which is <strong>then interpreted</strong> by a special interpreter program, famously known as Java Virtual Machine.</p>
+
+<p>I&rsquo;ve already written a lot about compiled versus interpreted languages, in a previous article. Let&rsquo;s go back to typing, instead.</p>
+
+<p>The reason why I said above that types have to be &ldquo;understood&rdquo; is because many programming languages, in particular interpreted languages, totally hide the types specification from the eyes of the developer. This often results in misunderstanding and, unavoidably, low-quality code.</p>
+
+<p>I really don&rsquo;t mean to be frigid or overly critical, but let me give you one example. I&rsquo;ve often seen code like this written in Python</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># WARNING: This is code is not well written</span>
+<span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">arg1</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">arg1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>  <span class="c1"># list</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># integer</span></code></pre></div>
+<p>Now, this code may be correct, may do what you want, may be fast to type, and can be a lot of other nice things. But why on earth your function sometimes returns a List type, and other times returns an Integer type?! You&rsquo;re leaving your &ldquo;customer&rdquo;, that is whoever would like to use your code, dealing with all issues generated by not knowing the type.</p>
+
+<p>In the good old days, functions used to have a complete signature. Not just a <code>def</code> keyword, but a complete signature such as:</p>
+<div class="highlight"><pre class="chroma">&lt;return-type&gt; &lt;function-name&gt; ( &lt;list of arguments with types&gt; )</pre></div>
+<p>For example, the previous Python example would be written somehow like the following:</p>
+<div class="highlight"><pre class="chroma">list foo (boolean arg1)</pre></div>
+<p>and you would know for sure that the function named <code>foo</code> returns a <code>List</code> type, and receives as input only one object, and that has got to be a <code>boolean</code>.</p>
+
+<p>Why do I like so much signatures? Because in compiled languages, the Compiler would give an error if the implementation didn&rsquo;t match the signature. So for example, if you did something like this</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="nb">list</span> <span class="n">foo</span> <span class="p">(</span><span class="n">boolean</span> <span class="n">arg1</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">arg1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span></code></pre></div>
+<p>your code would not compile! There would not be any stupid runtime crash due to this bad code, because the Compiler wouldn&rsquo;t let you proceed further. You would stop during compilation, with a message like the following (this one is from the Java Compiler):</p>
+<div class="highlight"><pre class="chroma">error: incompatible types: int cannot be converted to int[]
+		return -1;</pre></div>
+<p>At some point in Computer Science history, someone thought to remove typing because <em>it allows faster prototyping</em> (??!).</p>
+
+<p>I have quite a harsh opinion on this point. What does that even mean? Does writing weak and possibly buggy code allow faster prototyping? I really don&rsquo;t think so.</p>
+
+<p>And I am not the only one to think that. In fact, starting from the version 3.5, with the Python programming language you can use something very similar to signature (see the references at the end)! The official name is <em>Type Hints</em>, and you would write this way:</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">foo</span> <span class="p">(</span><span class="n">arg1</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span> <span class="p">:</span>
+    <span class="k">if</span> <span class="n">arg1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span></code></pre></div>
+<p>I like that. A great step in the good direction.</p>
+
+<p>In my opinion, <strong>programming languages should be designed as to encourage to write good and high-quality code</strong>, not just some code that maybe works.</p>
+
+<p>Now, to tell you the full story, Python still is an interpreted language, so there&rsquo;s no compiler which would generate an error for the above function. But I believe many IDE would at least show a red warning, and that&rsquo;s already something.</p>
+
+<p>At this point it should be pretty clear that I like <strong>static typing</strong>! Static typing, roughly said, is just another way of saying typing that is checked by the Compiler, <strong>before the program is run</strong>.</p>
+
+<p>Basically, the Compiler can know the type of each object just by looking at the source code. The other side of the coin is <strong>dynamic typing</strong>, when the type of an object is fully known only at runtime.</p>
+
+<p>Even though I like static typing, I must say it has some drawbacks. In particular, it&rsquo;s clear that <strong>static typing imposes very strict constraints</strong> and therefore some program that would in fact run correctly is disabled by the compiler before it&rsquo;s run. In simpler terms, programs that are not correctly typed don&rsquo;t even get a chance to prove they are good during runtime! They are aborted long before that (during Semantic Analysis, in fact!).</p>
+
+<h3 id="before-continuing-1">Before continuing&hellip;</h3>
+
+<p>I have already been talking about typing and types for a little while. And yet I didn&rsquo;t answer the most obvious question: <strong>what is a type?</strong></p>
+
+<p>Such question does not have a universally accepted answer. It may change from one language to another. Generally speaking though, the most common answer is that a type is:</p>
+
+<ul>
+<li>A set of values, along with</li>
+<li>A set of operations that are allowed on those values.</li>
+</ul>
+
+<p>Let me give an example to clarify.</p>
+
+<p>In many languages, <code>int</code> is a type. That&rsquo;s fine with the definition above, because the set of values is clearly defined (for example, from <code>-2^31</code> to <code>2^31 - 1</code>) as well as the valid operations on them. Most commonly, addition, subtraction, multiplication, division, modulus, but there might be others depending on the language. For example, Python does not define increment and decrement, while Java, C and C++ do, with the operands <code>++</code> and <code>--</code>.</p>
+
+<p>It&rsquo;s worth noting that the second point in the definition, about the set of valid operation, is extremely important. And it&rsquo;s actually even trickier to check for Semantic Analysis. Let&rsquo;s jump back straight into that.</p>
+
+<h2 id="understanding-types-in-semantic-analysis">Understanding Types in Semantic Analysis</h2>
+
+<p>We should now have a pretty good understanding of what a type is, and what is the difference between a static and a dynamic type. The question is, <strong>how does Semantic Analysis understand all of this?</strong></p>
+
+<p>After I studied these concepts, I now believe that the overall concept can be split into two subtasks to accomplish:</p>
+
+<ol>
+<li>Understanding the type of an expression.</li>
+<li>Understand the type of a declaration.</li>
+</ol>
+
+<p>Arguably, a declaration can be an assignment, and in such case an expression is assigned to a variable. If that&rsquo;s the case, then point 2 collapses onto point 1. Let&rsquo;s talk about them separately anyway, starting by the easiest: declarations.</p>
+
+<p>In statically typed languages, declaration are no-tasks for Semantic Analysis: the type is declared before the variable name, such as in</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span></code></pre></div>
+<p>which is a valid line in a lot of languages, for instance C, Java and C++. In this case, Semantic Analysis doesn&rsquo;t need to do complicated stuff:</p>
+
+<ul>
+<li>To handle the Symbol <code>x</code>. Probably, check in the Symbol Table, within the current scope, if that Symbol already exists. In many languages you cannot declare the same symbol twice. Then, if it&rsquo;s all good, add that Symbol into the Table.</li>
+<li>Simply assign the type int to the Symbol <code>x</code>. There&rsquo;s really nothing else to decide here, because that&rsquo;s what the source code says.</li>
+<li>Check that the right-hand side of the declaration, if present, has the same type (<code>int</code>, in this case). This boils down to understanding expressions type; I&rsquo;ll talk about it in a minute.</li>
+</ul>
+
+<p>Overall, this is a fairly easy task. The scenario becomes more interesting if the language is not explicitly typed. Consider the following line of valid Python code.</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="n">x</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">&gt;=</span> <span class="mi">7</span></code></pre></div>
+<p>How should we change the steps above, in this case? Let&rsquo;s see:</p>
+
+<ol>
+<li>To handle the Symbol <code>x</code>. I don&rsquo;t know any non-typed language that forbids to declare the same symbol twice. So, in this case you would still need to check the Symbol Table and, if <code>x</code> was already defined, override the definition in the current scope. I would also print a warning message at screen!</li>
+<li>Now, we can&rsquo;t actually assign any type to the Symbol <code>x</code>. We must first analyze the remainder of the line, and figure out what type <code>x</code> is. This procedure is called <strong>type inference</strong>.</li>
+</ol>
+
+<p>I find type inference very interesting, and this is why <strong>I designed a new programming language that is not explicitly typed</strong>: mainly because I wanted to practice types inference in Semantic Analysis and Compilation!</p>
+
+<p>Type inference is best shown when we have to <strong>figure out the type of a complex expression</strong> (the original point 1 of this discussion), so let&rsquo;s get to it.</p>
+
+<p>To infer the type of an expression we have to master the algorithm to walk down the Parse Tree. I explained to them in detail in a previous article, so I can only recommend you to read that, or to google for the following algorithm: &ldquo;deep-first search&rdquo;, &ldquo;tree visit&rdquo;.</p>
+
+<p>Why do we need to walk through the Parse Tree? The reason is that, no matter how complex an expression is, <strong>the real content is in the leaves of the tree</strong>. For example, consider the following expression:</p>
+<div class="highlight"><pre class="chroma">x = ((1 + 4) &gt; y) or (5 + (3 * z) % 7 &lt; 3)</pre></div>
+<p>The subtree that stores this expression is likely to be quite large. Still, the nodes that are at the deepest level (leaves) will contain the Tokens</p>
+<div class="highlight"><pre class="chroma">&lt;1, int&gt;
+&lt;4, int&gt;
+&lt;y, identifier&gt;
+&lt;5, int&gt;
+...</pre></div>
+<p>Thus, when we get down to a leaf, for example <code>&lt;1, int&gt;</code>, that&rsquo;s the leftmost leaf in the tree, it takes nothing to infer that this token&rsquo;s type is <code>int</code>.</p>
+
+<p>The most difficult case for a leaf is when it is an identifier. In such scenario, we must look up in the Symbol Table for the current scope, and get the type of the symbol from there. If the identifier is not in the Symbol Table, then we should reject the code and display an error, such as <code>Undefined Variable</code>.</p>
+
+<p>When we&rsquo;ve done that for all leaves, we start walking backwards in the tree. In other words, we uplift by one level the types inferred at the last level in the tree. In the second to last level we should meet all operators Tokens. For the previous example these would be</p>
+<div class="highlight"><pre class="chroma">&lt;&#39;+&#39;, operator&gt;
+&lt;&#39;&gt;&#39;, conditionalOperator&gt;
+&lt;&#39;or&#39;, logicalOperator&gt;
+...</pre></div>
+<p>Each operator, by definition itself, it&rsquo;s applied to a given number of operands. Most commonly two operands. Given that the operands are the types that we computed at the leafs, how can we compute now the type resulting from the application of each operator?</p>
+
+<p>There&rsquo;s really nothing magic here. We simply must check for each operator, and for each type of the first operand type, and for each type of the second operand, what&rsquo;s the result type.</p>
+
+<p>This can be realized, for instance, with a cascade of if-then-else. Something like the following snippet:</p>
+<div class="highlight"><pre class="chroma">if (operator is &#39;+&#39;)
+    if (operand-1 is int)
+        if (operand-2 is int)
+            return &#34;int&#34;;
+        else if (operand-2 is double)
+            return &#34;double&#34;;
+    // and so on...</pre></div>
+<p>However, this would be a pretty stupid way to implement it. Tedious and slow too. I believe the best way is with a set of <strong>lookup tables</strong>. We would create a look-up table for each operator. The columns of these tables are the possible types for the first operand, and the rows for the second operand. If the operator works with more than two operands, we would simply use a multi-dimensional array.</p>
+
+<p>For example, the result types of the &lsquo;+&rsquo; operator would be given by the following table:</p>
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="kt">int</span> <span class="n">plusOperatorTypes</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="cm">/*               int        float    string     bool    null     list   */</span>
+    <span class="cm">/* int    */</span>   <span class="p">{</span> <span class="n">_int</span><span class="p">,</span>     <span class="n">_float</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">},</span>
+    <span class="cm">/* float  */</span>   <span class="p">{</span> <span class="n">_float</span><span class="p">,</span>   <span class="n">_float</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">},</span>
+    <span class="cm">/* string */</span>   <span class="p">{</span> <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">},</span>
+    <span class="cm">/* bool   */</span>   <span class="p">{</span> <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">},</span>
+    <span class="cm">/* null   */</span>   <span class="p">{</span> <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">},</span>
+    <span class="cm">/* list   */</span>   <span class="p">{</span> <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+<p>This snippet was taken from the Semantic Analysis implementation in the Compiler for my own programming language.</p>
+
+<p>The Grammar I designed defines as basic types <code>int</code>, <code>float</code>, <code>null</code>, <code>string</code>, <code>bool</code> and <code>list</code>. I am using symbolic names, implemented like an <code>enum</code> object, but with integer values to easily access the lookup table. For instance, <code>_int</code>, to refer to the integer type.</p>
+
+<p>Let&rsquo;s take a look at one example, to clarify things.</p>
+
+<p>We could use the look-up table when we are to decide the type of the following expression:</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="n">x</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">true</span></code></pre></div>
+<p>The type for the token <code>4</code> is <code>_int</code> (that&rsquo;s implemented as <code>0</code>), while the type for the token <code>true</code> is <code>_bool</code> (that&rsquo;s <code>3</code>). Thus, the <strong>fast lighting lookup operation</strong></p>
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="n">plusOperatorType</span><span class="p">[</span><span class="n">_int</span><span class="p">][</span><span class="n">_bool</span><span class="p">]</span>  <span class="o">//</span> <span class="n">equal</span> <span class="n">to</span> <span class="n">plusOperatorType</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span></code></pre></div>
+<p>would give the result type of the operation <code>(4 + true)</code>. In this example, the result is <code>_undef</code>, a special value that I used to say the operation is not allowed.</p>
+
+<p>If the lookup operation says that the operation is not allowed, then again we should reject the source code and give an error message as clear as possible.</p>
+
+<p>When we have done that for all operators at the second to last level in the Parse Tree, we simply have <strong>to repeat the procedure recursively</strong>. Uplift the newly computed types to the above level in the tree, and compute again types.</p>
+
+<p>This has to be done over and over until we reach the root of the subtree for the expression. At that point, we will have the result type of the overall expression, or an error code if the expression wasn&rsquo;t typed correctly. That&rsquo;s it!</p>
+
+<h3 id="extensions-to-static-typing-check-systems">Extensions to static typing check systems</h3>
+
+<p>You can easily imagine what a debate has taken place, over many years, between sustainers of static typing on one side, and supporters of dynamic typing on the other. As of today, in my opinion, <strong>there&rsquo;s no winner</strong>.</p>
+
+<p>The main criticism moved to statically enforced typing is that many source code may be correct at runtime, but the compiler kills them before they are ever run. Why is that?</p>
+
+<p>The thing is that source code can get very tricky, especially when the developer plays with high-level semantic constructs, such as the ones available in OOP. For example, let&rsquo;s take a look at the following Java snippet.</p>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">class</span> <span class="nf">A</span> <span class="p">{</span>
+  <span class="p">...</span> <span class="c1">// something
+</span><span class="c1"></span><span class="p">}</span>
+
+<span class="kd">class</span> <span class="nf">B</span> <span class="kd">extends</span> <span class="nf">A</span> <span class="p">{</span>
+ <span class="p">...</span> <span class="c1">// something more than A
+</span><span class="c1"></span><span class="p">}</span>
+
+<span class="kd">class</span> <span class="nf">MainClass</span> <span class="p">{</span>
+  <span class="kd">public</span> <span class="nf">static</span> <span class="kt">void</span> <span class="nf">main</span> <span class="p">(</span><span class="n">String</span><span class="p">[]</span> <span class="nf">args</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">A</span> <span class="nf">a1</span><span class="p">;</span>  <span class="c1">// from now on, the static type of the identifier a1 will always be A
+</span><span class="c1"></span>    <span class="n">a1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">B</span><span class="p">();</span>  <span class="c1">// this should be allowed according to inheritance rules
+</span><span class="c1"></span>                   <span class="c1">// (and indeed is valid, in Java)
+</span><span class="c1"></span>  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+<p>The code above is a classic example that <strong>highlights the difference between the static and dynamic types</strong>, of the same identifier.</p>
+
+<p>When the variable <code>a1</code> is first declared, the compiler must add it into the Symbol Table and assign the type <code>A</code> to it. Thus, the type <code>A</code> will be the static type of the identifier <code>a1</code> for the rest of the program.</p>
+
+<p>However, according to the inheritance rule <em>is-a</em>, the assignment <code>a1 = new B();</code> is valid.</p>
+
+<p>How to use the is-a rule? It&rsquo;s very simple, just answer the following question: Is <code>new B()</code> an <code>A</code> object? Yes, it is, because the class <code>B</code> extends the class <code>A</code>. Therefore, the assignment is valid. And if we are building an OOP, robust, programming language, then our compiler has to understand all of what I just said.</p>
+
+<p>Another problem that static typing carries with itself is about the type assigned to an object when a method is invoked on it. Let me clarify with an example, again, in Java.</p>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">class</span> <span class="nf">A</span> <span class="p">{</span>
+  <span class="kd">public</span> <span class="nf">A</span> <span class="n">method1</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="p">...</span> <span class="c1">// some operation
+</span><span class="c1"></span>    <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+<p>This type of code where the object itself is returned is actually quite common, for example in many API calls, or in the Builder Design Pattern (see the references at the end).</p>
+
+<p>Let&rsquo;s now say that we want to extend class A.</p>
+<div class="highlight"><pre class="chroma">class B extends A {
+   ... // something here, without overriding method1
+}</pre></div>
+<p>So far so good. Now, let&rsquo;s say we want to initialize a <code>B</code> object using the builder method1. What we should (and would like to) do is:</p>
+<div class="highlight"><pre class="chroma">B bObject = (new B()).method1();</pre></div>
+<p>This is a conceptually correct line of code. We instantiate a bare-bone <code>B</code> object, using the normal <code>new B()</code>, and then call the <code>method1</code> on it, because we know it will do some operations and then return this.</p>
+
+<p>If you start being a bit confused, then don&rsquo;t worry. This stuff is tricky! Just take your time and read slowly.</p>
+
+<p>The point is that line of code give a compilation error! Why is that? The problem lies in the fact that <strong>the return type of <code>method1</code> is declared to be A</strong>. And even though we can assign a <code>B</code> object to a variable of type <code>A</code>, the other way around is not true.</p>
+
+<p>In other words, while a <code>B</code> object <em>is-a</em> <code>A</code> object, the inverse is not true. Therefore, the compiler will see a wrongly-typed assignment, and will reject the source code. What a setback!</p>
+
+<p>To solve this specific issue, some languages define &ldquo;self-type&rdquo;. Practically speaking, this is a keyword (e.g., <code>SELF_TYPE</code>). What&rsquo;s that? The important thing to know is that self-type is a static concept, NOT dynamic, which means the compiler knows how to handle it.</p>
+
+<p>Unfortunately Java does not support self-type, but let&rsquo;s assume for a moment it does, and let&rsquo;s see how to rewrite the previous method.</p>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// inside class A
+</span><span class="c1"></span><span class="kd">public</span> <span class="nf">SELF_TYPE</span> <span class="n">method1</span><span class="p">()</span> <span class="p">{</span>
+  <span class="p">...</span> <span class="c1">// some operation;
+</span><span class="c1"></span>  <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+<p>With that, a Java Compiler modified to handle <code>SELF_TYPE</code> would know that the return type of <code>method1</code> is-a <code>A</code> object. And although this is a static check, it practically means that at runtime it can be any subtype of <code>A</code>.</p>
+
+<p>Thus, the line that previously gave compilation error</p>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="n">B</span> <span class="nf">bObject</span> <span class="o">=</span> <span class="p">(</span><span class="k">new</span> <span class="n">B</span><span class="p">()).</span><span class="na">method1</span><span class="p">();</span></code></pre></div>
+<p>would now pass all checks, including Semantic Analysis&rsquo; ones.</p>
+
+<p>Why?</p>
+
+<p>The compiler will see that the return type of <code>method1</code> is <code>SELF_TYPE</code>, then it will see the dot notation <code>&lt;object&gt;.&lt;method&gt;</code>, in this case <code>(new B()).method1()</code>, and will understand that in this context <code>SELF_TYPE = B</code>. So, everything will go fine.</p>
+
+<h2 id="summing-up">Summing up</h2>
+
+<p>So far we have seen in detail static and dynamic typing, as well as self-type. These are <strong>just two examples, among many</strong>, of what extensions have been made over the years to static typing check systems.</p>
+
+<p>To complicate things further, there&rsquo;s a great deal of other, creative, things that happen in modern languages. I can&rsquo;t possibly mention all of them, and even if I did the list would become incomplete in a day.</p>
+
+<p>Thus, to wrap up this article, I just want to give a partial list of things that have been tried in one or more programming languages. It will look like a random list of words, but you may recognize some names, and I warmly recommend you to do your own research about them (Wikipedia is a good starting point).</p>
+
+<ul>
+<li>Generics.</li>
+<li>Self-Type.</li>
+<li>Agent Oriented Programming (the new frontier of OOP).</li>
+<li>Point-Free Style.</li>
+<li>Metaclasses (Read <a href="https://stackoverflow.com/a/6581949">this amazing StackOverflow answer</a>).</li>
+<li>Asynchronous Programming.</li>
+</ul>
+
+<h2 id="what-s-next">What&rsquo;s next</h2>
+
+<p>In this article, I went through a lot of advanced content. It wasn&rsquo;t easy for me at first place to study it, and I do have a good background in Computer Science, so don&rsquo;t worry if you feel overwhelmed.</p>
+
+<p>What I want to do next is to avoid leaving all these concepts lost in the wind. This is what I always try to avoid in my self-assigned classes. I found that the best way to do so is to assign myself a real, and quite complex project. Not at the industrial-strength level, but far more advanced than the typical MOOC assignments.</p>
+
+<p>If you have seen my previous articles then you know that for this class about Compilers I decided to build a new programming language. It&rsquo;s not too fancy, but I am building it from the ground, and without using any automatic tool.</p>
+
+<p>I have already designed the Grammar (by hand), implemented the Lexical Analysis (by hand, in C) and implemented the Parser (by hand, in C). Therefore, I now want to implement all those concepts that I learnt about Semantic Analysis and that apply to my language. And will tell you about it in the next article!</p>
+
+<h2 id="references">References</h2>
+
+<p>Language Implementation Patterns. A book by Prof. <a href="https://parrt.cs.usfca.edu/">Terrence Parr</a>.</p>
+
+<p>My article <a href="http://example.org/page/why-so-many-programming-languages/">Why There Are So Many Programming Languages?</a>. (Talks about front-end, back-end compilation).</p>
+
+<p>My article <a href="http://example.org/page/how-to-design-a-parser/">How to Design A Programming Language Parser</a> (If you don&rsquo;t know yet what a Parse Tree is).</p>
+
+<p>Alex Aiken&rsquo;s class Compilers at Stanford University. Available as <a href="https://lagunita.stanford.edu/courses/Engineering/Compilers/Fall2014/course/">free MOOC online</a>.</p>
+
+<p>Wikipedia page about the <a href="https://en.wikipedia.org/wiki/Builder_pattern">Builder Software Design Pattern</a>.</p>
+
+<p>Python PEP 0484 about Type Hints, <a href="https://www.python.org/dev/peps/pep-0484">https://www.python.org/dev/peps/pep-0484</a>.</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-design-semantic-analysis%2f&amp;text=How%20to%20Design%20Semantic%20Analysis&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fhow-to-design-semantic-analysis%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-design-semantic-analysis%2f&amp;title=How%20to%20Design%20Semantic%20Analysis" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-design-semantic-analysis%2f&amp;title=How%20to%20Design%20Semantic%20Analysis" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-design-semantic-analysis%2f&amp;title=How%20to%20Design%20Semantic%20Analysis" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-design-semantic-analysis%2f&amp;description=How%20to%20Design%20Semantic%20Analysis" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

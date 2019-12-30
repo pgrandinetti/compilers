@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>What Are the Differences Between Programming Languages | Compilers</title>
+  <meta name="description" content="Whether you want to design a new programming language, or you want to study Compilers theory, or you just want to learn a new language, the first and perhaps most important thing to do is to understand the whole picture.
+Programming Languages are very complex systems, where many features interact and provide a (hopefully) consistent result. This why we use many words to describe a single language. For example, Java is a general-purpose, high-level, statically typed, object-oriented, compiled to bytecode, programming language.">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/what-are-the-differences-in-programming-languages\/",
+          "name": "What are the differences between programming languages"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "What Are the Differences Between Programming Languages",
+  "description" : "Whether you want to design a new programming language, or you want to study Compilers theory, or you just want to learn a new language, the first and perhaps most important thing to do is to understand the whole picture.\nProgramming Languages are very complex systems, where many features interact and provide a (hopefully) consistent result. This why we use many words to describe a single language. For example, Java is a general-purpose, high-level, statically typed, object-oriented, compiled to bytecode, programming language.",
+  "inLanguage" : "en",
+  "wordCount":  3593 ,
+  "datePublished" : "2019-09-29T00:00:00",
+  "dateModified" : "2019-09-29T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/what-are-the-differences-in-programming-languages\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="What Are the Differences Between Programming Languages" />
+<meta property="og:description" content="Whether you want to design a new programming language, or you want to study Compilers theory, or you just want to learn a new language, the first and perhaps most important thing to do is to understand the whole picture.
+Programming Languages are very complex systems, where many features interact and provide a (hopefully) consistent result. This why we use many words to describe a single language. For example, Java is a general-purpose, high-level, statically typed, object-oriented, compiled to bytecode, programming language.">
+<meta property="og:url" content="http://example.org/page/what-are-the-differences-in-programming-languages/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="What Are the Differences Between Programming Languages" />
+  <meta name="twitter:description" content="Whether you want to design a new programming language, or you want to study Compilers theory, or you just want to learn a new language, the first and perhaps most important thing to do is to …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>What Are the Differences Between Programming Languages</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  September 29, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>Whether you want to design a new programming language, or you want to study Compilers theory, or you just want to learn a new language, the first and perhaps most important thing to do is to <strong>understand the whole picture</strong>.</p>
+
+<p>Programming Languages are very complex systems, where <strong>many features interact</strong> and provide a (hopefully) consistent result. This why we use many words to describe a single language. For example, Java is a general-purpose, high-level, statically typed, object-oriented, compiled to bytecode, programming language.</p>
+
+<p>Each of those definitions specify a particular feature of Java&rsquo;s. These are theoretical concepts, well defined in books about languages theory. Then, every language is basically a different implementation of several among these concepts, to provide an original result.</p>
+
+<p>To understand the whole picture means to understand what are the main features of a language. What does it mean that Java is object-oriented? What about the fact that is general-purpose?</p>
+
+<p>Here&rsquo;s the list of the concepts we will master:</p>
+
+<ol>
+<li>General-purpose vs Domain-Specific.</li>
+<li>High vs Low level.</li>
+<li>Interpreted vs Compiled.</li>
+<li>Procedural vs Functional vs Object-Oriented.</li>
+<li>Typed vs Untyped.</li>
+<li>Statically vs Dynamically typed.</li>
+<li>Automatic Memory management vs Manual management.</li>
+<li>Static vs Dynamic Scope.</li>
+</ol>
+
+<h2 id="general-purpose-vs-domain-specific-languages">General-purpose vs Domain-Specific Languages</h2>
+
+<p>This distinction is quite easy to understand.</p>
+
+<p>Some programming languages are designed to build software that can solve any problem and perform any task. This is why they are called general-purpose.</p>
+
+<p>Other languages are tailored to some specific application domain. They are therefore called domain-specific.</p>
+
+<p>An example of a general-purpose language is C++. You can build pretty much everything in C++, but in some cases it might cost you a lot of effort, even for simple problems.</p>
+
+<p>An example of a domain-specific language is the code you would write in a configuration file, where on each line you write <code>variable = value</code>. You can&rsquo;t build anything different from what you need for this application, with such a language. On the other hand, it does solves this specific problem in a very easy way, whereas it may require you to put in more effort using, say, C++.</p>
+
+<h2 id="high-vs-low-level-languages">High vs Low Level Languages</h2>
+
+<p>This distinction is related to the way the code you write interacts with the underlying computer architecture.</p>
+
+<p>The first thing you need to know is that, eventually, every program you write is somehow executed by the computer in its architecture: data are saved in the available memory, computing instructions are executed in the CPU, etc. Thus, at the end of the day, <strong>executable code is always low-level</strong>.</p>
+
+<p>Now, the point is - who interacts closely with the architecture? It is you, with your code? Or is the Compiler that makes something magic for you?</p>
+
+<p>In the first case, it means you are writing code in a low-level language. For example, you might be using Assembly language, where you specify what to do with each CPU&rsquo;s register and each slot of memory.</p>
+
+<p>This is why Assembly programs, as well as programs written in other low-level languages, are usually very long, in number of lines. You have to explicitly state every micro-operation you want to perform. For example:</p>
+<div class="highlight"><pre class="chroma">load 1 r1;  // save the integer number 1 into register r1
+load 2 r2; // save the integer number 2 into register r2
+add r3 r2 r3; // add the content of registers r1 and r2 and put it into register r3.</pre></div>
+<p>Keep in mind that, even though Assembly is considered low level, you can even go at a lower level. That&rsquo;s when you set <strong>each bit of memory</strong> into the machine.</p>
+
+<p>In the second case, instead, it means you are writing code in a high-level language. For instance, C is one among such languages.</p>
+
+<p>What happens when we write code in a high-level language? There&rsquo;s some part of the language, usually called either Compiler or Interpreter, that takes care of &ldquo;translating&rdquo; our high-level instructions into low-level code.</p>
+
+<p>A single line of C code, such as</p>
+<div class="highlight"><pre class="chroma">int x = 1;</pre></div>
+<p>is translated into many low-level instructions by the C Compiler. This is why they are called high-level instructions. Then, the low-level instructions are executed into the computer&rsquo;s architecture.</p>
+
+<h2 id="interpreted-vs-compiled-languages">Interpreted vs Compiled Languages</h2>
+
+<p>First, an important disclaimer. The distinction between interpreted and compiled languages was very clear years ago. Today, <strong>these two features are mixed in a lot of languages</strong>.</p>
+
+<p>Second, an important clarification. Using the terms interpreted and compiled next to a language name is actually a misuse of them. Python, the language, is not interpreted. It&rsquo;s not, because it&rsquo;s just a language. Same for Java. Languages are just definitions of words and symbols, along with their semantic.</p>
+
+<p>The correct way would be to say &ldquo;this Java&rsquo;s implementation compiles the code, whereas that one interprets it&rdquo;. This is just a nuance, but I think it&rsquo;s <strong>an important concept to remember</strong>.</p>
+
+<p>Programs in almost every language can be either compiled or interpreted, it&rsquo;s your choice. Furthermore, many languages do a combination of interpreting and compiling the source code.</p>
+
+<p>That said, let&rsquo;s continue the discussion by using the terms interpreted and compiled directly on languages, and we should refer in such cases to &ldquo;the most common implementation of that language&rdquo;.</p>
+
+<p>Let&rsquo;s see what the word <em>interpreter</em> and <em>compiler</em> means.</p>
+
+<p>First, and foremost:</p>
+
+<ul>
+<li>Given a source code and some input data, <strong>an interpreter produces a result</strong>.</li>
+<li>Given a source code (no data), <strong>a compiler produces another source code</strong>, one that is executable.</li>
+</ul>
+
+<p>If you give your source code and some initial data to an interpreter for that language, it will go through your code line by line, executing each line.</p>
+
+<p>If you give your source code to a compiler for that language, it will go through many steps that will eventually produce an executable code. This is a file that no human is able to read, because it contains instructions at machine-level (the lowest level). You will then have to run this executable, optionally providing some input data, to get the result.</p>
+
+<p>Some say that interpreted languages have advantages:</p>
+
+<ul>
+<li>It&rsquo;s faster to prototype using them. But I disagree, or, to better say it, capability to prototype faster is not about interpreting or compiling, in my opinion.</li>
+<li>They are portable. I disagree again: for compiling you need to have the compiler in the machine; to interpret you need to have the interpreter.</li>
+<li>They allow dynamic scoping. I disagree! I mean, yes they do, but dynamic scoping is not something to be proud of! More on this later.</li>
+<li>They allow dynamic typing. Yes, that one I will concede.</li>
+</ul>
+
+<p>Obviously, others say compiled languages have advantages:</p>
+
+<ul>
+<li>They are more robust, because they perform static-type checking (we will study it in future articles).</li>
+<li>They are faster in execution.</li>
+<li>Source code is protected (because the executable is not really readable).</li>
+</ul>
+
+<p>At any rate, you don&rsquo;t want to get involved in a discussion about which type of language is better. Furthermore, as I said, <em>many modern languages are both interpreted and compiled</em>.</p>
+
+<p>For example, let&rsquo;s talk about Java. Java code really gets a long way before it&rsquo;s eventually executed.</p>
+
+<ol>
+<li><strong>First, the source code is compiled</strong> by a program called javac (Java Compiler), and another source code is produced. The latter is in a language called bytecode.</li>
+<li>Then, another program called java is started. This creates a virtual environment, called Java Virtual Machine.</li>
+
+<li><p>Now, depending on the specific JVM, <strong>the bytecode can be either interpreted or compiled</strong>:</p>
+
+<ul>
+<li>If interpreted, then the Java Interpreter takes the bytecode and runs it.</li>
+<li>If compiled, then a Just-In-Time Java Compiler takes the bytecode and produces native machine-level code.</li>
+</ul></li>
+</ol>
+
+<p>The compilation down to bytecode is a very common step for a lot of languages that are said to be &ldquo;interpreted&rdquo;. For example, Python, that is known to most people as an interpreted language, is actually first compiled to bytecode. Only then, the bytecode is interpreted.</p>
+
+<p><strong>Why is compilation to bytecode done?</strong> The reason is that interpreting directly the high-level language and executing it into the machine would be really, really inefficient. Bytecode is an intermediate language, much lower level, that therefore can provide improvements in terms of efficiency.</p>
+
+<h2 id="procedural-vs-functional-vs-object-oriented-languages">Procedural vs Functional vs Object-Oriented Languages</h2>
+
+<p>First of all, what are such names? They are <strong>programming paradigms</strong>.</p>
+
+<p>A programming paradigm is a concept, and idea that shapes the way you write a code, and even the way an entire programming language is designed.</p>
+
+<p>For example, <strong>Python is a Object-Oriented language</strong>. This means that every thing, inside a Python program, is an &ldquo;object&rdquo;.</p>
+
+<p>So, what is an object? The standard way to identify objects is as <strong>instances of a Class</strong>, where the word &ldquo;class&rdquo; is a construct of the Grammar of a given language.</p>
+
+<p>Let&rsquo;s make all I said more concrete.</p>
+
+<p>In Python, the reserved keyword class is used to create (or refer to) a Class, in the semantic sense. When you write</p>
+<div class="highlight"><pre class="chroma">class A:
+    # fields and methods here…
+
+a = A() # new object of type A</pre></div>
+<p>the semantic of the code you wrote is to <em>logically define a type of objects, said A, and then to create a single instance of such type</em>.</p>
+
+<p>I will discuss in a minute what implication all that has on actual code writing. Let me first briefly introduce the other two paradigms.</p>
+
+<p>Procedural programming, like the name says, it&rsquo;s when the <strong>code is organized in procedures</strong>. Procedures is the standard block of code that we often (improperly) call function. Let&rsquo;s stick with the word procedures, to avoid confusion with the functional paradigm.</p>
+
+<p>The classical example of procedural language is C, where you organize all your code in procedures, routines, structures, etc.</p>
+
+<p>Finally, functional programming, to put it simply, it&rsquo;s <strong>the counterpart of procedural programming</strong>. The name comes from the mathematical world, where a function is a computable object that will always return the same value, if the same input is provided.</p>
+
+<p>Furthermore, <strong>functions have no side effects</strong>. No database read/write, no file systems write, no changes to the global state.</p>
+
+<p>You may wonder - how can I possibly write a meaningful program with such constraints. Well, you need to accept some compromise. Very good examples of functional languages are Scala and Haskell.</p>
+
+<p>It&rsquo;s my firm opinion that <strong>none of these paradigms is superior to the others</strong>. Good software can be written with each paradigm, and it&rsquo;s more about your knowledge of the language and you skills as a software engineer.</p>
+
+<p>That said, I also think that depending on the problem you want to solve, and even more on your personal style (yes, each programmer has their own style!) one paradigm can work better than the others, in the given situation.</p>
+
+<p>For example, if you want a complete separation between data and algorithms in your code, then adopting a procedural style might be the right approach. By their own nature, procedures isolate the logic from the data.</p>
+
+<p>If instead you like to think about your software as a group of logical entities, each with its own set of data and internal logic, then OOP comes immediately to mind.</p>
+
+<p>Finally, if you prefer to think about your program in a mathematical way, like a flow of mathematical functions that compute partial results and share them each to another, then functional programming is likely the answer for you.</p>
+
+<h2 id="typed-vs-untyped-languages">Typed vs Untyped Languages</h2>
+
+<p>To illustrate the difference between typed and untyped languages, there&rsquo;s a distinction I want to emphasize first:</p>
+
+<ul>
+<li>An <em>identifier</em>, often called &ldquo;variable, is the logical name that we use to refer to some entity inside the code.</li>
+<li>The <em>data</em> that an identifier refers to, is the actual memory content that is referred by that identifier.</li>
+</ul>
+
+<p>A simple example will make everything clear. In Java, the line of code</p>
+<div class="highlight"><pre class="chroma">int x = 1;</pre></div>
+<p>defines:</p>
+
+<ul>
+<li>An identifier, <code>x</code>.</li>
+<li>The data referred by <code>x</code>, that&rsquo;s the integer number <code>1</code>.</li>
+</ul>
+
+<p>Alright. Now, here&rsquo;s another simple distinction:</p>
+
+<ul>
+<li>In typed languages, at least one between identifiers or their data have types.</li>
+<li>In untyped languages, neither identifiers nor data have types.</li>
+</ul>
+
+<p>Let me make this concept clearer, with an example.</p>
+
+<p>Python is a typed language. Indeed, if you write</p>
+<div class="highlight"><pre class="chroma">x = 5
+y = None
+print(x + y)</pre></div>
+<p>you will get an error, because Python&rsquo;s interpreter knows that the type of <code>x</code> (numeric) and the type of <code>y</code> (None) are such that the two data cannot be added. In other words, Python knows the <code>add</code> operation (<code>+</code>) cannot work in this case.</p>
+
+<p>Assembly, on the other hand, is a untyped language. It known nothing about types. It only knows about bits! Thus, you can add the bit-representation of <code>5</code>, which in 8 bits is <code>00000101</code>, to the bit-representation of None (let&rsquo;s assume that&rsquo;s just a sequence of <code>0</code> bits). This operation will be executed in a mathematically correct way. The problem is that the result is not what you wanted, very likely.</p>
+
+<p>Let&rsquo;s consider Java again. Java is a typed language, because each identifier must be declared with a type. You can already see the difference with Python: both are typed, but Java is more &ldquo;explicit&rdquo;. I am going to discuss this point in a minute.</p>
+
+<p>Untyped languages are very rare today, especially among high-level languages. Assembly is an untyped language, because you don&rsquo;t deal with integers, strings, etc., you just deal with bits and words of memory.</p>
+
+<h2 id="statically-typed-vs-dynamically-typed-languages">Statically typed vs Dynamically typed Languages</h2>
+
+<p>This is a key distinction, but also a very easy to understand after the previous one.</p>
+
+<ul>
+<li>In statically typed languages, <strong>identifiers have types</strong>.</li>
+<li>In dynamically typed languages, <strong>data have types</strong> (but not identifiers).</li>
+</ul>
+
+<p>Thus, the distinction is easily understandable, but the implications are enormous! In my opinion, this is one of the most important things to understand in modern languages.</p>
+
+<p>In fact, <strong>what I said it above is imprecise</strong>. Let me tell you the whole story, in view of the importance of this concept.</p>
+
+<p><strong>A language is statically typed if the type of each identifier is known at compile time.</strong></p>
+
+<p>This is the precise definition. The compiler can get this information in two ways:</p>
+
+<ol>
+<li>The programmer is required to write the type next to each identifier. Languages such as Java, C, C++ work like this, with keywords such as <code>int</code>, <code>double</code>, etc..</li>
+<li>The compiler infers the type of each identifier, during compiler. Most often, in a compilation step known as Semantic Analysis, that we will study in a future article (not too far away!). Scala is a language that works this way.</li>
+</ol>
+
+<p>On the contrary, <strong>a language is dynamically typed if types are known at runtime only, and not associated with identifiers but only with data</strong>.</p>
+
+<p>Languages such as Python, Perl, Php, are dynamically typed. For instance, in Python, you can write</p>
+<div class="highlight"><pre class="chroma">x = 1;
+x = &#34;abc&#34;;</pre></div>
+<p>and there won&rsquo;t be any type associated with the identifier <code>x</code>. At runtime, the Python interpreter will know that, while the first instruction is executed, the identifier <code>x</code> is associated with an <code>integer</code> data, and then with a <code>string</code> data, when the second instruction is executed.</p>
+
+<h2 id="automatic-memory-management-vs-manual-management">Automatic Memory Management vs Manual Management</h2>
+
+<p>Every program you ever wrote, and each program you will ever write, interacts with the memory of the computer.</p>
+
+<p>Declaring an identifier means (almost in all languages) to allocate some memory in the stack. Initializing an object in Java, means allocating some space in the heap part of the memory.</p>
+
+<p>Even though we haven&rsquo;t discussed yet stack and heap, I am sure you understand how important is memory management in software design.</p>
+
+<p>For every bit of memory that we allocate, there&rsquo;s a natural question: when is that bit going to be freed? And who will take care of doing it?</p>
+
+<p>Quite simply:</p>
+
+<ul>
+<li>In languages with manually managed memory, <strong>the programmer is responsible to free memory for future usage</strong>.</li>
+<li>In languages where the memory is automatically managed, there&rsquo;s one module of the language itself that takes care of freeing memory slots every now and again. This module is usually called <strong>Garbage Collector</strong>.</li>
+</ul>
+
+<p>The C programming language is a good example of manual memory management. To reserve some space in memory (the heap part), you need to use the instruction <code>alloc</code>. To free some part of memory, you must explicitly invoke the function <code>free</code>, and you also have to specify the address of the location you want to free (which, in C, means a pointer).</p>
+
+<p>While this is a fine approach, and truly gives control of everything to the programmer, it&rsquo;s undeniable that <strong>it creates space for errors and bugs</strong>. In fact, it&rsquo;s realistic to say that almost all programs with manual memory management have some hidden memory leak!</p>
+
+<p>Java was the language that brought automatic memory management, and Garbage collector, to the mainstream.</p>
+
+<p>The idea, in Java as well as in most languages that uses such an approach, is that the execution environment will, at times, <strong>stop to execute the main program in order to run the Garbage Collector</strong>. This is a software module that, thanks to some algorithms, understands what pieces of memory can be freed, and does so. We will study these algorithms too, of course!</p>
+
+<h2 id="static-vs-dynamic-scope">Static vs Dynamic Scope</h2>
+
+<p>Although this is a good piece of knowledge to have in our bag, let me start with a disclaimer here.</p>
+
+<p><em>Static scope is much better and easier to understand for both humans and automated tools. Therefore, practically all important languages use static scope.</em></p>
+
+<p>That said, let&rsquo;s see what&rsquo;s the difference between the two.</p>
+
+<p><strong>With static (lexical) scope, the data referred by each identifier is determined by the source code.</strong></p>
+
+<p>Despite the complex sentence, this is exactly as you would expect. When you write</p>
+<div class="highlight"><pre class="chroma">programA {
+    x = 1;
+
+    function f() {
+        print(x);
+    }
+
+    function g() {
+        x = 2;
+        f();
+    }
+
+    main() {
+        g();
+    }
+}</pre></div>
+<p>the <code>main</code> function of the program invokes the function <code>f</code> and as you would expect that prints out <code>1</code> because it sees the global value of <code>x</code> defined at the beginning of the program. That&rsquo;s probably the only way you are used to, and the best way.</p>
+
+<p>But there&rsquo;s another way.</p>
+
+<p>If you are using a language with dynamic scoping, then the function <code>f</code> will be able to access the scope of the function <code>g</code>, because it was <code>g</code> to invoke <code>f</code>. The calling chain is</p>
+
+<p>main &ndash;&gt; g &ndash;&gt; f</p>
+
+<p>and in dynamic scoping that means <code>f</code> &ldquo;can see&rdquo; the scope of <code>g</code> as first thing. The scope of <code>g</code> contains the statement <code>x=2</code>, so <code>f</code> will resolve the identifier <code>x</code> inside the print command to <code>2</code>.</p>
+
+<p>So, how does that work?</p>
+
+<ul>
+<li>In lexical scoping, <strong>the &ldquo;meaning&rdquo; of each identifier depends on the source code</strong>. That&rsquo;s why it&rsquo;s known as static scope.</li>
+<li>In dynamic scoping, <strong>the &ldquo;meaning&rdquo; of each identifier depends on the current execution</strong> and runtime status.</li>
+</ul>
+
+<p>To be more precise, &ldquo;meaning&rdquo; of an identifier is better said as <strong>binding</strong>. Basically, what value has to be associated with a given identifier, in a particular point of the program.</p>
+
+<p>In static scope, the binding depends on the source code only. And, most generally, <strong>each function can see the scope of the parent functions</strong> (even after they are terminated).</p>
+
+<p>Another simple example will clarify.</p>
+<div class="highlight"><pre class="chroma">Main {
+    x = 1;
+
+    function f1() {
+
+        function foo() {
+            x = 3;
+            print(x);
+            f2();
+        }
+
+        foo();
+    }
+
+    function f2() {
+        print(x);
+    }
+
+    f1();
+}</pre></div>
+<p>In languages with static scoping:</p>
+
+<ul>
+<li>Function <code>f1</code> will see the scope of <code>Main</code>, so it will bind <code>x</code> (if needed) to the value <code>1</code>.</li>
+<li>Function <code>f2</code> will do like <code>f1</code>.</li>
+<li>Function <code>foo</code> can also see the scope of <code>Main</code>, but if it has to bind the identifier <code>x</code> it will use its own scope, where <code>x</code> is set to the value <code>3</code>.</li>
+<li>Function <code>f1</code> can&rsquo;t see the scope of <code>f2</code>. Nor can <code>f2</code> see the scope of <code>foo</code>. As well, <code>f1</code> can&rsquo;t see the scope of <code>foo</code>.</li>
+<li>When the <code>Main</code> function invokes <code>f1</code>, this will first set <code>x=1</code> in its scope and then invoke <code>foo</code>. Then, <code>foo</code> will first bind <code>x</code> to the value in its internal scope, which is <code>3</code>, then print it and then invoke <code>f2</code>.</li>
+<li>When <code>f2</code> is invoked, no matter by what function is invoked, it can only see its inner scope and the outer scope of <code>Main</code>, but not the scope of <code>f1</code> nor <code>foo</code>. Therefore, it will bind <code>x=1</code> and will print &ldquo;1&rdquo;.</li>
+</ul>
+
+<p>This is the standard way, you should get used to it, if you aren&rsquo;t already.</p>
+
+<p>But, if the language you&rsquo;re using it&rsquo;s based on dynamic scoping, then:</p>
+
+<ul>
+<li>Whether <code>f1</code>, <code>f2</code>, <code>f3</code> can see each other&rsquo;s scope depends on the invocation chain, that is known only at runtime.</li>
+<li>So, when the <code>Main</code> function calls <code>f1</code>, this will set <code>x=1</code>, call <code>foo</code>, set <code>x=3</code>, print <code>3</code> and then call <code>f2</code>. But now, <code>f2</code> can see all the scopes in the invocation chain (that is, <code>foo</code>, <code>f1</code> and <code>Main</code>) and therefore it will bind <code>x=3</code>, because it finds it in <code>foo</code>&rsquo;s scope.</li>
+</ul>
+
+<p>As you can easily imagine, <strong>dynamic scoping can be very confusing</strong>. That&rsquo;s why languages with dynamic scope lost the &ldquo;historical war&rdquo; against languages with static scope, and the former have practically disappeared.</p>
+
+<h2 id="conclusions">Conclusions</h2>
+
+<p>In this article we learned a number of concepts that are extremely important to wrap our heads around each programming language&rsquo;s features.</p>
+
+<p>When you get in touch with a new language, asking (and answering) questions about types, programming paradigms, scope and garbage collector, will help you understand the language better.</p>
+
+<p>And if you were not very familiar with these concepts, then be reassured that now you will understand better even languages you already knew, and <strong>write better code</strong>.</p>
+
+<h2 id="references">References</h2>
+
+<p>Rather than a long list of references, I recommend to google each team you are interested in, such as &ldquo;static scope&rdquo;, &ldquo;typed programming language&rdquo;, etc.</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fwhat-are-the-differences-in-programming-languages%2f&amp;text=What%20Are%20the%20Differences%20Between%20Programming%20Languages&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fwhat-are-the-differences-in-programming-languages%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fwhat-are-the-differences-in-programming-languages%2f&amp;title=What%20Are%20the%20Differences%20Between%20Programming%20Languages" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fwhat-are-the-differences-in-programming-languages%2f&amp;title=What%20Are%20the%20Differences%20Between%20Programming%20Languages" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fwhat-are-the-differences-in-programming-languages%2f&amp;title=What%20Are%20the%20Differences%20Between%20Programming%20Languages" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fwhat-are-the-differences-in-programming-languages%2f&amp;description=What%20Are%20the%20Differences%20Between%20Programming%20Languages" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

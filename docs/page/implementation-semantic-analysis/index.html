@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>Implementation of Semantic Analysis | Compilers</title>
+  <meta name="description" content="This article is part of my course on Compilers, Formal Grammars and Programming Languages. Up to this point we have studied:
+ What is a Compiler. What are the several stages of the compilation process. What is a Formal Grammar, and several existing types of Grammars. A real design example of a new Context-Free Grammar, for a new Turing-complete programming language. What is Parsing, the second stage of compilation. A real implementation of a Recursive Descent Parser, made for the new programming language mentioned above.">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/implementation-semantic-analysis\/",
+          "name": "Implementation of semantic analysis"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "Implementation of Semantic Analysis",
+  "description" : "This article is part of my course on Compilers, Formal Grammars and Programming Languages. Up to this point we have studied:\n What is a Compiler. What are the several stages of the compilation process. What is a Formal Grammar, and several existing types of Grammars. A real design example of a new Context-Free Grammar, for a new Turing-complete programming language. What is Parsing, the second stage of compilation. A real implementation of a Recursive Descent Parser, made for the new programming language mentioned above.",
+  "inLanguage" : "en",
+  "wordCount":  6857 ,
+  "datePublished" : "2019-10-13T00:00:00",
+  "dateModified" : "2019-10-13T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/implementation-semantic-analysis\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="Implementation of Semantic Analysis" />
+<meta property="og:description" content="This article is part of my course on Compilers, Formal Grammars and Programming Languages. Up to this point we have studied:
+ What is a Compiler. What are the several stages of the compilation process. What is a Formal Grammar, and several existing types of Grammars. A real design example of a new Context-Free Grammar, for a new Turing-complete programming language. What is Parsing, the second stage of compilation. A real implementation of a Recursive Descent Parser, made for the new programming language mentioned above.">
+<meta property="og:url" content="http://example.org/page/implementation-semantic-analysis/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="Implementation of Semantic Analysis" />
+  <meta name="twitter:description" content="This article is part of my course on Compilers, Formal Grammars and Programming Languages. Up to this point we have studied:
+ What is a Compiler. What are the several stages of the compilation …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>Implementation of Semantic Analysis</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  October 13, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>This article is part of my course on Compilers, Formal Grammars and Programming Languages. Up to this point we have studied:</p>
+
+<ul>
+<li>What is a Compiler.</li>
+<li>What are the several stages of the compilation process.</li>
+<li>What is a Formal Grammar, and several existing types of Grammars.</li>
+<li>A real design example of a new Context-Free Grammar, for a new Turing-complete programming language.</li>
+<li>What is Parsing, the second stage of compilation.</li>
+<li>A real implementation of a Recursive Descent Parser, made for the new programming language mentioned above.</li>
+<li>What is Semantic Analysis, the third stage of compilation.</li>
+</ul>
+
+<p>You&rsquo;ll find, roughly speaking, one or two articles for each of the topics above. In the course&rsquo;s content you can also find other articles meant to explore related subjects and provide a better, deeper understanding of the whole theme. Check the references!</p>
+
+<p>In this article, I will show and discuss my personal implementation of a Semantic Analysis module.</p>
+
+<p>As you already know, to complement my theoretical studies, I decided to build a new (simple) programming language, along with its compiler. The Semantic Analysis is the third module of this Compiler, and the last of the front-end part.</p>
+
+<h2 id="background">Background</h2>
+
+<p>For the sake of understanding this article, it&rsquo;s worth reviewing what we&rsquo;ve already learnt about Semantic Analysis. In brief:</p>
+
+<ul>
+<li>It&rsquo;s the third step of the Compiler, the last one of the font-end part.</li>
+<li>It takes care of all errors that went unnoticed through the first two steps (Lexical Analysis and Parsing).</li>
+<li>It&rsquo;s the last one among the steps that are meant &ldquo;to reject&rdquo; ill-typed codes. After Semantic Analysis, we assume the code is correct, although it might not do what the developer meant!.</li>
+<li>The most important things it takes care of are: symbols definitions, scopes, typing.</li>
+</ul>
+
+<p>In Lexical Analysis (as well as in Parsing), some large part of the code can be realized with standard algorithms. This is why there exist tools, such as ANTLR, that implement them almost automatically. As said before, <strong>I didn&rsquo;t use any of such tools</strong>, because I think it&rsquo;s worth doing it &ldquo;by hand&rdquo; once in a lifetime, for the sake of learning.</p>
+
+<p>The beautifully complex thing about Semantic Analysis is that most of the things it does depends on the given language specification. There are several pillars that all Semantic Analysis implementations are based on, and I discussed them in a previous article. In this one, <strong>we are going to see the implementation I made of these concepts</strong>, specific for the language I designed.</p>
+
+<h2 id="grammar-and-language-review">Grammar and Language review</h2>
+
+<p>Before going further, I think it&rsquo;s worth taking a minute and review the peculiarities of the Grammar I designed, and of the Language I am building. Given the nature of what Semantic Analysis has to do, is very important to understand the key concepts of the Language.</p>
+
+<p>The language I designed:</p>
+
+<ul>
+<li>Is extremely <strong>explicit</strong>. There are almost no &ldquo;implicit&rdquo; instructions or assignments. I believe this encourages the developer to think more about what she writes.</li>
+<li>Is also <strong>compact</strong>. Although things are explicit, you don&rsquo;t need to type a lot on the keyboard. The main reason for this is because types are inferred by the compiler. Yes, there&rsquo;s something &ldquo;implicit&rdquo; after all.</li>
+<li>It&rsquo;s <strong>compiled</strong>. Of course!</li>
+<li>It&rsquo;s <strong>statically typed</strong>. I discussed static and dynamic typing in vast detail in a previous article. Basically, the compiler will also check that each instruction is correct from the point of view of the types. This is what C, Java, C++ do (but types are explicit there), and what Javascript, Python, Perl do not.</li>
+<li>It support as <strong>basic types</strong> int, float, boolean, string and list.</li>
+<li>It&rsquo;s <strong>Turing-complete</strong>. Yes, I&rsquo;ve got you covered with a conditional instruction (if) and a loop (while), as well as I/O instructions.</li>
+<li>It&rsquo;s designed as a <strong>learning tool and benchmark</strong>. As I said, a fairly advanced assignment to complement my studies.</li>
+<li><strong>Logical lines are terminated with Physical lines</strong>. In practice, this means that the developer is forced to use two given characters anytime a statement is completed. These are semicolon and newline <code>';\n'</code>, which means two logical statements can never be on the same physical line.</li>
+<li><strong>It lacks advanced features</strong>, such as OOP, routines, etc. which of course are very valuable additions. They are on my road map, but for the pure objective of learning the compilation process, I decided to postpone their design and implementation.</li>
+</ul>
+
+<p>How does a source code look like, in this language? In fact, I am quite satisfied with many design choices I made. The result is <strong>a language that looks like a scripting language, but it&rsquo;s compiled and statically typed</strong>. As already said, the code must be monolithic, as routines (methods, functions) are not allowed for the moment.</p>
+
+<p>The easiest is to look at an example. I am going to repeat one that I&rsquo;ve already shown in a previous article: given an integer $N$ (to be entered by whoever runs the code), compute the sum of all prime numbers that exist in the interval $[2, N]$. This time though, I will add some comments to highlight the semantic of the code, not just the syntax.</p>
+<div class="highlight"><pre class="chroma">readInt N;  // read an integer from standard input, save it in the variable N
+totSum = 0;  // totSum will be automatically assigned type int, inferred by the compiler
+i = 0;
+while (i &lt;= N)  // i and N are both integer, so the operator &#39;&lt;=&#39; is well defined
+    j = 2;  // j is assigned integer type and value 2
+    isPrime = True; // isPrime is assigned bool type and value True
+    while ((j &lt;= i / 2) &amp;&amp; isPrime) // the two sub-expressions have both boolean type
+        if (i % j == 0)
+            writeOut &#34;%d is not prime&#34;, i;  // write on standard output
+            isPrime = False;
+        ;
+        j = j + 1;  // assignment, the left-hand side is an integer, so it&#39;s the right-hand side
+    ; // this is the end of the logical line started with &#34;while&#34;
+    if (isPrime)
+        totSum = totSum + i; // totSum+1 has type int (inferred) so can be assigned to the
+                                         // variable totSum
+    ;
+    i = i + 1;
+;
+writeOut &#34;Total primes sum until %d is %d&#34;, N, totSum;</pre></div>
+<h2 id="tasks-for-semantic-analysis">Tasks for Semantic Analysis</h2>
+
+<p>Let&rsquo;s now discuss what tasks Semantic Analysis should accomplish for this language. When I arrived at this point, I literally asked myself the question - <strong>what errors can still be uncaught?</strong></p>
+
+<h3 id="assignment-statements">Assignment Statements</h3>
+
+<p>I started off by thinking about the assignment. After all, assignment statements are some of the most common instructions in a source code, of any language. I went back to the Grammar definitions and found it:</p>
+<div class="highlight"><pre class="chroma">assign      :   var &#39;=&#39; expr</pre></div>
+<p>I knew that the Parser would take care of checking most issues there:</p>
+
+<ul>
+<li>It would check that the first Token really is a <code>var</code> Token.</li>
+<li>Then, it would check there is an Equal Symbol (that&rsquo;s a Token too).</li>
+<li>It would also check that after the Equal there is a well formed <code>expr</code>, made by a potentially very long sequence of Tokens, or even by just one Token.</li>
+</ul>
+
+<p>What&rsquo;s left? There are a few things Semantic Analysis has to do, still.</p>
+
+<ol>
+<li>It must understand what is the type of the whole <code>expr</code> Token.</li>
+<li>If the Symbol contained in the <code>var</code> Token (also called lexeme) was never defined before, then it must be added into the Symbol Table. To know what such a Table is, I recommend checking my previous articles (see the references at the end of this one).
+
+<ol>
+<li>It should also assign to this Symbol the type computed at step 1. This information must be saved somewhere in memory (somewhere linked to the Symbol Table, of course).</li>
+</ol></li>
+<li>If the Symbol in Var was already defined then things are quite a bit different.
+
+<ol>
+<li>Optionally display a warning that a variable has been overwritten. I would not do this at this stage though (and I will explain why in a minute).</li>
+<li>Check what was the previous type assigned to such Symbol, in the Symbol Table.</li>
+<li>If the type found in 3.2 is not the same as the type computed at step 1, then two options are possible:
+
+<ol>
+<li>Reject the code with a compilation error.</li>
+<li>Overwrite the type of that Symbol, in the Symbol Table. In this case a warning message is also opportune, in my opinion.</li>
+</ol></li>
+</ol></li>
+</ol>
+
+<p>The point I discuss in 3.3 is very important. In fact, I initially decided to go with the option 3.3.2, because I wanted to give the developer the possibility to modify the type of a variable.</p>
+
+<p>However, <strong>I later changed my mind</strong> and went for 3.3.1. That means that now you cannot modify the type of a variable after it&rsquo;s defined the first time, in my language. This is also what happens in C and Java, for instance. Why did I do that? The problem is that option 3.3.2 clashes with my ideas on how to handle List objects, as we&rsquo;ll see in a minute.</p>
+
+<p>Overall, this task is not very complex, assuming that the first step (understanding the type of a whole Expression) is already solved. Before talking about Expressions though, I want to take you through small digression.</p>
+
+<h3 id="pseudo-code-to-descend-the-parse-tree">Pseudo-code to descend the Parse Tree</h3>
+
+<p>The concept I want to discuss is well shown in the following pseudo-code:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="n">function</span> <span class="nf">analyzeNode</span> <span class="p">(</span><span class="n">Node</span> <span class="n">n</span><span class="p">,</span> <span class="n">SymbolTable</span> <span class="n">table</span><span class="p">,</span> <span class="n">Scope</span> <span class="n">scope</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">preprocessNode</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span>
+    <span class="n">analyzeNode</span><span class="p">(</span><span class="n">n</span><span class="p">.</span><span class="n">child</span><span class="p">);</span>
+    <span class="n">postprocessNode</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
+<p>This code seems not doing anything at all, but in fact it shows the core principle of how to execute Semantic Analysis in complex cases such as the Expression.</p>
+
+<p>First of all, remember that when we want to analyze some complex structure what we really have access to is the root node of the subtree, within the Parse Tree, that was created by the Parser.</p>
+
+<p>We therefore start the analysis at such node. As the code perfectly clarifies, we &ldquo;just&rdquo; do three things: some pre-processing for this node, the analysis of the child, and some post-processing.</p>
+
+<p>The key here is that <strong>the function <code>analyzeNode</code> is recursive</strong>, of course. By calling it over and over for each child, we will eventually arrive at the leaves of the tree. Leaves are very simple Token Types, therefore understanding their semantic is extremely easy. Moreover, at the leafs there&rsquo;s usually no need to pre-process or post-process anything.</p>
+
+<p>Let&rsquo;s look at one example that clarifies everything.</p>
+
+<p>A leaf can be, for instance, a <code>num</code> Token, which is either a <code>float</code> or an <code>int</code>. I want to show you the code I used to analyze a <code>num</code> node in my Semantic Analysis. Although you don&rsquo;t have yet the full picture, its simplicity will be evident.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">analyze_Num</span> <span class="p">(</span><span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">tree</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">num</span><span class="p">;</span>
+
+    <span class="n">num</span> <span class="o">=</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">child</span><span class="p">;</span> <span class="c1">// the Float node
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">num</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">!=</span> <span class="n">Float</span><span class="p">)</span>
+        <span class="c1">// it&#39;s the sign, skip it
+</span><span class="c1"></span>        <span class="n">num</span> <span class="o">=</span> <span class="n">num</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">num</span><span class="o">-&gt;</span><span class="n">child</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">!=</span> <span class="n">Int</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_float</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">num</span><span class="o">-&gt;</span><span class="n">child</span><span class="o">-&gt;</span><span class="n">sibling</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="c1">// then there is either frac or pow
+</span><span class="c1"></span>        <span class="k">return</span> <span class="n">_float</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">_int</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+<p>All I do in the code above is to check the shape of the subtree that starts at the <code>num</code> node (the pointer given as argument to the function), and return the type of it.</p>
+
+<p>The literals <code>_int</code> and <code>_float</code> are constants that I defined (with the <code>#define</code> instruction in C). <code>parseTree</code>, <code>floa</code>, <code>int</code> are all struct definitions or Token Types I defined in the Lexical Analyzer or in the Parser.</p>
+
+<p>How did I know the structure of the subtree? I simply looked at the Grammar.</p>
+<div class="highlight"><pre class="chroma">num      :   (&#39;+&#39; | &#39;-&#39;)? float
+float    :   (frac exp?) | (int frac? exp?)
+int      :   &#39;0&#39; | digit+ digit0*</pre></div>
+<p>If you carefully analyze that portion of the Grammar side by side with the <code>analyze_Num</code> function, you&rsquo;ll see things more clearly.</p>
+
+<p>Now, imagine that we are analyzing an Expression. We&rsquo;d keep initiating recursive calls following the pre-process, analyze-child, post-process strategy. But when we arrive to a Num node, <strong>the recursion will stop</strong> because the function <code>analyze_Num</code> will simply return the type of the Num subtree.</p>
+
+<p>You are probably thinking - wait! The Num subtree is not a leaf, why aren&rsquo;t we descending further with more recursive calls?</p>
+
+<p>Even though you are formally right, there&rsquo;s no reason to <strong>pile up unnecessary recursive calls</strong>. Even though <code>num</code> is not formally a leaf, it&rsquo;s simple enough that we can analyze it directly.</p>
+
+<p>This is all about &ldquo;analyzing&rdquo; a Node: either call the same function recursively on its child (or children), or just return the type of that node. The latter works for simple nodes.</p>
+
+<p>What about the pre-process and post-process functions? The actual steps you have to take in these functions depends on the type of Node you are currently analyzing, as well as the overall language specification. Here&rsquo;s some things that could be required:</p>
+
+<ul>
+<li>Push information into the stack of Scopes (pre-process).</li>
+<li>Pop information from the stack of Scopes (post-process).</li>
+<li>Push information about the Context (pre-process).</li>
+<li>Pop information about the Context (post-process).</li>
+<li>Add a new Symbol in the Symbol Table (pre-process, usually).</li>
+</ul>
+
+<p>In fact, there are many other things that can potentially be done. I can&rsquo;t really offer a universal recipe about this, but I will show you what I did in my Semantic Analysis implementation.</p>
+
+<p>For the moment being, I want to give one example that would help clarify. My Grammar supports the <code>continue</code> and <code>break</code> instructions. Their semantic is the same as in many other languages: to exit from the innermost loop, or conditional (<code>if</code>) statement.</p>
+
+<p>There&rsquo;s a catch with these instructions. They can only appear inside a loop or a conditional block. For example, the following code is correct</p>
+<div class="highlight"><pre class="chroma">while (x &lt;= 5)
+    writeOut &#34;OK&#34;;
+    break;
+;</pre></div>
+<p>Whereas the following one isn&rsquo;t, and should be rejected.</p>
+<div class="highlight"><pre class="chroma">while (x &lt;= 5)
+    writeOut &#34;OK&#34;;
+;
+break;</pre></div>
+<p>This is a perfect example of information that can be pushed onto a stack in the pre-processing stage of a Node, before going further down in the recursion. In my case, I handle these situations by simply pushing a flag that says the current Context allows for break/continue instructions. Then, I pop this flag from the Context in the post-processing stage.</p>
+
+<p>Let&rsquo;s go back to the analysis of the most interesting piece of Grammar: the Expressions.</p>
+
+<h3 id="expressions">Expressions</h3>
+
+<p>In my programming language Expressions have a complex, recursive definition very typical of <em>Context-Free Grammars</em>. I have explained it in great detail in my article about the Grammar (again, see the references at the end).</p>
+
+<p>What has Semantic Analysis got to do about them?</p>
+
+<ul>
+<li>It must check that every Symbol used within the expression was defined earlier in the code.</li>
+<li>It must check that every operator in the expression is used with compatible types.</li>
+<li>It must compute the final return type of the entire expression.</li>
+</ul>
+
+<p>Let&rsquo;s go with three examples, one for each point above.</p>
+<div class="highlight"><pre class="chroma">x = 3;
+y = x + z;</pre></div>
+<p>Clearly, the two lines above should not compile, because the symbol <code>z</code>, used in the expression to assign a value to <code>y</code>, was never defined.</p>
+<div class="highlight"><pre class="chroma">x = 3;
+z = &#34;abc&#34;;
+y = x + z;</pre></div>
+<p>The three lines above should also generate a compilation error. The reason is that the operator <code>+</code> is used with a <code>int</code> type (<code>x</code>) and a <code>string</code> type (<code>z</code>). Even though this kind of operation may be allowed in some languages, the semantic of my language forbids it. It was my choice, of course.</p>
+<div class="highlight"><pre class="chroma">x = 3;
+z = &#34;abc&#34;;
+y = z + &#34;%d&#34;, x;</pre></div>
+<p>These three lines should be compiled correctly. No error should be reported. Moreover, the Symbol <code>y</code> should be assigned type <code>string</code>. Why? Because Semantic Analysis must be able to understand that the result of the expression</p>
+<div class="highlight"><pre class="chroma">z + &#34;%d&#34;, x</pre></div>
+<p>is a string. This, of course, under the condition that the operator <code>+</code> is well defined between two strings.</p>
+
+<p>How should we go about implementing that? Here&rsquo;s where the previous digression about pseudo-code and analysis strategy kicks in.</p>
+
+<p>Every expression is analyzed with multiple recursive calls, that descend into the Parse Tree until a leaf, or a simple subtree is found. In my code, some examples of these are:</p>
+
+<ul>
+<li>The Num Token, as we already saw.</li>
+<li>The Var Token. In this case, the string literal of the Token (formally called lexeme) is searched in the Symbol Table. If found, its type is returned. If not found, an error is reported.</li>
+<li>Int, String, Bool, Null, Float and ListElem Tokens. Notice that Int and Float are actually always nested into Num.</li>
+</ul>
+
+<p>Thus, <strong>all recursive calls will eventually stop</strong> when any of those Token Types is found. Then, the result will be returned by the function that analyzed them. You can imagine the procedure as to descend into the Parse Tree first, and then climb up to higher levels carrying the results computed at the bottom.</p>
+
+<p>While climbing up and carrying the results from the lower levels, all sorts of checks are performed. For example, consider the simple expression</p>
+<div class="highlight"><pre class="chroma">3 + &#34;abc&#34;</pre></div>
+<p>At the bottom of the Parse Tree the recursive call would stop:</p>
+
+<ul>
+<li>On the left side of the tree, when the Num subtree that contains the <code>int</code> Token with value <code>3</code> it&rsquo;s met. In this case, the type <code>_int</code> will be returned.</li>
+<li>On the right side of the tree, when the String subtree that contains <code>&quot;abc&quot;</code> is found. Here, the <code>_string</code> type will be returned.</li>
+</ul>
+
+<p>These two results will be carried over while climbing up the tree. The algorithm will then meet the Node that contains the operator <code>+</code>. Here, it will check if such operator is valid. In this specific example, an error message will be generated because the <code>+</code> is not defined (in my language) between int and string types. The source code that contains that expression will then be rejected.</p>
+
+<p>No matter how complex the Expression is, or, that&rsquo;s the same, how many nested levels there are in the subtree for this Expression. The general strategy does not change by an inch.</p>
+
+<h3 id="lists">Lists</h3>
+
+<p>List is a data structure that I really wanted to add in my programming language. First of all, because containers help to write readable source code. Secondly, because I find the notation à la Python quite beautiful and handy. Thus, my language supports statements such as</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span></code></pre></div>
+<p>However, the semantic Lists have in my language is more similar to the typed arrays in C and Java, than to actual Python lists. Let me explain better.</p>
+
+<p>In my professional experience, where I use Python a lot, I&rsquo;ve seen that many developers use lists (and tuples) with mixed types. For example:</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&#34;string&#34;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">}]</span></code></pre></div>
+<p>Now, even though this is valid in Python, and perhaps in some cases can lead to more compact code, and everything works nicely in your code, <strong>I discourage this type of code</strong>. In my humble opinion, it&rsquo;s bad practice to mix different types in the same container.</p>
+
+<p>This is why I decided to forbid that in my language. If you try to do it, the Compiler will reject your code!</p>
+
+<p>Who&rsquo;s taking care of checking it? Semantic Analysis, of course! Here&rsquo;s how it works.</p>
+
+<p>First, when the root of the subtree containing a List is found, Semantic Analysis skips the initial bracket <code>[</code>. Why? We know it&rsquo;s there, because the Parser already checked it.</p>
+
+<p>Then it comes the actual list content. Now, thanks to the Grammar we know that objects in the list are comma-separated.</p>
+<div class="highlight"><pre class="chroma">list        :   &#39;[&#39; (listExpr)? &#39;]&#39;
+listExpr    :   obj (&#39;,&#39; obj)*</pre></div>
+<p>Thus, the function that analyze the listExpr subtree will analyze object by object, skipping the commas. What does &ldquo;to analyze a obj Token&rdquo; consist of? Let&rsquo;s look at its definition</p>
+<div class="highlight"><pre class="chroma">obj         :   var | num | str | bool | null | list | listElem</pre></div>
+<p>Therefore, we would simply switch among those token types. Notice that they are all very simple Token Types, precisely those types that do not require recursive calls.</p>
+
+<p>After each object in the <code>listExpr</code> has been analyzed, the Semantic Analysis checks that all of them have the same type:</p>
+
+<ul>
+<li>If not, then report an error and reject the source code.</li>
+<li>If yes, then save this information somewhere linked from the Symbol Table. The reason is that we must know what type of objects a list contains. This is actually how the type for the basic Token listElem is found.</li>
+</ul>
+
+<p>Let me repeat again the second point above. Say we are analyzing the following expression</p>
+<div class="highlight"><pre class="chroma">x = [1, 3, 6]</pre></div>
+<p>When the list on the right-hand side will be analyzed, we know that it&rsquo;s a valid list of integers. Thus, we must save two information in the Symbol Table (and in the current scope):</p>
+
+<ul>
+<li>The Symbol <code>x</code> refers to a <code>list</code> type.</li>
+<li>The list referred by <code>x</code> contains all <code>int</code> types.</li>
+</ul>
+
+<p>Why is point 2 important? Because in future parts of the code we could find a <code>listElem</code> Token, for example</p>
+<div class="highlight"><pre class="chroma">y = 3 + x[1]</pre></div>
+<p>And we must have a way to check what&rsquo;s the type of the elements inside the list <code>x</code>, so we can decide whether <code>3 + x[1]</code> is a well-typed Expression or not.</p>
+
+<p>At this point it should also be clear why I decided to forbid to change a variable type after it&rsquo;s defined the first time. If that was allowed, then it would be easy to mess up with containers, for example</p>
+<div class="highlight"><pre class="chroma">x = 3; # x is int
+y = 5; # y is int too
+z = [x, y]; # z is a list of int
+x = &#34;ooops&#34;; # a string! Now the list is mixed up.</pre></div>
+<p>Similar case will be handled by Semantic Analysis, which will reject the code. Note, however, that I can&rsquo;t stop you from writing weird code, if you really want: the following code is valid, but strongly discouraged.</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">];</span> <span class="c1"># list of integers</span>
+<span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;a&#34;</span><span class="p">,</span> <span class="s2">&#34;b&#34;</span><span class="p">];</span> <span class="c1"># list of strings</span>
+<span class="n">z</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">];</span> <span class="c1"># list of lists, where inner lists have different types</span></code></pre></div>
+<p>However, since I don&rsquo;t support double indexing in the Grammar (such as <code>z[0][0]</code>), this should have limited effects. At any rate, just don&rsquo;t do it!</p>
+
+<h3 id="basic-operations">Basic Operations</h3>
+
+<p>The type of checkings Semantic Analysis will do most often is the basic check about correct usage of an operator. For example, when it finds the subtree relative to code such as</p>
+<div class="highlight"><pre class="chroma">if (x + 3 &lt;= y)</pre></div>
+<p>it will have to decide (among many other things) whether the operations <code>+</code> and <code>&lt;=</code> are valid.</p>
+
+<p>Why did I say this is the most frequent type of check? Simply because Expression is the most frequent Token Type you will find in computer languages, not only in mine. Here&rsquo;s a partial lists of where it&rsquo;s used:</p>
+
+<ul>
+<li>Assignments (<code>var = expr</code>)</li>
+<li>Conditionals (<code>if (expression) do something</code>)</li>
+<li>Loops (same logic as conditionals)</li>
+</ul>
+
+<p>As we have seen in the previous subsection, the semantic evaluation of an Expression eventually boils down to two steps:</p>
+
+<ol>
+<li>Understand types of basic objects involved (<code>x</code>, <code>3</code>, and <code>y</code> in the previous example).</li>
+<li>Decide if the operators between these objects are well used. For example, you cannot use <code>+</code> between a <code>int</code> type and a <code>string</code> type, in my language.</li>
+</ol>
+
+<p>And this is why to check basic operations is a task that Semantic Analysis will perform a lot.</p>
+
+<p>How to go about it? Strictly speaking, this is an easy type of reasoning. All we have to do is to check, for each operator, if the two operands have types that can be used with that operator. Theoretically, this corresponds to a nested sequence of if/then/else.</p>
+<div class="highlight"><pre class="chroma">if (operator == &#39;+&#39;)
+    if (operand1.type == &#34;int&#34;)
+        if (operand2.type == &#34;int&#34;)
+            return VALID;
+        if (operand2.type == &#34;float&#34;)
+            return VALID;
+        if (operand2.type == &#34;string&#34;)
+            return FAIL;
+// many more...</pre></div>
+<p>However, this type of implementation is quite silly:</p>
+
+<ul>
+<li>It&rsquo;s slow. Every time we want to check an operation we have to go through the evaluation all these nested conditions.</li>
+<li>It&rsquo;s <strong>verbose and error-prone</strong>, as every bad code ever written.</li>
+</ul>
+
+<p>The much better solution, perhaps the best, is to <strong>use lookup tables</strong>. The idea is to have a lookup table for each operator, implemented as a 2-dimensional array. The row and column index correspond to the type of operand1 and operand2.</p>
+
+<p>I am going to illustrate this much more in detail in the next section, for now let&rsquo;s just grasp the idea. Here&rsquo;s a snippet from my code.</p>
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="cp">#define _int 0
+</span><span class="cp">#define _float 1
+</span><span class="cp">#define _string 2
+</span><span class="cp">#define _bool 3
+</span><span class="cp">#define _null 4
+</span><span class="cp">#define _list 5
+</span><span class="cp">#define _undef -100
+</span><span class="cp"></span>
+<span class="c1">// ... 
+</span><span class="c1"></span>
+<span class="kt">int</span> <span class="n">plusOperatorLookup</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="cm">/*                 int       float    string    bool     null    list   */</span>
+    <span class="cm">/* int    */</span>    <span class="p">{</span> <span class="n">_int</span><span class="p">,</span>     <span class="n">_float</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">},</span>
+    <span class="cm">/* float  */</span>    <span class="p">{</span> <span class="n">_float</span><span class="p">,</span>   <span class="n">_float</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">},</span>
+    <span class="cm">/* string */</span>    <span class="p">{</span> <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">},</span>
+    <span class="cm">/* bool   */</span>    <span class="p">{</span> <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">},</span>
+    <span class="cm">/* null   */</span>    <span class="p">{</span> <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">},</span>
+    <span class="cm">/* list   */</span>    <span class="p">{</span> <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>   <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">,</span>  <span class="n">_undef</span><span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+<p>To see how this works, let&rsquo;s get back to the simplest example of expression</p>
+<div class="highlight"><pre class="chroma">y = x + 2;</pre></div>
+<p>We already know that Semantic Analysis will evaluate this assignment statement by evaluating the right-hand side (after the <code>=</code>) sign, which is an expression.</p>
+
+<p>It will walk down to the leafs of the Parse Tree, via recursive calls. The branching will stop in two places:</p>
+
+<ul>
+<li>When it finds the <code>var</code> Token, for <code>x</code>, it will use a function probably named <code>analyze_Var</code>. Such function does not start any recursive call, because to analyze a <code>var</code> Token is a simple enough task, as we saw earlier. Let&rsquo;s assume that <code>x</code> was already defined in the Symbol Table (so the code is correct), and it&rsquo;s type is <code>_float</code>.</li>
+<li>When it finds the <code>num</code> Token, for <code>2</code>. We already know what happens in the function <code>analyze_Num</code>. In this case, it will return <code>_int</code>.</li>
+</ul>
+
+<p>Now that we have got the two results <code>_float</code> and <code>_int</code>, the magic happens. It will simply call</p>
+<div class="highlight"><pre class="chroma">int result_type = plusOperatorLookup[_float][_int];</pre></div>
+<p>Notice that <code>_float</code> and <code>_int</code> are defined as integer value corresponding to the correct indexes of the lookup table! A small, but very useful trick. The above operation is <strong>very, very fast</strong>.</p>
+
+<p>Furthermore, notice that the lookup table gives one more information, not just whether the operation is valid or not. The lookup table tells us what the result type is.</p>
+
+<p>For example <code>plusOperatorLookup[_float][_int]</code> gives the type <code>_float</code>. In fact, if you do <code>3.2 + 4</code> you want the result to be stored in a floating point object (<code>7.2</code>, hopefully!).</p>
+
+<p>Finally, notice also that I defined one more constant value, <code>_undef</code>, that is returned when the operation is not valid. For example, we would get <code>_undef</code> from <code>plusOperatorLookup[_null][_int]</code>, because operations such as <code>3 + NULL</code> are not valid, in my language as well as in many others.</p>
+
+<p>I defined more lookup tables like that, although not one for every and each operator. The reason is that the same rule applies to more than one operator.</p>
+
+<p>For example, the same lookup table works well for <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>. Another table works for comparison operators, such as <code>&lt;=</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&gt;=</code>. And so on, I grouped operators together and defined only the strictly necessary lookup tables.</p>
+
+<h2 id="code-organization">Code Organization</h2>
+
+<p>In the previous section you saw the main items on the list what does Semantic Analysis has to do? You&rsquo;ve also seen that the answer is very specific to the Grammar and the Language you&rsquo;re building the compiler for.</p>
+
+<p>With this information, you are now able to implement your own Semantic Analysis module. Nonetheless, I want to show more details about my implementation, so you can get a more tangible  perspective of what my code looks like, and possibly give me some good suggestions.</p>
+
+<p>As you know, my whole Compiler is implemented in C. I created the header file <em>semantic.h</em> for the Semantic Analysis part. First of all, I defined some constant for the types (that we already saw), and for error messages.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#define _int 0
+</span><span class="cp">#define _float 1
+</span><span class="cp">#define _string 2
+</span><span class="cp">#define _null 3
+</span><span class="cp">#define _bool 4
+</span><span class="cp">#define _list 5
+</span><span class="cp"></span>
+<span class="cp">#define NODE_OK 100
+</span><span class="cp"></span>
+<span class="cp">#define _undef -100
+</span><span class="cp">#define UNDEFINED_SYMBOL -1
+</span><span class="cp">#define NODE_TYPE_ERROR -2
+</span><span class="cp">#define LIST_TYPE_ERROR -3
+</span><span class="cp">#define SEMANTIC_ERROR -4
+</span><span class="cp">#define BREAK_OUT_OF_CONTEXT -5
+</span><span class="cp">#define CONTINUE_OUT_OF_CONTEXT -6
+</span><span class="cp">#define OVERWRITE_TYPE_ERROR -7</span></code></pre></div>
+<p>The constant <code>NODE_OK</code> is meant to signal that the analysis of an entire Node (that is, a subtree) went fine, in case we do not have to return a type.</p>
+
+<p>The above sentence deserves more details. The points is that, even though the algorithm to analyze any subtree is pretty much always the same, the conclusions of such analysis can be threefold:</p>
+
+<ul>
+<li>A simple <code>NODE_OK</code> value, that is like saying &ldquo;This subtree is OK, go ahead with the analysis&rdquo;.</li>
+<li>An error message (will be discussed in a second).</li>
+<li>An actual type. This is the case, for example, for subtrees that represent Expressions. The analysis must return the type of that Expression subtree, if it&rsquo;s well-typed of course.</li>
+</ul>
+
+<p>Thus, the negative constant values I defined are meant to represent different error types</p>
+
+<p>For example, the constant <code>BREAK_OUT_OF_CONTEXT</code> will be returned when Semantic Analysis find a <code>break</code> keyword used outside of a loop or a if/else.</p>
+
+<p><code>LIST_TYPE_ERROR</code> is used when the objects in a List Token do not have all the same type.</p>
+
+<p><code>SEMANTIC_ERROR</code> instead is a generic error returned in several cases. <code>OVERWRITE_TYPE_ERROR</code> is when you try to change the type of a variable, by redefining it.</p>
+
+<p>The next things I defined in the header file are the lookup tables for the basic operations. I have four of them:</p>
+
+<ol>
+<li><code>resultType_aritm</code>. This is for the operators <code>+</code>, <code>-</code>, <code>/</code>, <code>*</code>, <code>%</code>.</li>
+<li><code>resultType_floatDiv</code>. This is for the operator <code>/.</code> that means float division in my language.</li>
+<li><code>resultType_compare</code>, for <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code>.</li>
+<li><code>resultType_logic</code>, for <code>&amp;&amp;</code>, <code>||</code>, <code>!=</code>, <code>==</code>.</li>
+</ol>
+
+<p>After this, the next step was to define the data structures that I will use. I will not discuss in too much detail what data structures are typically used for Semantic Analysis as I illustrated that in great detail in my previous article (see the references at the end).</p>
+
+<p>Here&rsquo;s what I needed to use:</p>
+
+<ul>
+<li>A Symbol structure.</li>
+<li>A Symbol Table, that keeps references to a collection of Symbol structs.</li>
+<li>A Stack of Context objects. I will explain this in a moment.</li>
+</ul>
+
+<p>In general though, with complex languages and especially OOP languages, you will also need a Stack of scopes, where each scope is intended like real scopes defined by language elements. For example, each method in a class defines its own scope. A class has a scope that contains more scopes (one for each method, for example). And then there&rsquo;s also the global scope, with the variables that are visible in all parts of the code. Each of these scopes need to have its own Symbol Table. My Grammar is very simple, and therefore there exists only a global scope.</p>
+
+<p>What about the data structure I called Stack of Context? The motivation for it lies in tracking down the correct usage of keywords such as <code>break</code> and <code>continue</code>: we need to make sure they are used only within a loop, or a if/else statement.</p>
+
+<p>The easiest way to do this is to keep a pointer to a stack-like data structure, where information about the current context is pushed on the top, or popped from the top. This is exactly the definition of stack in computer science.</p>
+
+<p>Thus, when we enter a loop in the source code, I would push on the Context Stack this information. Then, when we leave the loop, I would pop from the stack. If we enter a if/else before leaving the loop, I would push that information too, onto the stack. So, if the code is well written, we would first leave the if/else (one pop from the stack), and then leave the loop (another pop). At any moment, if a <code>break</code> or <code>continue</code> keyword is found, I would check what&rsquo;s the context at the top of the stack, and if it&rsquo;s not a loop or a if/else then I would return an error value.</p>
+
+<p>After all, the information we need in the Context is entirely contained in the TokenType structure, defined a long time ago when I implemented the Lexical Analysis, in the header file <em>lexer.h</em>. Once more, I can only recommend to check out previous articles of this series.</p>
+
+<p>Here&rsquo;s how the Context Stack is implemented.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">ContextStack</span> <span class="p">{</span>
+    <span class="k">enum</span> <span class="n">TokenType</span> <span class="n">top</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">ContextStack</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+<span class="p">};</span></code></pre></div>
+<p>And here are the operations it supports:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="n">include</span> <span class="n">parser</span><span class="p">.</span><span class="n">h</span> <span class="c1">// it includes lexer.h
+</span><span class="c1"></span>
+<span class="k">struct</span> <span class="n">ContextStack</span><span class="o">*</span> <span class="n">alloc_Context</span><span class="p">();</span> <span class="c1">// create
+</span><span class="c1"></span><span class="kt">void</span> <span class="nf">free_Context</span><span class="p">(</span><span class="k">struct</span> <span class="n">ContextStack</span> <span class="o">*</span><span class="n">stack</span><span class="p">);</span> <span class="c1">// free memory
+</span><span class="c1"></span><span class="kt">void</span> <span class="nf">push_Context</span><span class="p">(</span><span class="k">struct</span> <span class="n">ContextStack</span> <span class="o">**</span><span class="n">stack</span><span class="p">,</span> <span class="k">enum</span> <span class="n">TokenType</span> <span class="n">type</span><span class="p">);</span> <span class="c1">// push on the top
+</span><span class="c1"></span><span class="k">enum</span> <span class="n">TokenType</span> <span class="nf">pop_Context</span><span class="p">(</span><span class="k">struct</span> <span class="n">ContextStack</span> <span class="o">**</span><span class="n">stack</span><span class="p">);</span> <span class="c1">// pop from the top
+</span><span class="c1"></span><span class="kt">void</span> <span class="nf">print_Context</span><span class="p">(</span><span class="k">struct</span> <span class="n">ContextStack</span> <span class="o">*</span><span class="n">stack</span><span class="p">);</span> <span class="o">//</span> <span class="n">print</span> <span class="n">at</span> <span class="n">screen</span></code></pre></div>
+<p>Regarding Symbol and Symbol Table, here&rsquo;s how I implemented them. Just keep in mind that <strong>a clever solution for the Symbol Table is to implement is as a Hash Map</strong>. The reason is that we will have to perform a lot of searches in this table; at any rate I discussed this subject, as well as alternative implementations, in the previous article.</p>
+
+<p>Since my focus wasn&rsquo;t on implementing a great hash function (that, by the way, is a very interesting task and one that is worth studying in depth), I decided to keep it simple and used a very standard linked list.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">Symbol</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">sym</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">type</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">list_type</span><span class="p">;</span> <span class="c1">// type of each element if list
+</span><span class="c1"></span><span class="p">};</span>
+
+<span class="k">struct</span> <span class="n">SymbolTable</span> <span class="p">{</span>
+    <span class="c1">// currently implemented as a linked list
+</span><span class="c1"></span>    <span class="k">struct</span> <span class="n">Symbol</span> <span class="o">*</span><span class="n">head</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">SymbolTable</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+<span class="p">};</span></code></pre></div>
+<p>Note that each Symbol structure keeps track of both its own type, as well as the type of the objects it contains in case it&rsquo;s a list. We saw a lot of Linked List-like data structure in the previous articles, so I will not discuss it further at this time.</p>
+
+<p>The entry point of Semantic Analysis is also specified in the header file <em>semantic.h</em>, and it&rsquo;s the following function</p>
+<div class="highlight"><pre class="chroma">int analyze_Program(struct ParseTree *node);</pre></div>
+<p>The argument node is assumed to be a pointer to the root of the entire Parse Tree that was built by the Parser. The whole thing, not a subtree.</p>
+
+<p>Switching to the actual implementation (the file <em>semantic.c</em>), let&rsquo;s start by seeing the analyze_Program function.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">analyze_Program</span><span class="p">(</span><span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">node</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">SymbolTable</span> <span class="o">*</span><span class="n">table</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">ContextStack</span> <span class="o">*</span><span class="n">stack</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">res</span><span class="p">;</span>
+
+    <span class="n">table</span> <span class="o">=</span> <span class="n">alloc_SymbolTable</span><span class="p">();</span>
+    <span class="n">stack</span> <span class="o">=</span> <span class="n">alloc_Context</span><span class="p">();</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">_analyze_Program</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">table</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">stack</span><span class="p">);</span>
+
+    <span class="n">free_SymbolTable</span><span class="p">(</span><span class="n">table</span><span class="p">);</span>
+    <span class="n">free_Context</span><span class="p">(</span><span class="n">stack</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">_analyze_Program</span><span class="p">(</span><span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">node</span><span class="p">,</span> <span class="k">struct</span> <span class="n">SymbolTable</span> <span class="o">**</span><span class="n">table</span><span class="p">,</span> <span class="k">struct</span> <span class="n">ContextStack</span> <span class="o">**</span><span class="n">stack</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">line</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">status</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">res</span><span class="p">;</span>
+
+    <span class="n">line</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">child</span><span class="p">;</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">_undef</span><span class="p">;</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">NODE_OK</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">line</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">analyze_Line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">stack</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">status</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;ERROR: %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">type2str</span><span class="p">(</span><span class="n">status</span><span class="p">));</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">SEMANTIC_ERROR</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">else</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;OK. Type is %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">type2str</span><span class="p">(</span><span class="n">status</span><span class="p">));</span>
+        <span class="c1">// Skip Endline
+</span><span class="c1"></span>        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+<p>Basically, the entry point <code>analyze_Program</code> is just an interface function that creates the data structure we will need along the process (SymbolTable and ContextStack) and then calls the internal function <code>_analyze_Program</code>.</p>
+
+<p>This internal function has a very simple behavior. It takes each Line node, child of the root node (that is Program TokenType), and calls the internal function <code>analyze_Line</code> for each of them. Notice that Endline Tokens are skipped, because we know the Parser already checked they are there.</p>
+
+<p>Let&rsquo;s now take a look at the <code>analyze_Line</code> function.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">analyze_Line</span><span class="p">(</span><span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">node</span><span class="p">,</span> <span class="k">struct</span> <span class="n">SymbolTable</span> <span class="o">**</span><span class="n">table</span><span class="p">,</span> <span class="k">struct</span> <span class="n">ContextStack</span> <span class="o">**</span><span class="n">stack</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">line</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">res</span><span class="p">;</span>
+
+    <span class="n">line</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">child</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">line</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">Assign</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">analyze_Assign</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">table</span><span class="p">);</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">line</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">IfLine</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">analyze_IfLine</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">stack</span><span class="p">);</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">line</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">Break</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">analyze_BreakLine</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">stack</span><span class="p">);</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">line</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">Continue</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">analyze_ContinueLine</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">stack</span><span class="p">);</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">line</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">Input</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">analyze_Input</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">table</span><span class="p">);</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">line</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">Output</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">analyze_Output</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">table</span><span class="p">);</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">line</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">LoopLine</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">analyze_LoopLine</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">stack</span><span class="p">);</span>
+    <span class="k">else</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">SEMANTIC_ERROR</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">res</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+    <span class="k">else</span>
+        <span class="k">return</span> <span class="n">NODE_OK</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+<p>In this function, I quite simply identify the type of Line that is currently under analysis, and invoke the right function.</p>
+
+<p>One point I want to drive your attention on is that <strong>all functions named <code>analyze_XYZ</code> have similar signatures</strong>, and they call each other depending on the current Token Type.</p>
+
+<p>Let&rsquo;s keep digging deeper, and have a look at the <code>analyze_Assign</code> function. Like its name says, this function will be invoked when a Token <code>assign</code> is found. It&rsquo;s worth recalling once more that this kind of Line is grammatically defined as</p>
+<div class="highlight"><pre class="chroma">assign      :   var &#39;=&#39; expr</pre></div>
+<p>You will see that the code uses this definition.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">analyze_Assign</span><span class="p">(</span><span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">node</span><span class="p">,</span> <span class="k">struct</span> <span class="n">SymbolTable</span> <span class="o">**</span><span class="n">table</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">var</span><span class="p">,</span> <span class="o">*</span><span class="n">expr</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">found_var</span><span class="p">,</span> <span class="n">valid_expr</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">Symbol</span> <span class="o">*</span><span class="n">sym</span><span class="p">;</span>
+
+    <span class="c1">// Get the part of this subtree we are interested in
+</span><span class="c1"></span>    <span class="n">var</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">child</span><span class="p">;</span>
+    <span class="n">expr</span> <span class="o">=</span> <span class="n">var</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="p">;</span>
+
+    <span class="n">found_var</span> <span class="o">=</span> <span class="n">analyze_Var</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">table</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">found_var</span> <span class="o">==</span> <span class="n">UNDEFINED_SYMBOL</span><span class="p">)</span>
+        <span class="c1">// the add_symbol function prints a log message
+</span><span class="c1"></span>        <span class="c1">// and add the symbol in the table
+</span><span class="c1"></span>        <span class="n">add_symbol</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">var</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">lexeme</span><span class="p">);</span> 
+
+    <span class="n">sym</span> <span class="o">=</span> <span class="n">search_symbol</span><span class="p">(</span><span class="o">*</span><span class="n">table</span><span class="p">,</span> <span class="n">var</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">lexeme</span><span class="p">);</span>
+    <span class="n">valid_expr</span> <span class="o">=</span> <span class="n">analyze_Expr</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">sym</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">valid_expr</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Expression is not valid</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">valid_expr</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">sym</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">!=</span> <span class="n">_undef</span> <span class="o">&amp;&amp;</span> <span class="n">valid_expr</span> <span class="o">!=</span> <span class="n">sym</span><span class="o">-&gt;</span><span class="n">type</span><span class="p">){</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;ERROR: Cannot Modify Type for Identifier %s to %s. It was %s.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span>
+               <span class="n">var</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">lexeme</span><span class="p">,</span> <span class="n">type2str</span><span class="p">(</span><span class="n">valid_expr</span><span class="p">),</span> <span class="n">type2str</span><span class="p">(</span><span class="n">sym</span><span class="o">-&gt;</span><span class="n">type</span><span class="p">));</span>
+        <span class="k">return</span> <span class="n">OVERWRITE_TYPE_ERROR</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">assign_type</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">var</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">lexeme</span><span class="p">,</span> <span class="n">valid_expr</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">valid_expr</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+<p>After all, this function is quite easy too. It gets pointers to the subtree that contain the Var and Expr parts of the Assign Line, then it calls the function _analyze<em>Var</em> and _analyze<em>Expr</em>. I am sure you start getting the pattern by now.</p>
+
+<p>Let&rsquo;s <strong>keep walking down the tree</strong>, and look at the <code>analyze_Var</code> function.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">analyze_Var</span><span class="p">(</span><span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">node</span><span class="p">,</span> <span class="k">struct</span> <span class="n">SymbolTable</span> <span class="o">**</span><span class="n">table</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">Symbol</span> <span class="o">*</span><span class="n">found</span><span class="p">;</span>
+
+    <span class="n">found</span> <span class="o">=</span> <span class="n">search_symbol</span><span class="p">(</span><span class="o">*</span><span class="n">table</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">lexeme</span><span class="p">);</span>
+    <span class="c1">// found contains the _type of the symbol, or UNDEFINED
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">found</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">found</span><span class="o">-&gt;</span><span class="n">type</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Variable Symbol Not Found In Symbol Table: %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">lexeme</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">UNDEFINED_SYMBOL</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+<p>And so we see one case where the recursive calls end. The function <code>analyze_Var</code> simply checks if the symbol contained in the current Node was already defined. If yes, it returns its type. If not, it returns the error value <code>UNDEFINED_SYMBOL</code>.</p>
+
+<p>Let&rsquo;s briefly turn our attention to the function <code>analyze_Expression</code>, that I discussed in detail in a section above. We can thus see how <strong>the theory is implemented into code</strong>.</p>
+
+<p>Recall that the expressions are defined in the Grammar with a recursive rule:</p>
+<div class="highlight"><pre class="chroma">expr        :   pred (condOp expr)?
+pred        :   term ( (&#39;+&#39; | &#39;-&#39;) pred)?
+term        :   baseExpr ( (&#39;*&#39; | &#39;/&#39; | &#39;/.&#39; | &#39;%&#39;) term)?
+baseExpr    :   obj
+            |   &#39;(&#39; expr &#39;)&#39;</pre></div>
+<p>You will see that the code leverages on this structure quite a lot, and uses functions such as <code>analyze_Pred</code>, <code>analyze_Term</code>, <code>analyze_BaseExpr</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">analyze_Expr</span><span class="p">(</span><span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">node</span><span class="p">,</span> <span class="k">struct</span> <span class="n">SymbolTable</span> <span class="o">**</span><span class="n">table</span><span class="p">,</span> <span class="k">struct</span> <span class="n">Symbol</span> <span class="o">**</span><span class="n">sym</span><span class="p">){</span>
+    <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">child</span><span class="p">,</span> <span class="o">*</span><span class="n">op</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">type1</span><span class="p">,</span> <span class="n">type2</span><span class="p">,</span> <span class="n">result</span><span class="p">;</span>
+
+    <span class="n">child</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">child</span><span class="p">;</span> <span class="c1">// the Pred Token
+</span><span class="c1"></span>    <span class="n">type1</span> <span class="o">=</span> <span class="n">analyze_Pred</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">sym</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">type1</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Sub Expression Ill-Formed &#34;</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">sym</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;For Symbol: %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="p">(</span><span class="o">*</span><span class="n">sym</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">sym</span><span class="p">);</span>
+        <span class="k">else</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">type1</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">child</span><span class="o">-&gt;</span><span class="n">sibling</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="c1">// then this expression is completed
+</span><span class="c1"></span>        <span class="k">return</span> <span class="n">type1</span><span class="p">;</span>
+
+    <span class="c1">// Save the operator, skip it for now
+</span><span class="c1"></span>    <span class="n">op</span> <span class="o">=</span> <span class="n">child</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="p">;</span>
+
+    <span class="c1">// Analyze the second part of this expression
+</span><span class="c1"></span>    <span class="n">type2</span> <span class="o">=</span> <span class="n">analyze_Expr</span><span class="p">(</span><span class="n">op</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">sym</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">type2</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Sub Expression Ill-Formed &#34;</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">sym</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;For Symbol: %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="p">(</span><span class="o">*</span><span class="n">sym</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">sym</span><span class="p">);</span>
+        <span class="k">else</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">type2</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Now compute the result type with the lookup tables
+</span><span class="c1"></span>    <span class="c1">// based on the operator previously saved
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">is_ComparisonOp</span><span class="p">(</span><span class="n">op</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span><span class="p">))</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">resultType_compare</span><span class="p">[</span><span class="n">type1</span><span class="p">][</span><span class="n">type2</span><span class="p">];</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">is_LogicOp</span><span class="p">(</span><span class="n">op</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span><span class="p">))</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">resultType_logic</span><span class="p">[</span><span class="n">type1</span><span class="p">][</span><span class="n">type2</span><span class="p">];</span>
+    <span class="k">else</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">NODE_TYPE_ERROR</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+<p>I think I explained the entire logic in a previous section (see Tasks for Semantic Analysis - Expressions), so I will let you connect the dots!</p>
+
+<h2 id="take-home-messages">Take-home Messages</h2>
+
+<p>If you made it so far, and you also read other articles, you have now got a good grasp on all concepts around Semantic Analysis. In the past articles I discussed a lot of theoretical details, whereas in this article we saw many practical details and implementation tips.</p>
+
+<p>You are now ready to implement your own Semantic Analysis! Remember that:</p>
+
+<ul>
+<li>You&rsquo;ll need data structures such as Symbol Tables, Scopes/Context and Stack.</li>
+<li>Your algorithm is going to be heavily recursive.</li>
+<li>You should identify the places where the recursion will end. These are usually very close to the bottom of the Parse Tree.</li>
+<li>You can take a look at my own implementation, but don&rsquo;t be afraid to experiment and strive for further optimization. Focus on learning the concepts though, without spending time on &ldquo;irrelevant&rdquo; details. Irrelevant for the sake of learning, of course.</li>
+</ul>
+
+<h2 id="summary-and-outlook">Summary and Outlook</h2>
+
+<p>You are now able of building your own front-end Compiler!</p>
+
+<p>Semantic Analysis is indeed the last module in what&rsquo;s usually called front-end compilation process. The previous two are Lexical Analysis and Parsing.</p>
+
+<p>We have studied the three of them in great detail, both theoretically and practically. Therefore you can take what you&rsquo;ve learnt and put it into practice.</p>
+
+<p>After this, the path towards building a new programming language and its Compiler is waiting for one more milestone only: Code Generation.</p>
+
+<p>We have already studied Code Generation at the theoretical level, and in the next article I will show how I put those concepts into practice and built my own Code Generation Module.</p>
+
+<h2 id="references">References</h2>
+
+<p>My <a href="https://github.com/pgrandinetti/compilers">GitHub repository</a> for this course.</p>
+
+<p><a href="http://example.org/">Table of contents</a> for this course.</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fimplementation-semantic-analysis%2f&amp;text=Implementation%20of%20Semantic%20Analysis&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fimplementation-semantic-analysis%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fimplementation-semantic-analysis%2f&amp;title=Implementation%20of%20Semantic%20Analysis" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fimplementation-semantic-analysis%2f&amp;title=Implementation%20of%20Semantic%20Analysis" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fimplementation-semantic-analysis%2f&amp;title=Implementation%20of%20Semantic%20Analysis" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fimplementation-semantic-analysis%2f&amp;description=Implementation%20of%20Semantic%20Analysis" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

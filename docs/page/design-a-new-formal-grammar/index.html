@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>Design of a New Context-Free Grammar | Compilers</title>
+  <meta name="description" content="We studied Formal Grammars in some of the previous articles in this course, What is a Grammar in programming languages and How to design formal Grammars. The most important concepts we learned are:
+ There are 4 types of Grammar in the Chomsky hierarchy. Type-2 Grammars, also said Context-Free Grammars, are the ones used to design new programming languages. One must avoid many pitfalls while creating a new Grammar, for example left-recursion and ambiguity.">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/design-a-new-formal-grammar\/",
+          "name": "Design of a new context free grammar"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "Design of a New Context-Free Grammar",
+  "description" : "We studied Formal Grammars in some of the previous articles in this course, What is a Grammar in programming languages and How to design formal Grammars. The most important concepts we learned are:\n There are 4 types of Grammar in the Chomsky hierarchy. Type-2 Grammars, also said Context-Free Grammars, are the ones used to design new programming languages. One must avoid many pitfalls while creating a new Grammar, for example left-recursion and ambiguity.",
+  "inLanguage" : "en",
+  "wordCount":  6888 ,
+  "datePublished" : "2019-10-13T00:00:00",
+  "dateModified" : "2019-10-13T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/design-a-new-formal-grammar\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="Design of a New Context-Free Grammar" />
+<meta property="og:description" content="We studied Formal Grammars in some of the previous articles in this course, What is a Grammar in programming languages and How to design formal Grammars. The most important concepts we learned are:
+ There are 4 types of Grammar in the Chomsky hierarchy. Type-2 Grammars, also said Context-Free Grammars, are the ones used to design new programming languages. One must avoid many pitfalls while creating a new Grammar, for example left-recursion and ambiguity.">
+<meta property="og:url" content="http://example.org/page/design-a-new-formal-grammar/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="Design of a New Context-Free Grammar" />
+  <meta name="twitter:description" content="We studied Formal Grammars in some of the previous articles in this course, What is a Grammar in programming languages and How to design formal Grammars. The most important concepts we learned are: …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>Design of a New Context-Free Grammar</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  October 13, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>We studied Formal Grammars in some of the previous articles in this course, <em>What is a Grammar in programming languages</em> and <em>How to design formal Grammars</em>. The most important concepts we learned are:</p>
+
+<ul>
+<li>There are 4 types of Grammar in the Chomsky hierarchy.</li>
+<li>Type-2 Grammars, also said Context-Free Grammars, are the ones used to design new programming languages.</li>
+<li>One must avoid many pitfalls while creating a new Grammar, for example left-recursion and ambiguity.</li>
+</ul>
+
+<p>In this article we will take all those concepts and put them into practice: I will show how I designed a new Context-Free Grammar. This Grammar is the basis of the new Programming Language I created as a learning tool for this course.</p>
+
+<h2 id="preliminaries">Preliminaries</h2>
+
+<p>The first baby-step in the design of a Formal Grammar is to decide on the Alphabet, and the set of characters allowed. If such terminology sounds a bit confusing, I can’t help but suggest you to read a bit via Wikipedia, or the previous articles in this course (see the references at the end).</p>
+
+<p>Now, one thing I always had as objective while working on the design part was the simplicity of the programming language. <strong>I wanted to create a very direct programming language</strong>, almost “explicit” if you will, and without overloading it with fancy statements or complex expressions. This has been the main guideline during the whole process.</p>
+
+<p>Also, to start off, I decided to focus on a small set of instructions. That means the initial version of the language (that’s what I will show in this article) does not allow for OOP, routines, coroutines, etc.. Of course, I understand that routines are an extremely important part of a language, and <strong>I will definitely add them at a later stage</strong>.</p>
+
+<p>Also, I wanted the language to be explicit but not too verbose. Therefore I decided to make it non-explicitly typed. So, for example, you wouldn’t write <code>int x = 5</code>, you would just write <code>x = 5</code>.</p>
+
+<p>However, I do want the language to be aware of types, also at compilation time, therefore <strong>it will be a language with static and implicit typing system</strong>. Based on that, the compiler will also check for typing-errors, such as adding a string to an integer (more on this in a future article).</p>
+
+<p>At the theoretical level, I wanted to design a LL(1) grammar, so that I can also write my own implementation of a LL(1) recursive descent parser.</p>
+
+<p>If you need to check what these naming conventions mean, start from my previous article <em>What are the differences between programming languages</em>, or google them!</p>
+
+<p>Wherever possible, I tried to add some small nuances into the formal grammar, to give a personal touch to the whole. Having fun was one of the goals too!</p>
+
+<h2 id="characters-numbers-and-strings">Characters, Numbers and Strings</h2>
+
+<p>To start with, I knew I would need all basic blocks such as digits and letters in the Alphabet. Thus, I defined the following regular expressions as part of the Grammar.</p>
+<div class="highlight"><pre class="chroma">digit0      : 0-9
+digit       : 1-9
+letter      : a-z | A-Z
+otherChar   : |!”%&amp;/()=+-*#&gt;&lt;;,^.][\n \t
+char        : letter | otherChar | digit</pre></div>
+<p>Let’s take a moment and think, because the choices I made have already some implications. First of all, the distinction between all digits, and the subset of them without the zero, is a bit redundant, but I found it useful (as I will tell you later).</p>
+
+<p>In second place, the underscore (_) and the single quote (‘) are missing from the set of allowed characters! Why is that?</p>
+
+<p>Regarding the underscore, things are quite simple: I don’t think it’s needed. The CamelCase convention (where variables are named like <em>thisIsAVariable</em>) is good enough in my opinion, and also very clear.</p>
+
+<p>What happened to the single quote, instead? It will be clear in a moment.</p>
+
+<p>With that (almost) clarified, let’s continue from the simpler to the tougher, and take a look at how I defined the numeric objects &ndash; integer and float types.</p>
+<div class="highlight"><pre class="chroma">num         :   (&#39;+&#39; | &#39;-&#39;)? float
+float       :   (frac exp?) | (int frac? exp?)
+int         :   &#39;0&#39; | digit+ digit0*
+frac        :   &#39;.&#39; int
+exp         :   &#39;^&#39; (&#39;+&#39; | &#39;-&#39;)? int</pre></div>
+<p>Just one word before a full explanation: I used all over the grammar the single quotation mark to delimit parts of the grammar. So, if I write <code>‘+’</code> it means that there must be a plus symbol for that token to be valid. That’s partially why the single quote is not a valid character in the Grammar, so there’s no confusion about it.</p>
+
+<p>Okay, what is happening in the last few definitions? First, I defined a <code>num</code> (numeric) grammatical token. This is made by a sign (either plus or minus) followed by a <code>float</code> token. Notice also that the sign is optional, and, as you would guess, the number is positive by default when the signed is omitted.</p>
+
+<p>What’s the <code>float</code> token? I defined it as a choice between two cases: it can either be a <code>frac</code> (fractional part), followed by an optional exponent part, or it can be an integer token, optionally followed by a fraction and also an optional exponent.</p>
+
+<p>Remember that the pipe <code>|</code> means OR (either of two), and the question mark <code>?</code> after a parenthesis means that the group of characters in parentheses is optional. Also, the star <code>*</code> after a parenthesis means that the group of characters in parentheses can be repeated zero or more times, while the plus <code>+</code> means the group can be repeated one or more times. Don’t get confused between <code>‘+’</code> and just <code>+</code>. The former means the symbol ‘+’, whereas the latter is a notation in the regular expression syntax.</p>
+
+<p>My definition of float is not extremely elegant, but it’s very explicit. In particular, it makes clear that you don’t need to start with an integer if you want to write a floating point number. You can just start with the dot, like in the number <code>.25</code>, which is interpreted as <code>0.25</code>.</p>
+
+<p>What about the integer token? I very simply defined it either as a single <code>‘0’</code>, or as a sequence of digits that does not start with zero. So, in my language you could write <code>x = 0</code> to define a new integer, and also <code>x = 1</code>, but you could not write <code>x = 01</code>. Quite standard, isn’t it?</p>
+
+<p>I defined the fractional part also simply as a dot followed by an integer. So far, so good. You could write <code>x = 1.25</code>, and <code>‘1’</code> would be the integer part, while <code>‘.25’</code> would be the fractional part, made by a dot and another integer.</p>
+
+<p>Lastly, the exponent. Here I introduced a small novelty. The vast majority of programming languages uses the exponential notation with the <code>E</code> (or <code>e</code>) letter. I decided to use the caret <code>^</code>, like scientists do on the calculator. A small nuance, nothing more. After the caret you have an optional sign (plus by default) followed by an integer. So, <code>x = 1.25^5</code> would be a valid <code>num</code> token in my language. And its meaning it’s the same as in languages where you use the <code>E</code> notation: <code>1.25</code> times <code>10</code> at the power <code>5</code>.</p>
+
+<p>The other building block a language truly needs are strings, or characters array at least. I defined string in the following way.</p>
+<div class="highlight"><pre class="chroma">str         :   quotedStr (&#39;+&#39; quotedStr)*
+quotedStr   :   &#39; &#34; &#39; (char)* &#39; &#34; &#39; (&#39;,&#39; obj)*</pre></div>
+<p>The basic unit of a string is a “quoted string”. This is what you would actually call string in other languages, that is a sequence of characters in between double quotes.</p>
+
+<p>So, for example, <code>&quot;abc def”</code> is a valid <code>quotedStr</code> token in my Grammar. However, my definition is a bit more complex, and let you create strings the C (or Python) way. Basically, each such sequence of characters can be followed by a comma <code>,</code> and an object <code>obj</code>, possibly repeated. This is to allow string interpolation. Here’s one example:</p>
+<div class="highlight"><pre class="chroma">“Abc %d defg”, 5</pre></div>
+<p>As you can see, there a single pair (comma, object) after the closing double quote. So, if you are familiar with other programming language, you already know that the <code>“5”</code> will be interpolated where the <code>“%d”</code> is in the string.</p>
+
+<p>The following string, with two pairs of (comma, obj), is also valid according to Grammar:</p>
+<div class="highlight"><pre class="chroma">“The number %d is greater than %d”, 5, 4</pre></div>
+<p>And this explains why I wrote <code>(‘,’ obj)*</code> in the Grammar: to allow for multiple interpolations (zero or more).</p>
+
+<p>Having said that, the definition of string in the Grammar is just a <code>quotedStr</code>, optionally followed by a plus sign <code>+</code> and another <code>quotedStr</code>, etc. This way you can concatenate strings as in the following example:</p>
+<div class="highlight"><pre class="chroma">“first “ + “second is %d”, 2 + “hello, third”</pre></div>
+<p>You have probably noticed that I didn’t define explicitly the <code>obj</code> token used in the definition of quotedStr. We’ll do it soon.</p>
+
+<h2 id="other-basic-types">Other basic types</h2>
+
+<p>The choice of what basic types are to be supported in a language is an important one. It will affect forever how people write code in your language. Can you imagine what would Python be without lists? What if C had built-in dictionaries?</p>
+
+<p>I decided that <strong>I wanted to support lists</strong>, in this new programming language. The Python way, to be clear. I find lists really explicit and handy to use. However, I also want to encourage good programming patterns, therefore I will force lists to contain only objects of the same type.</p>
+
+<p>I have seen enough of bad programming practice that mixes different object types in the same container, and want to avoid that to ever happen in my language. This last constraint, however, is not a syntactical one, rather is a semantic constraint, so the Formal Grammar is not concerned by it.</p>
+
+<p>I also wanted to add a boolean type, and the <code>NULL</code> type. Finally, I defined the “variable” type to be any sequence of characters that is not a reserved keyword.</p>
+<div class="highlight"><pre class="chroma">obj         :   var | num | str | bool | null | list
+bool        :   &#39;True&#39; | &#39;False&#39;
+null        :   &#39;NULL&#39;
+var         :   letter (digit | letter)*
+list        :   &#39;[&#39; (listExpr)? &#39;]&#39;
+listExpr    :   obj (&#39;,&#39; obj)*
+listElem    :   var &#39;[&#39; int &#39;]&#39;</pre></div>
+<p>Now the <code>obj</code> definition is clear. A <code>obj</code> token is either a variable, a numeric, a string, a boolean, a list or even <code>NULL</code>.</p>
+
+<p>A detail to note is that variables (names) can only be made of letters and digits. As I already said, no underscore or other strange things!</p>
+
+<p>The grammatical definition of list is more interesting. First of all, you must have a open square bracket <code>[</code>. Then you have an optional token, called <code>listExpr</code> (list-expression), followed by a closed square bracket <code>]</code>, that is not optional.</p>
+
+<p>First remark: the definition implies that you can write empty lists: <code>[ ]</code> is a valid expression according to the grammar.</p>
+
+<p>The <code>listExpr</code> token is not very surprising. It’s made by a <code>obj</code> token, optionally followed by a sequence of pairs <code>(comma, obj)</code>. This definition allows to stack up in a list as many obj tokens as you wish.</p>
+
+<p>A second remark is worth noting here. My definition of list forbids to end a <code>listExpr</code> token with a trailing comma. As you may already know, in Python you can have a trailing comma in a list, like in <code>[1, 2, 3, 4,]</code>, and the Python interpreter will take care of that final comma for you. In my language, instead, if you have a trailing comma like that you will receive a compilation error.</p>
+
+<p>After some thought I decided to include another “type”, among the basic one. I called it <code>listElem</code> (list-element), and it simply identifies the natural (and explicit!) way you would index an array, or a list in this case. It’s made by a var token, which should always be the name of a list object, and a pair of square brackets with an integer token between them.</p>
+
+<p>Lots of words just to say that <code>x[1]</code> is a valid expression in the Grammar, and it just means to take the element in position <code>1</code> in the list identified by the variable <code>x</code>. Standard stuff. Are we sure?</p>
+
+<h2 id="my-first-mistake">My first mistake</h2>
+
+<p>I must be honest and say that as far as numeric, strings, boolean and other basic types were concerned, my work went smoothly. Surely because these are very standard grammatical constructs, and I studied them both in the MOOC and on my reference book.</p>
+
+<p>With lists things got a bit trickier. The list definition itself was not complicated, but <strong>I had to think about all its possible implications</strong>.</p>
+
+<p>That’s when I made my first mistake. It’s was even more than “just” a mistake, it was a misunderstanding on an important concept. And that’s what makes it even more important: I think to go over my (wrong) reasoning, and see how I corrected it, <strong>can be very beneficial to other students</strong>.</p>
+
+<p>I initially included the listElem token among the choices for the obj token. So, the definition was:</p>
+<div class="highlight"><pre class="chroma">obj   :   var | num | str | bool | null | list | listElem</pre></div>
+<p>I wanted it to be that way because I thought having the <code>listElem</code> like one of the basic types would be useful. However, that led to a very subtle issue. Let me illustrate it.</p>
+
+<p>As we will see later in this article, the Grammar will also include a “output statement”, that has to be interpreted like the “print” function in Python, or the “printf” in C. In my Grammar, I defined it as made by the keyword <code>writeOut</code> followed by a <code>obj</code> token.</p>
+
+<p>So, for example, if <code>x</code> is a token <code>obj</code> (that means, a <code>var</code>, or a <code>string</code>, etc.) you could write <code>writeOut x</code>, and that will compile correctly, and will print at screen the value stored into <code>x</code>. Formally, the definition is</p>
+<div class="highlight"><pre class="chroma">output     : ‘writeOut’ obj</pre></div>
+<p>Here’s where the problem comes. Or rather, where I thought it came.</p>
+
+<p>If <code>listElem</code> was part of the <code>obj</code> token choices, then there would be two cases where the keyword <code>‘writeOut’</code> could be followed by a <code>var</code> token:</p>
+
+<ol>
+<li>When it’s really just a <code>var</code> token.</li>
+<li>When it’s the var token that starts a <code>listElem</code>.</li>
+</ol>
+
+<p>This means <strong>the Grammar would not be LL(1)</strong>, because after the parser grabs the token <code>‘writeOut’</code> and looks ahead, and sees a <code>var</code> token, it wouldn’t know whether it’s just a <code>var</code> or a <code>listElem</code>. It would actually need to look further ahead, but <strong>I didn’t want to design a LL(2) Grammar</strong>.</p>
+
+<p>If you are wondering what happens in similar cases in widely used languages, such as Python, just know that common Programming Languages have several constructs that are not LL(1), and are handled ad-hoc by the compiler.</p>
+
+<p>I spent some time brainstorming about this issue, and eventually decided to exclude the <code>listElem token</code> from the obj token types.</p>
+
+<p>So, I thought I had solved the issue. Instead I was wrong. In fact, <strong>I was wrong twice!</strong></p>
+
+<p>I got the whole (and right) picture only much (much) later, while I was working on the Semantic Analysis module of the language. This is why I am telling you about the entire process &ndash; I think it can be a very helpful learning experience.</p>
+
+<p>While working on a later module of the Compiler, I realized what was wrong in my reasoning. Let’s put ourselves in the position of the Parser, that is currently parsing an Output statement, such as</p>
+<div class="highlight"><pre class="chroma">writeOut x[1]</pre></div>
+<p>where <code>x</code> was previously defined as a list, for example</p>
+<div class="highlight"><pre class="chroma">x = [1, 2, 3]</pre></div>
+<p>What will the parser do? I was wrong (again!) in saying that when it gets the <code>'writeOut'</code> token, it will have to look ahead two tokens to understand whether it’s just <code>'x'</code> (list) or it’s actually <code>'x[1]'</code> (listelem).</p>
+
+<p><strong>Why was I (doubly) wrong?</strong></p>
+
+<p>The reason is that after getting the <code>“writeOut”</code> token the Parser will only need to know that a <code>obj</code> token is after that. Therefore it won’t look ahead at all, not even 1 step. It will simply delegate the task to some sub-module that has to parse a <code>obj</code> token.</p>
+
+<p>What will happen next, then? This sub-module (that I will show later), will now point at the <code>'x'</code> token. Only now it will look ahead 1 token, and just 1 token, to figure out if it’s a <code>var</code> or a <code>listElem</code>. At this point looking ahead one token only is more than enough. Therefore <strong>the Grammar is still LL(1)</strong>, and the final <code>obj</code> definition is:</p>
+<div class="highlight"><pre class="chroma">obj     :   var | num | str | bool | null | list | listElem</pre></div>
+<h2 id="operators">Operators</h2>
+
+<p>After the somewhat intricate definitions above, I needed something easier to work on! So I defined, in a “almost standard” way, the logical operators allowed in the Grammar. Here they are.</p>
+<div class="highlight"><pre class="chroma">operator  :   &#39;+&#39; | &#39;-&#39; | &#39;*&#39; | &#39;/&#39; | &#39;/.&#39; | &#39;%&#39; | condOp
+condOp    :   &#39;&amp;&amp;&#39; | &#39;||&#39; | &#39;!=&#39; | &#39;==&#39; | &#39;&lt;=&#39; | &#39;&gt;=&#39; | &#39;&gt;&#39; | &#39;&lt;&#39;</pre></div>
+<p>These are very normal definition, with the exception of the token <code>'/.'</code> &ndash; this is something I added because I wanted to distinguish between the standard division operator, that truncates the result when the operands are integer numbers. So, <code>3/4</code> will yield <code>0</code> (integer division), but you can write <code>3/.4</code> and it will yield <code>0.75</code>.</p>
+
+<p>Wait, <strong>there’s actually a blind spot here</strong>! What if I write <code>3/.4</code> but what I really mean is <code>3</code> divided by <code>0.4</code>? Well, in this case you will need to add one space, because the characters are read from left to right, so if the dot <code>.</code> is found immediately after the slash <code>/</code>, then it will be interpreted as a floating division <code>/.</code>.</p>
+
+<p>You would write <code>3/.4</code> if you mean “3 divided by 4, without truncating the result”, while you’d write <code>3/ .4</code>, if you mean “3 divided by 0.4, with integer truncation” (which is, by the way, quite a strange thing to do).</p>
+
+<p>At any rate, I do recommend the Python convention to add spaces around the operators. So, just write <code>3 /. 4</code> and everything will be more readable. Or also <code>3 /. .4</code> if you want to compute the floating point division between 3 and 0.4.</p>
+
+<p>Speaking about this, for a long time I considered to forbid floating point to start with a dot. I wanted to force the usage of zero, so you’d never write <code>.4</code>, and always <code>0.4</code>. I decided not to, eventually, for consistency with many (many) other languages. Nonetheless, I do encourage programmers to type that zero on their keyboard!</p>
+
+<h2 id="expressions">Expressions</h2>
+
+<p>Expressions are a fundamental block of any programming languages. Actually, as you should know if you read my previous articles, the ability to write balanced expressions (with balanced parentheses) is exactly what makes Context Free Grammars more powerful than Regular Expressions, and give them the power to design entire languages.</p>
+
+<p>This is also why Expressions, and in particular Arithmetic Expressions, are the single most used example in textbook about Formal Grammars. Therefore, I pretty much already knew what to do here. My only challenge was to make sure the definition included the other basic types of my Grammar, and not just numeric (like in arithmetic expressions).</p>
+<div class="highlight"><pre class="chroma">expr        :   term ( (&#39;+&#39; | &#39;-&#39;) expr)?
+term        :   baseExpr ( (&#39;*&#39; | &#39;/&#39; | &#39;/.&#39; | &#39;%&#39;) term)?
+baseExpr    :   obj   |   &#39;(&#39; expr &#39;)&#39;</pre></div>
+<p>I suggest you pay attention to the patterns in the definition above, because they are standard and thus <strong>very important to know</strong>. Let me illustrate them.</p>
+
+<p>There are <strong>three basic blocks</strong>, which you can think of as three rings in a chain: the general expression <code>expr</code>, the inner term <code>term</code>, and the basic expression <code>baseExpr</code>. They are somehow ordered, in the sense that the definition of <code>expr</code> involves the definition of <code>term</code>, and the definition of <code>term</code> involves the definition of <code>baseExpr</code>. Finally, <code>baseExpr</code> can either be a basic <code>obj</code> token, or a whole new expression, but only if it’s enclosed in parentheses.</p>
+
+<p>This way of defining expressions ensures a very important thing: <strong>the Grammas is not ambiguous</strong>. Ambiguity is really bad for Formal Grammars, and is to avoid with all means.</p>
+
+<p>In the case of expressions, ambiguity can come from the operator precedence. If you write <code>5 + 3 * 2</code>, there must be one and only one way this expression is interpreted by the Grammar (and hopefully is the one that prioritizes the star <code>*</code> operator over the plus <code>+</code>).</p>
+
+<p>The recursive definition with three basic blocks (Expr, Term, baseExpr) is guaranteed to be unambiguous, so it’s worth sticking it to our mind.</p>
+
+<h2 id="program-and-statements">Program and Statements</h2>
+
+<p>Expressions were the last among the building blocks. With that done, I decided to jump right at the top of the Grammar and clarify what the whole Program will look like.</p>
+
+<p>Once again, I took a very explicit approach to this design challenge, and I told myself: <em>A Program will simply be a sequence of statements, that I will call Lines, and each Line must be followed by a Endline token</em>.</p>
+
+<p>The concept of Line/statement includes really all types of statement. So, a simple assignment (e.g., <code>x = 5</code>) will be a <code>line</code>, and also a long and complex if-then-else will be just one <code>line</code>. That also implies that a Line must be able to contain more Lines.</p>
+
+<p>Here’s the definition of Program I came up with. You can think of the Program token as if it’s used to represent the entire source code.</p>
+<div class="highlight"><pre class="chroma">program   :   (line ENDLINE)*
+ENDLINE   :   &#39;;&#39; &#39;\n&#39;
+line      :   assign
+          |   input
+          |   output
+          |   ifLine
+          |   loopLine
+          |   breakLine
+          |   contLine</pre></div>
+<p>The first grammatical rule says a <code>program</code> is a (possibly empty) sequence of pairs <code>(line, Endline)</code>. As already said, a <code>line</code> can be anything from an assignment operation <code>assign</code>, to a complex loop instruction <code>loopLine</code>. You should really think of a Line token like a “logical line”.</p>
+
+<p>The <code>Endline</code> token instead is a very simple token meant to clarify the end of a logical line, and it’s made of two characters: a semicolon and a newline. I believe this a small novelty that I introduced with respect to other languages. Let me explain why.</p>
+
+<p>In all languages I know, you can put two logical statements on the same physical line, for example:</p>
+<div class="highlight"><pre class="chroma">x = 5; y = x + 2;</pre></div>
+<p>is a valid string in Python, C, Java, etc., and it consists of two assignment operations.</p>
+
+<p>In my Grammar instead, <strong>physical lines and logical lines are terminated together</strong>*, because the Endline token contains a <code>‘\n’</code>. Thus, the previous example would give a compilation error, and you must instead write</p>
+<div class="highlight"><pre class="chroma">x = 5;
+y = x + 2;</pre></div>
+<p>I believe this improves the readability of the code, and in fact programmers are supposed to follow this practice even if it’s not enforced by the language… just that sometimes they do not!</p>
+
+<p>It is worth noting that the <code>Endline</code> token is the only one where the semicolon appears. Therefore, you can’t really write a semicolon in my language if it’s not followed by a <code>\n</code> character.</p>
+
+<p>Now, let’s stop one more minute here to think about the implications brought by the concept of logical Lines. Let’s start with an example of valid Program:</p>
+<div class="highlight"><pre class="chroma">&lt;Program&gt;
+  &lt;Line&gt;
+    &lt;Assign&gt;
+  &lt;Endline&gt;
+  &lt;Line&gt;
+    &lt;ifLine&gt;
+  &lt;Endline&gt;</pre></div>
+<p>This <code>program</code> corresponds to a source file made of just two lines, the first being an assignment and the second being a <code>ifLine</code>. It could look like the following excerpt:</p>
+<div class="highlight"><pre class="chroma">a = “a valid string”;
+if (a != NULL)
+  inner-Line1;
+  inner-Line2;
+;</pre></div>
+<p>It’s really important to understand that the first <code>line</code> ends at the second double quote (<code>...string”</code>) and it’s correctly followed by a <code>Endline</code> token. Then, the second <code>line</code> starts and it’s a <code>ifLine</code>. As we will see in a moment, the <code>ifLine</code> can contain multiple Lines, each terminated by a <code>Endline</code>.</p>
+
+<p>What I want to underline is that <strong>the ifLine must be terminated by a Endline token too</strong>. This is the semicolon that you see as the last line in the example.</p>
+
+<p>Let me repeat the concept again. The last semicolon in the example is (part of) the <code>Endline</code> that terminates the <code>ifLine</code> started with <code>if (a != NULL)</code>.</p>
+
+<p>This way to terminate complex instructions, such as a <code>if</code> block, is slightly uncommon, because in most languages you open a curly bracket at the beginning of the <code>if</code>, and then “close” such a bracket when the if-body is done, as in the following code</p>
+<div class="highlight"><pre class="chroma">a = “a valid string”;
+if (a != NULL) {
+  inner-Line1;
+  inner-Line2;
+}</pre></div>
+<p>On the other hand, and to be absolutely honest, my idea of “logical lines” is not a new one. There are already a few languages using it. Python has the same concepts, and implements it with an INDENT token. Indeed, if you know Python then you know that indentation plays an important role in it.</p>
+
+<p>Other languages terminate the if statements with the <code>end</code> keyword, which is the closest to my choice that you can think of. Matlab is an example of such languages.</p>
+
+<p>I must say <strong>I am very happy with this design choice of mines</strong>. To terminate complex blocks with a semicolon feels really natural once you grasp the concept of logical lines, and I think the simple, lonely, semicolon at the end of the block it’s quite nice looking. And don’t forget there’s an invisible <code>\n</code> next to it!</p>
+
+<p>At this point, let’s see the grammatical definition for each of the possible Lines, starting with the ifLine.</p>
+
+<h2 id="conditional-statement-if">Conditional statement - if</h2>
+
+<p>The conditional line (statement, if you will) is meant to represent branches in the code, such as the if-then-else statement. Thus, my definition for it is quite simple.</p>
+<div class="highlight"><pre class="chroma">ifLine   :   &#39;if&#39; ifCond ifBody</pre></div>
+<p>Basically, the `ifLine is a sequence of three elements.</p>
+
+<ul>
+<li>First, a constant token, <code>“if”</code>.</li>
+<li>Then a token called <code>ifCond</code>. This is meant to represent the logical condition that, if True, will let the flow “enter” the if.</li>
+<li>Then, a token called <code>ifBody</code>, which hopefully is superfluous to explain.</li>
+</ul>
+
+<p>Now, it’s time to recursively define the <code>ifCond</code> and <code>ifBody</code> token, to complete the definition of <code>ifLine</code>. Let’s start with the ifCond token.</p>
+
+<h3 id="my-second-bigger-and-most-useful-mistake">My second (bigger, and most useful) mistake</h3>
+
+<p>To define a sound syntax for the <code>if</code> statement was a tricky affair. It wasn’t all clear to me until I wrote the code for the parser. I do understand the details now though, so this is also a very good lesson to share.</p>
+
+<p>In my mission to keep things explicit, I initially defined the ifCond as it follows</p>
+<div class="highlight"><pre class="chroma">ifCond      :   &#39;(&#39; obj condOp obj &#39;)&#39;</pre></div>
+<p>It made perfect sense to me, at the beginning. Open a parenthesis, create a conditional expression with two <code>obj</code> token (that is, two primitive types of my Grammar) and then close the parenthesis.</p>
+
+<p>Unfortunately, I soon realized this was way too restricted. With this syntax you can’t even write</p>
+<div class="highlight"><pre class="chroma">if (x + 1 == y)</pre></div>
+<p>because the first part <code>x+1</code> is not just a token <code>obj</code>, it’s a whole expression. Therefore, I understood that I could not keep things too restricted in the <code>ifCond</code> and decided to change it to the following.</p>
+<div class="highlight"><pre class="chroma">ifCond      :   &#39;(&#39; expr condOp expr &#39;)&#39;</pre></div>
+<p>This sounds right, isn’t it? The <code>expr</code> token gives a lot of flexibility and all you have to do is to write two expressions with a conditional operator (<code>==</code>, <code>!=</code>, <code>&amp;&amp;</code>, <code>&lt;</code>, etc.) in between them.</p>
+
+<p>For example, you could now write</p>
+<div class="highlight"><pre class="chroma">if (x + 1 == y + z)</pre></div>
+<p>and the Grammar would be fine with it. I thought I nailed it.</p>
+
+<p>Not quite.</p>
+
+<p>As I kept digging deeper (again, I understood all this later, while I was writing the parser) I realized the latest definition of <code>ifCond</code> didn’t work well.</p>
+
+<p>To start with, I couldn’t use more than two conditions, such as in</p>
+<div class="highlight"><pre class="chroma">if (boolean1 &amp;&amp; boolean2 &amp;&amp; boolean3)</pre></div>
+<p>This could be solved by rewriting it as</p>
+<div class="highlight"><pre class="chroma">ifCond  :  &#39;(&#39; expr (condOp expr)+ &#39;)&#39;</pre></div>
+<p>so that we could use as many boolean expressions as we wanted. But then, when I thought about this, I realized there was <strong>a much bigger issue in my design</strong>.</p>
+
+<p>What about the following line:</p>
+<div class="highlight"><pre class="chroma">if (x + 1 == y &amp;&amp; boolean1)</pre></div>
+<p>This is a perfectly fine, intuitive way to write a piece of code and it should really be supported by a good Grammar. However, notice that in the parentheses there is one conditional operator <code>==</code> used as part of the expression <code>x+1==y</code>, and another one <code>&amp;&amp;</code> used to link and evaluate two expressions.</p>
+
+<p>This clarifies that there was <strong>a major flow</strong> in my design, at this point. But luckily, <strong>I also figured out the source of the problem</strong>.</p>
+
+<p>The problem lied in a simple fact: I was not able to use conditional operators in the logical expressions!</p>
+
+<p>After I realized this single thought, everything became clearer soon. In fact, in many languages, <strong>expressions have a value</strong>. In C, for example, you can write <code>int x = a &amp;&amp; b;</code> and the result of the expression <code>a &amp;&amp; b</code> is assigned to the variable <code>x</code>.</p>
+
+<p>This also allowed me to understand that I didn’t need to design the <code>ifCond</code> as a condition between two expressions. One expression alone is enough, because it’s evaluated no matter how complex it is. And, as a convention, there is a defined set of basic values that evaluate to “false” (e.g., <code>0</code>, <code>NULL</code>, <code>False</code>, and a possibly empty list).</p>
+
+<p>Thus, I was finally clear about the way to go. I had to redesign the <code>expr</code> token to include conditional operators and then the ifCond will simply be</p>
+<div class="highlight"><pre class="chroma">ifCond  :  &#39;(&#39; expr &#39;)&#39;</pre></div>
+<p>That single expression will be evaluated, and its value will be the condition to enter the if branch or not.</p>
+
+<p>In hindsight this all looks pretty obvious now, but it totally wasn’t for me!</p>
+
+<p>Okay, so, <strong>how to modify the grammatical definition of expression token?</strong> We understood in a previous paragraph that operators priority is implemented with a chain of tokens, such as the chain made by <code>expr</code>, <code>term</code>, <code>baseExpr</code>.</p>
+
+<p>Now, if I want to add conditional operators and assign them a different priority then <strong>I need to add a new ring to the chain</strong>.</p>
+
+<p>I decided this was the case, because in general conditional operators have the lowest priority, at least in my intuition. Let’s take an example. When I write</p>
+<div class="highlight"><pre class="chroma">if (x + y &lt;= 3)</pre></div>
+<p>I really mean that I first want to compute the sum <code>x+y</code> and then check if it’s smaller or equal than <code>3</code>. This means that the conditional operator <code>&lt;=</code> has a lower priority than the plus <code>+</code>. And plus is already at the lowest priority (less than multiplication and division, for instance).</p>
+
+<p>Sure, I could use more parentheses. If I wrote</p>
+<div class="highlight"><pre class="chroma">if ((x + y) &lt;= 3)</pre></div>
+<p>then it would be all good, but it definitely seems unnecessary to do so.</p>
+
+<p>So, all considered, I added one more element in the recursive rule for the <code>expr</code> token and called it <code>pred</code> (as for logical predicate). Since this is the lowest in the priorities, it will be at the top of the chain.</p>
+
+<p>Here’s the new grammatical rule for the <code>expr</code> token.</p>
+<div class="highlight"><pre class="chroma">expr        :   pred (condOp expr)?
+pred        :   term ( (&#39;+&#39; | &#39;-&#39;) pred)?
+term        :   baseExpr ( (&#39;*&#39; | &#39;/&#39; | &#39;/.&#39; | &#39;%&#39;) term)?
+baseExpr    :   obj    |   &#39;(&#39; expr &#39;)&#39;</pre></div>
+<p>By comparing this with the previous (flawed) rule, the design pattern is very clear and easy to understand.</p>
+
+<p>One last thing worth noticing. I didn’t differentiate between conditional operators. It means that, for example, <code>&amp;&amp;</code> and <code>&lt;=</code> have the same priority. As a consequence, if you write</p>
+<div class="highlight"><pre class="chroma">if (x &lt;= y &amp;&amp; boolean1)</pre></div>
+<p>it’s not guaranteed which of the two logical expressions will be executed before. It could either be <code>(x &lt;= y) &amp;&amp; boolean1</code>, or it could be <code>x &lt;= (y &amp;&amp; boolean1)</code>. This is not a case of ambiguity, it’s a design choice. I know the first case is far more common, yet all logical operators are the same to me, so in similar case I want you use parentheses.</p>
+
+<p>Alright! With this troublesome issue solved, now it’s time to breath again!</p>
+
+<h3 id="back-to-the-if-statement">Back to the if statement</h3>
+
+<p>Let’s complete the definition of ifLine by specifying what the ifBody is.</p>
+<div class="highlight"><pre class="chroma">ifBody   :   (line ENDLINE)+ (optElse)?
+optElse  :   &#39;else&#39; (line ENDLINE)+</pre></div>
+<p>At this point, the above two definitions should be very easy to understand. The <code>ifBody</code> token is defined as a non-empty sequence of <code>(line, Endline)</code>. The last of these pairs may be followed by a <code>optElse</code> token (optional Else).</p>
+
+<p>The <code>optElse</code> token is made of the keyword <code>“else”</code> followed by a non-empty sequence of <code>(line, Endline)</code>.</p>
+
+<p>I think this is quite intuitive. Basically, both the if and the else branch are sub-Program tokens.</p>
+
+<p>Here is how a simple and valid if-then-else would look like in my Grammar.</p>
+<div class="highlight"><pre class="chroma">if (expr1)
+  line1;
+  line2;
+else
+  line3;
+;</pre></div>
+<p>Mind the final semicolon!</p>
+
+<p>Nested if statements would be written like this one:</p>
+<div class="highlight"><pre class="chroma">if (expr1)
+    line1-1;
+    line1-2;
+else
+    if (expr2)
+        line2-1;
+        line2-2;
+    else
+        line2-3;
+        line2-4;
+    ;
+;</pre></div>
+<p>Writing a sound grammatical rule for the conditional statement (ifLine) was definitely the piece of work <strong>I learnt the most from!</strong></p>
+
+<h2 id="loop-statement-while">Loop statement - while</h2>
+
+<p>With the <code>ifLine</code> out of our way, I believe the loop statement will not require any comment!</p>
+
+<p>Here’s the definition.</p>
+<div class="highlight"><pre class="chroma">loopLine    :   &#39;while&#39; ifCond loopBody
+loopBody    :   program</pre></div>
+<p>Just notice that I am using again the <code>ifCond</code>, as well as the whole program token. Pretty useful, isn’t it?</p>
+
+<h2 id="input-output-assignment">Input, Output, Assignment</h2>
+
+<p>The <code>line</code> definitions that we are still missing to complete the <code>program</code> token are those related to I/O and assignment. Luckily, I kept these very simple and, once again, explicit.</p>
+<div class="highlight"><pre class="chroma">input    :   ‘readIn’ var
+output   :   &#39;writeOut&#39; obj
+assign   :   var &#39;=&#39; expr</pre></div>
+<p>Notice that <code>“readIn”</code> and <code>“writeOut”</code> are reserved keyword. I will leave the understanding of these three simple definitions as exercise for you!</p>
+
+<h3 id="my-third-but-not-last-mistake">My third (but not last!) mistake</h3>
+
+<p>Here’s another thing I got wrong about the Grammar. It’s going to be the last mistake for this article, but definitely not my last one in the whole Compiler’s studies!</p>
+
+<p>As I said at the beginning, my objective is to build an implicitly typed programming language. This means that the Compiler knows about types, but it’s able to understand them all by itself. The programmer does not need to declare types explicitly.</p>
+
+<p>For example, you would simply write</p>
+<div class="highlight"><pre class="chroma">x = 5;
+y = NULL;</pre></div>
+<p>And the Compiler would understand that <code>x</code> is integer and <code>y</code> is a null type. You do not need to write</p>
+<div class="highlight"><pre class="chroma">int x = 5;
+Object y =  NULL;</pre></div>
+<p>like in Java, C++, etc. What’s even more important is that, if later in the program you write</p>
+<div class="highlight"><pre class="chroma">z = x + y;</pre></div>
+<p>The Compiler will remember the types <code>x</code> and <code>y</code> were assigned to, and will tell you that the operation <code>+</code> is not allowed between these two types. And the compilation will stop with an error.</p>
+
+<p>So, my language is statically typed, but implicitly, which saves some time in typing on the keyboard.</p>
+
+<p>It’s worth underlining that this is a very different behavior from what we see, for example, in Python, Perl, and other scripting language. There, when an operation is not possible between two types, the error is generated at runtime, not during the compilation (which often does not even exist, in scripting languages).</p>
+
+<p>Type-checking is part of the Semantic Analysis, and this is why I didn’t immediately realize that I made a mistake at this point. The problem is with the Input Line.</p>
+
+<p>If all we declare is <code>readIn var</code>, how could the Compiler possibly know what’s the type of the newly assigned variable? It just can’t.</p>
+
+<p>That’s true in many languages. For example in Python3, you would do</p>
+<div class="highlight"><pre class="chroma">x = input()</pre></div>
+<p>And <code>x</code> would automatically given a <code>str</code> class (because Python is Object Oriented), regardless of what you enter. Even if enter just digits, such as <code>1234</code>, and wanted to have an integer variable, <code>x</code> will still be a string.</p>
+
+<p>You are required to do an explicit type cast, if you want an integer. Something like</p>
+<div class="highlight"><pre class="chroma">x = int(input())</pre></div>
+<p>Type cast is a very weird beast in my opinion. It’s totally unsafe, and can potentially lead to crashes at runtime. Still, it’s very common especially in interpreted languages.</p>
+
+<p>At any rate, since types are implicit in my language, it didn’t make sense to support type casting. I would also have to introduce all keywords reserved to types.</p>
+
+<p>I therefore decided to modify the Input Line. The new definition is</p>
+<div class="highlight"><pre class="chroma">input   :   readIn var</pre></div>
+<p>where <code>readIn</code> is not a keyword anymore, it’s another token type, defined as it follows.</p>
+<div class="highlight"><pre class="chroma">readIn  :   &#39;readInt&#39; | &#39;readFloat&#39; | &#39;readBool&#39; | &#39;readStr&#39;</pre></div>
+<p>Like that, when you write an Input Line you will also have to declare what’s the input type, for example</p>
+<div class="highlight"><pre class="chroma">readInt x;</pre></div>
+<p>and the Compiler will assign type int to the identifier <code>x</code>. Obviously, it does not make sense to have a <code>readNull</code> keyword.</p>
+
+<h2 id="break-and-continue">Break and Continue</h2>
+
+<p>In the <code>program</code> token, as you’ve already seen, I also added the <code>break</code> and <code>continue</code> instructions, that are quite useful when managing control flow. I kept them as last ones because they are the easiest!</p>
+<div class="highlight"><pre class="chroma">breakLine   :   &#39;break&#39;
+contLine     :   &#39;continue&#39;</pre></div>
+<h2 id="summary">Summary</h2>
+
+<p>At this point all pieces of the Grammar have taken their places. Here’s how the entire thing looks like.</p>
+<div class="highlight"><pre class="chroma">digit0     : 0-9
+digit      : 1-9
+letter     : a-z | A-Z
+otherChar  : |!”%&amp;/()=+-*#&gt;&lt;;,^.][\n \t
+char       : letter | otherChar | digit
+
+num         :   (&#39;+&#39; | &#39;-&#39;)? float
+float       :   (frac exp?) | (int frac? exp?)
+int         :   &#39;0&#39; | digit+ digit0*
+frac        :   &#39;.&#39; int
+exp         :   &#39;^&#39; (&#39;+&#39; | &#39;-&#39;)? int
+
+str         :   quotedStr (&#39;+&#39; quotedStr)*
+quotedStr   :   &#39; &#34; &#39; (char)* &#39; &#34; &#39; (&#39;,&#39; obj)*
+
+bool        :   &#39;True&#39; | &#39;False&#39;
+null        :   &#39;NULL&#39;
+var         :   letter (digit | letter)*
+list        :   &#39;[&#39; (listExpr)? &#39;]&#39;
+listElem    :   var &#39;[&#39; int &#39;]&#39;
+obj         :   var | num | str | bool | null | list | listElem
+listExpr    :   obj (&#39;,&#39; obj)*
+
+program     :   (line ENDLINE)*
+ENDLINE     :   &#39;;&#39; &#39;\n&#39;
+line        :   assign
+            |   input
+            |   output
+            |   ifLine
+            |   loopLine
+            |   breakLine
+            |   contLine
+
+input       :   readIn var
+readIn      :   &#39;readInt&#39; | &#39;readFloat&#39; | &#39;readBool&#39; | &#39;readStr&#39;
+output      :   &#39;writeOut&#39; obj
+assign      :   var &#39;=&#39; expr
+
+expr        :   pred (condOp expr)?
+pred        :   term ( (&#39;+&#39; | &#39;-&#39;) pred)?
+term        :   baseExpr ( (&#39;*&#39; | &#39;/&#39; | &#39;/.&#39; | &#39;%&#39;) term)?
+baseExpr    :   obj   |   &#39;(&#39; expr &#39;)&#39;
+
+operator    :   &#39;+&#39; | &#39;-&#39; | &#39;*&#39; | &#39;/&#39; | &#39;/.&#39; | &#39;%&#39; | condOp
+condOp      :   &#39;&amp;&amp;&#39; | &#39;||&#39; | &#39;!=&#39; | &#39;==&#39; | &#39;&lt;=&#39; | &#39;&gt;=&#39; | &#39;&gt;&#39; | &#39;&lt;&#39;
+
+ifLine      :   &#39;if&#39; ifCond ifBody
+ifCond      :   &#39;(&#39; expr &#39;)&#39;
+ifBody      :   (line ENDLINE)+ (optElse)?
+optElse     :   &#39;else&#39; (line ENDLINE)+
+
+loopLine    :   &#39;while&#39; ifCond loopBody
+loopBody    :   program
+
+breakLine   :   &#39;break&#39;
+contLine    :   &#39;continue&#39;</pre></div>
+<p>I must say I do like the result. First of all because is a neat and quite simple Grammar. Sure, at the moment it does not allow for many important things, such as OOP and routines. I will definitely add routines at some point down the road.</p>
+
+<p>Despite that, this Grammar is LL(1), a feature I really wanted so that I can further learn by implementing a LL(1) recursive descent parser. Moreover, the Grammar does allow for constructs such as input, output, conditional branching and loops, therefore the generated Language is Turing-complete.</p>
+
+<h2 id="a-complete-example">A Complete Example</h2>
+
+<p>Although this work is still far away to be a new Programming Language, I want to show you how a meaningful source code would look like.</p>
+
+<p>As an example, let’s consider every student’s favorite exercise: <em>read an integer number N and compute the total sum of the first N prime numbers</em>.</p>
+
+<p>Here’s how I would implement this in Python (&gt; 3.6) and in my own language.</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># Python3.6</span>
+<span class="n">N</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">())</span>
+<span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">isPrime</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+          <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{i} is not prime&#39;</span><span class="p">)</span>
+          <span class="n">isPrime</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">isPrime</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="k">if</span> <span class="n">isPrime</span><span class="p">:</span>
+        <span class="n">total</span> <span class="o">+=</span> <span class="n">i</span>
+<span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Total primes sum until {N} is {total}&#39;</span><span class="p">)</span></code></pre></div><div class="highlight"><pre class="chroma"># My language
+readInt N;
+totSum = 0;
+i = 2;
+while (i &lt;= N)
+    j = 2;
+    isPrime = True;
+    while ((j &lt;= i / 2) &amp;&amp; isPrime)
+        if (i % j == 0)
+            writeOut &#34;%d is not prime&#34;, i;
+            isPrime = False;
+        ;
+        j = j + 1;
+    ;
+    if (isPrime)
+        totSum = totSum + i;
+    ;
+    i = i + 1;
+;
+writeOut &#34;Total primes sum until %d is %d&#34;, N, totSum;</pre></div>
+<h2 id="conclusions-and-outlook">Conclusions and Outlook</h2>
+
+<p>The design of a formal, LL(1) Grammar for a new Programming Language is not only a fun task, but it’s also very instructive.</p>
+
+<p>A Grammar itself though, while fun to design, is not very useful. To take this one step further and build a new Programming Language out of it, as we already know, all the other main modules of a Compiler must be built: Parsing, Semantic Analysis and Code Generation.</p>
+
+<h2 id="references">References</h2>
+
+<p>Language Implementation Patterns. A book by Prof. <a href="https://parrt.cs.usfca.edu/">Terrence Parr</a>.</p>
+
+<p>Alex Aiken&rsquo;s class Compilers at Stanford University. Available as <a href="https://lagunita.stanford.edu/courses/Engineering/Compilers/Fall2014/course/">free MOOC online</a>.</p>
+
+<p>My article <a href="http://example.org/page/what-is-a-programming-language-grammar/">What Is A Programming Language Grammar?</a>.</p>
+
+<p>My article <a href="http://example.org/page/how-to-design-grammars/">How to design Formal Grammars</a>.</p>
+
+<p>My article <a href="(http://example.org/page/what-are-the-differences-in-programming-languages/)">What are the differences between programming languages?</a>.</p>
+
+<p>Python Lexical Analysis <a href="https://docs.python.org/3/reference/lexical_analysis.html">documentation page</a>.</p>
+
+<p>My <a href="https://github.com/pgrandinetti/compilers">GitHub repository</a> for this course.</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fdesign-a-new-formal-grammar%2f&amp;text=Design%20of%20a%20New%20Context-Free%20Grammar&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fdesign-a-new-formal-grammar%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fdesign-a-new-formal-grammar%2f&amp;title=Design%20of%20a%20New%20Context-Free%20Grammar" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fdesign-a-new-formal-grammar%2f&amp;title=Design%20of%20a%20New%20Context-Free%20Grammar" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fdesign-a-new-formal-grammar%2f&amp;title=Design%20of%20a%20New%20Context-Free%20Grammar" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fdesign-a-new-formal-grammar%2f&amp;description=Design%20of%20a%20New%20Context-Free%20Grammar" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

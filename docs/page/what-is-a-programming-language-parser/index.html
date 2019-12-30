@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>What Is a Programming Language Parser? | Compilers</title>
+  <meta name="description" content="First of all, a correction:
+Parsing algorithms are not made for programming languages; they are made for language Grammars.
+A Grammar is a set of rules that specify how you can write characters one after the other in order to form valid sentences (that is, valid for that grammar).
+For example, the English grammar tells us that you can put the characters &lsquo;y&rsquo;, &lsquo;o&rsquo;, &lsquo;u&rsquo; one after the other and form a valid token (the word &ldquo;you&rdquo;), and that if you also add the characters &lsquo; &lsquo;, &lsquo;a&rsquo;, &lsquo;r&rsquo;, &lsquo;e&rsquo;, &lsquo; &lsquo;, &lsquo;g&rsquo;, &lsquo;r&rsquo;, &lsquo;e&rsquo;, &lsquo;a&rsquo;, &rsquo;t&rsquo;, you will have made a valid sentence (that is, &ldquo;you are great&rdquo;).">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/what-is-a-programming-language-parser\/",
+          "name": "What is a programming language parser?"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "What Is a Programming Language Parser?",
+  "description" : "First of all, a correction:\nParsing algorithms are not made for programming languages; they are made for language Grammars.\nA Grammar is a set of rules that specify how you can write characters one after the other in order to form valid sentences (that is, valid for that grammar).\nFor example, the English grammar tells us that you can put the characters \x26lsquo;y\x26rsquo;, \x26lsquo;o\x26rsquo;, \x26lsquo;u\x26rsquo; one after the other and form a valid token (the word \x26ldquo;you\x26rdquo;), and that if you also add the characters \x26lsquo; \x26lsquo;, \x26lsquo;a\x26rsquo;, \x26lsquo;r\x26rsquo;, \x26lsquo;e\x26rsquo;, \x26lsquo; \x26lsquo;, \x26lsquo;g\x26rsquo;, \x26lsquo;r\x26rsquo;, \x26lsquo;e\x26rsquo;, \x26lsquo;a\x26rsquo;, \x26rsquo;t\x26rsquo;, you will have made a valid sentence (that is, \x26ldquo;you are great\x26rdquo;).",
+  "inLanguage" : "en",
+  "wordCount":  2646 ,
+  "datePublished" : "2019-10-02T00:00:00",
+  "dateModified" : "2019-10-02T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/what-is-a-programming-language-parser\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="What Is a Programming Language Parser?" />
+<meta property="og:description" content="First of all, a correction:
+Parsing algorithms are not made for programming languages; they are made for language Grammars.
+A Grammar is a set of rules that specify how you can write characters one after the other in order to form valid sentences (that is, valid for that grammar).
+For example, the English grammar tells us that you can put the characters &lsquo;y&rsquo;, &lsquo;o&rsquo;, &lsquo;u&rsquo; one after the other and form a valid token (the word &ldquo;you&rdquo;), and that if you also add the characters &lsquo; &lsquo;, &lsquo;a&rsquo;, &lsquo;r&rsquo;, &lsquo;e&rsquo;, &lsquo; &lsquo;, &lsquo;g&rsquo;, &lsquo;r&rsquo;, &lsquo;e&rsquo;, &lsquo;a&rsquo;, &rsquo;t&rsquo;, you will have made a valid sentence (that is, &ldquo;you are great&rdquo;).">
+<meta property="og:url" content="http://example.org/page/what-is-a-programming-language-parser/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="What Is a Programming Language Parser?" />
+  <meta name="twitter:description" content="First of all, a correction:
+Parsing algorithms are not made for programming languages; they are made for language Grammars.
+A Grammar is a set of rules that specify how you can write characters one …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>What Is a Programming Language Parser?</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  October 2, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>First of all, a correction:</p>
+
+<p><em>Parsing algorithms are not made for programming languages; they are made for language Grammars.</em></p>
+
+<p>A Grammar is a set of rules that specify how you can write characters one after the other in order to form valid sentences (that is, valid for that grammar).</p>
+
+<p>For example, the English grammar tells us that you can put the characters &lsquo;y&rsquo;, &lsquo;o&rsquo;, &lsquo;u&rsquo; one after the other and form a valid token (the word &ldquo;you&rdquo;), and that if you also add the characters &lsquo; &lsquo;, &lsquo;a&rsquo;, &lsquo;r&rsquo;, &lsquo;e&rsquo;, &lsquo; &lsquo;, &lsquo;g&rsquo;, &lsquo;r&rsquo;, &lsquo;e&rsquo;, &lsquo;a&rsquo;, &rsquo;t&rsquo;, you will have made a valid sentence (that is, &ldquo;you are great&rdquo;). The English grammar defines the English language.</p>
+
+<p>Formal Grammars work in similar way. The confusion arises because Formal Grammars are used in computer science to define new programming languages, and therefore the two definitions often get mixed. But I hope that now the distinction is clear.</p>
+
+<p>Now, let&rsquo;s <strong>answer the question</strong>.</p>
+
+<p><em>A parser is an algorithm designed in order to take a sequence of tokens and decide whether that sequence is valid in the considered grammar.</em></p>
+
+<p>This answer generates more questions, as it often happens. Here are some:</p>
+
+<p><strong>Where does the sequence of tokens come from?</strong></p>
+
+<p>From a broader point of view, a Compiler takes a stream of characters in input, for example a file with the source code of the program that must be compiled. The first step in the compilation process, called Lexical Analysis, takes care of producing the sequence of tokens from the entire characters stream. Such a sequence is then fed into the Parser, which is the second step of the compilation.</p>
+
+<p><strong>Does the parser only decide whether to accept or reject the tokens sequence? Like a Yes/No answer?</strong></p>
+
+<p>Strictly speaking, that&rsquo;s correct. A parser can &ldquo;just&rdquo; make a decision about acceptance or rejection of the input. However, to do so it builds some data structure (tree-like) and perform some computations on it. Such data structure is also useful in the remainder of the compilation process, and therefore is not discarded by the parser, rather it can be considered its output.</p>
+
+<p><strong>What makes a tokens sequence valid?</strong></p>
+
+<p>It&rsquo;s all about respecting the rules set by the Grammar. If the tokens are put one after the other in a valid order then the sequence is accepted. However, Grammars are complicated beasts, so the algorithm to decide on the validity of a token sequence is not trivial. If it was, then this article would stop here!</p>
+
+<p>I believe the answers so far give a pretty good understanding of what a Parser is, although a bit too general. Let&rsquo;s then go into more details.</p>
+
+<h2 id="different-types-of-parsing-algorithms">Different Types of Parsing Algorithms</h2>
+
+<p>Writing a parsing algorithm is a bit like an artistic effort. In fact, if you google or maybe search on GitHub, you will find thousands of programmers who have made their own domain-specific parser. The logic and the algorithms of these Parsers do not basically follow any pattern.</p>
+
+<p>Even though you can create a parser from scratch and without knowing much theory, that is <strong>not how you should do it</strong>. Science and theory exist for a good reason: to guide scientists as well as engineers and practitioners. That&rsquo;s just my opinion, of course.</p>
+
+<p>Thus, instead of jumping right away into writing some code that may or may not work eventually, I always try to take my time to research the problem and see what the state of the art is.</p>
+
+<p>In the case of Grammar Parsing Algorithms, it turns out that the state of the art algorithms are pretty solid and widely used for a very big class of grammars (more on this last point in a minute).</p>
+
+<p>Let me say it again, in different words:</p>
+
+<p><em>You should really avoid to write a parser without first studying and understanding the basic parsing patterns that are used in the most famous compilers.</em></p>
+
+<p>Thus, to understand and to study these algorithms is what we are about to do!</p>
+
+<p><img src="/images/ParserClassification.png" alt="Distinction Between Parsers Implementation" /></p>
+
+<h3 id="a-first-classification">A first classification</h3>
+
+<p>Books and theoreticians divide parsing algorithms in two very large groups, at first. I think knowing such a definition is extremely useful: imagine yourself talking with a colleague about some piece of code. Then, you both can use this common language to understand what each is saying to the other.</p>
+
+<p><strong>This first classification is based on how the algorithm builds the parse tree in the internal memory.</strong></p>
+
+<p>First of all, let me repeat the concept: parsers build a so-called <em>parse tree</em>, which is a tree-like data structure whose leaves are the terminal tokens of the grammar, and the intermediate nodes in the tree are nonterminal tokens. Why a tree? This is a very good question, but let me skip it for a minute, and take it back later. Just assume we really want to have it in a tree-like shape.</p>
+
+<p>If you think about a tree-like data structure, there are two sensible ways to build it. One is from the top (root) to the bottom (leaf), and the other is vice versa.</p>
+
+<p>And indeed, parsing algorithms are classified in first instance as:</p>
+
+<ul>
+<li><strong>Top-down</strong> Parsers,</li>
+<li><strong>Bottom-up</strong> Parsers.</li>
+</ul>
+
+<p>What does it mean in practice? Well, remember that parsing algorithms works on the grammar definition. Thus, a top-down parser will assume that the first token it sees in the input string is the start symbol of the grammar. Then, it will derive all the other tokens as children of the start symbol.</p>
+
+<p>Bottom-up parsers follow the inverse logic. They will assume the first symbol seen in the input string is a leaf of the tree, and will start building the tree by deciding what is the parent node of that leaf, and so on until they arrive at the root of the tree.</p>
+
+<p>This very simple classification is actually extremely important. In fact, top-down and bottom-up parsers are not different &ldquo;just&rdquo; in the way they build the tree. They can actually &ldquo;do&rdquo; different things.</p>
+
+<p>In particular, and this is a very important thing to remember, <strong>bottom-up algorithms are more powerful, but also much more complex</strong>.</p>
+
+<p>What does &ldquo;more powerful&rdquo; mean? It means that they can work with a larger set of grammars.</p>
+
+<p>For example, top-down parsers do not work with left-recursive grammar, whereas bottom-up ones do. Left-recursive grammars are those grammars where a production rule for a nonterminal symbol A starts with the same symbol. For example the production rule</p>
+<div class="highlight"><pre class="chroma">A : Ab</pre></div>
+<p>would make a grammar left-recursive, because to &ldquo;replace&rdquo; the symbol <code>A</code> in a string you have to start with another <code>A</code> (followed by a <code>b</code>).</p>
+
+<p>We will see in a minute why top-down parsers get into trouble in such cases.</p>
+
+<h3 id="a-second-classification">A second classification</h3>
+
+<p><strong>The second classification is based on how the algorithm expands the nodes in the parse-tree</strong>.</p>
+
+<p>Generally speaking, expanding a node in a tree means to figure out what are its connections (for example, its children if you are building the tree top-down). In a parse tree this means to <strong>understand what production rule must be applied to that node</strong>. Let me give a concrete example.</p>
+
+<p>Let&rsquo;s say we are just starting off the parsing procedure, and want to do it with a top-down approach. Therefore, we would have only one node in the tree, the root, with the start symbol of the grammar. Let&rsquo;s say this symbol is <code>S</code>.</p>
+
+<p>The grammar is likely to have many production rules for the starting symbol <code>S</code>, for example</p>
+<div class="highlight"><pre class="chroma">S : aAb | Ac | dB.</pre></div>
+<p>So, the first goal of a top-down parser would be to figure out what&rsquo;s the right production rule that must be used to expand the root node further down in its child. It can have three children, in the form aAb, or two children in either the form <code>Ac</code> or <code>dB</code>.</p>
+
+<p>Now, when you expand the root node, the parse tree will have either three or two nodes that must be expanded further. The question is: which one to pick up for expansion?</p>
+
+<p>There are two common approaches:</p>
+
+<ul>
+<li><strong>Leftmost parsers</strong> choose to expand the leftmost node in the tree that is not a terminal token.</li>
+<li><strong>Rightmost parsers</strong> expand the rightmost node that is not a terminal token.</li>
+</ul>
+
+<p>The natural question, at this point, is whether different expansions rule can lead to different parse trees, or not.</p>
+
+<p>The answer is <em>in general, yes</em>, there can be two different parse trees for the same input string. However, and this is very important, the same string can have multiple parse trees only if the grammar is ambiguous.</p>
+
+<p><strong>Ambiguity is BAD</strong>, and in fact grammars designed for programming languages are unambiguous. That means, each string that is valid in that grammar can have one and only one parse tree. And therefore, we should get the same result no matter if we expand the leftmost or rightmost child.</p>
+
+<h3 id="backtracking-or-not-that-s-the-question">Backtracking or not, that&rsquo;s the question</h3>
+
+<p><strong>A third classification is based on whether the parsing algorithm uses backtracking or not.</strong></p>
+
+<p>I find that knowing about this distinction is very useful to understand articles and other people&rsquo;s code.</p>
+
+<p>Backtracking is a general programming techniques that (very informally) says: each time you have to make a decision about what to do in the procedure, save the current state, try one of the choices you have and if it fails then simply start over again by resuming the saved state and making a different decision at that point.</p>
+
+<p>In parsing, decisions are all about what production rule to choose when many of them seem fine. Let&rsquo;s see a concrete example.</p>
+
+<p>Consider the string <code>a = b + 1</code>, and assume you have already parsed it correctly until the <code>=</code> symbol (included). So, the parser must figure out what&rsquo;s on the right-hand side of this assignment statement.</p>
+
+<p>Your grammar is likely to have production rules about assignments that are similar to the following</p>
+<div class="highlight"><pre class="chroma">assign_stm :  ID &#39;=&#39; ID
+           |  ID &#39;=&#39; expr
+           |  ID &#39;=&#39; NUM</pre></div>
+<p>Such rule basically says:</p>
+
+<p><em>an assignment statement can be made in three ways only: an identifier, a <code>=</code> sign and another identifier; an identifier, a <code>=</code> sign and a whole expression; an identifier, a <code>=</code> sign and a number&rdquo;.</em></p>
+
+<p>Notice that the above rule can be also written as</p>
+<div class="highlight"><pre class="chroma">assign_stm : ID &#39;=&#39; (ID | exp | NUM).</pre></div>
+<p>Thus, when you are parsing the input string and arrive at the <code>=</code> sign, it&rsquo;s time to figure out which of the three alternatives is the right one. If you have no clue about it, then the solution is to save the current parse tree, pick one choice among the three at random and keep going trusting this decision. If it turns out it was a wrong decision (because you reach a dead end in the parsing procedure), then you must backtrack: restore the parse tree you saved, and take a different choice.</p>
+
+<p><strong>Backtracking is a very powerful technique</strong>, because it guarantees that you will take the right decision, eventually. Or, in the case of a parser, that there was no right decision and therefore the input string has to be rejected (like in a compilation error).</p>
+
+<p>However, as it often happens, <strong>powerful techniques are also expensive</strong>. And backtracking is very expensive. Therefore, you might want to avoid it in a parser.</p>
+
+<p>The cost of avoiding backtracking is that you can&rsquo;t assume the parser will be able to handle all types of grammars. In fact, to avoid backtracking the parser needs to have some hint about what decision to take when multiple production rules are available.</p>
+
+<p>These &ldquo;hints&rdquo; the parser need are called <em>lookahead</em>. Simply, the parser algorithm is allowed to look a bit further in the input string, and it can decide what production rule to continue on based on the tokens it sees ahead.</p>
+
+<p>Definitions gets a bit more complex now, but let me try to summarize them.</p>
+
+<p>If a parser only needs to look one token ahead to parse the grammar successfully (that is, to parse all possible input strings), then the grammar is said to be LL(1).</p>
+
+<ul>
+<li>The first L means leftmost derivation (which I explained above).</li>
+<li>The second L means lookahead.</li>
+<li>The integer in the parenthesis is the number of tokens it needs to look ahead. In general, if the parser needs to look k tokens, then the grammar is said to be LL(k).</li>
+</ul>
+
+<p>LL(k) grammars are obviously a (small) subset of all formal grammars you can make. This is what I meant by saying &ldquo;backtracking is more powerful&rdquo;:</p>
+
+<ul>
+<li>With backtracking you can parse a very large set of Grammars, but it will take a long time to execute.</li>
+<li>Without it, you can parse a restricted set of Grammars, but it will be much more efficient.</li>
+</ul>
+
+<h3 id="recursion-or-not-that-s-the-other-question">Recursion or not, that&rsquo;s the other question</h3>
+
+<p>A final distinction that I want to make, because I find it very useful, is more technical and specifically related to the implementation of the parsing algorithm.</p>
+
+<p>In fact, it&rsquo;s well known that every recursive algorithm can be implemented with a non-recursive procedure, typically using a stack data structure (Last In First Out - LIFO).</p>
+
+<p><strong>Grammars and Programming Languages are intrinsically recursive</strong>, because the production rules uses each other. Thus, the most natural implementation of almost every parsing algorithm is via a recursive scheme. However, it&rsquo;s often convenient to switch to an equivalent iterative procedure (non-recursive), for memory management purposes.</p>
+
+<p>Keeping in mind this fourt distinctions has helped me quite a bit in studying parsers implementation.</p>
+
+<h2 id="take-home-messages-so-far">Take-home Messages so far</h2>
+
+<p>At this point, I believe repeating a few key concepts is beneficial in order to not lose the thread of the subject, before continuing. First, about parsing in general:</p>
+
+<ul>
+<li>A Parser is a software able to decide whether or not a string respects a Grammar rules, and hence belongs or not to a Language.</li>
+<li>Parsing is the second step in a compilation process, after the Lexical Analysis. In fact, the input of the Parser is the sequence of tokens generated by the Lexical Analyzer.</li>
+<li>To decide whether to accept or reject the string in input, the Parser builds in memory a Parse-Tree, where the leafs are the terminal tokens of the grammar. This parse tree can be seen as the output of the parsing process (and thus the input of the next compilation step).</li>
+</ul>
+
+<p>I&rsquo;ve also discussed with you the main differences that can exist in a parser:</p>
+
+<ul>
+<li>The Parser can build the parse tree from the root to the leaves, in which case is said to be a top-down parser, or vice versa, in which case it&rsquo;s said a bottom-up parser.</li>
+<li>Bottom-up parser are more general than top-down ones, in the sense that they can handle more types of grammars. On the other hand, top-down parsers have a much simpler algorithmic structure, easier to maintain.</li>
+<li>In building the Parse-Tree, the parser can either expand the leftmost nonterminal node in the tree, or the rightmost. Leftmost is definitely the most common approach.</li>
+<li>Useful Grammars have a lot of production rules, many for each symbol. In such a case, the Parser must decide what is the right production rule to apply to expand a nonterminal node. The most general approach to do this is with backtracking, which however is awfully slow. The (more commonly used) alternative is to write a parser that works for LL(k) Grammars, since with a lookahead of k tokens backtracking is not necessary.</li>
+<li>Although Grammars have a strong recursive footprint, Parsers can be implemented either with a recursive algorithm or with an iterative one. The latter often uses a stack data structure to imitate the recursion in an iterative fashion.</li>
+</ul>
+
+<p>I think that makes enough for an overview of parsing algorithms! Next, I am going to dive much deeper into <strong>the nuts and bolts of a parser prototype</strong>.</p>
+
+<h2 id="references">References</h2>
+
+<p>My article <a href="http://example.org/page/what-is-a-programming-language-grammar/">What is a Programming Language Grammar?</a></p>
+
+<p>Language Implementation Patterns. A book by <a href="https://parrt.cs.usfca.edu/">Prof. Terrence Parr</a>.</p>
+
+<p>The Dragon Book. Compilers: Principles, Techniques and Tools. <a href="https://en.wikipedia.org/wiki/Compilers:_Principles,_Techniques,_and_Tools">Wikipedia page</a> (of the book).</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fwhat-is-a-programming-language-parser%2f&amp;text=What%20Is%20a%20Programming%20Language%20Parser%3f&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fwhat-is-a-programming-language-parser%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fwhat-is-a-programming-language-parser%2f&amp;title=What%20Is%20a%20Programming%20Language%20Parser%3f" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fwhat-is-a-programming-language-parser%2f&amp;title=What%20Is%20a%20Programming%20Language%20Parser%3f" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fwhat-is-a-programming-language-parser%2f&amp;title=What%20Is%20a%20Programming%20Language%20Parser%3f" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fwhat-is-a-programming-language-parser%2f&amp;description=What%20Is%20a%20Programming%20Language%20Parser%3f" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

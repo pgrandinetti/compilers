@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>What Is Semantic Analysis in a Compiler? | Compilers</title>
+  <meta name="description" content="Semantic Analysis is the last step in the front-end compilation. It&rsquo;s called front-end because it basically is an interface between the source code written by a developer, and the transformation that this code will go through in order to become executable.
+In different words, front-end is the stage of the compilation where the source code is checked for errors. There can be lots of different error types, as you certainly know if you&rsquo;ve written code in any programming language.">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/what-is-semantic-analysis-in-compilers\/",
+          "name": "What is semantic analysis in a compiler?"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "What Is Semantic Analysis in a Compiler?",
+  "description" : "Semantic Analysis is the last step in the front-end compilation. It\x26rsquo;s called front-end because it basically is an interface between the source code written by a developer, and the transformation that this code will go through in order to become executable.\nIn different words, front-end is the stage of the compilation where the source code is checked for errors. There can be lots of different error types, as you certainly know if you\x26rsquo;ve written code in any programming language.",
+  "inLanguage" : "en",
+  "wordCount":  2172 ,
+  "datePublished" : "2019-10-03T14:41:56",
+  "dateModified" : "2019-10-03T14:41:56",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/what-is-semantic-analysis-in-compilers\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="What Is Semantic Analysis in a Compiler?" />
+<meta property="og:description" content="Semantic Analysis is the last step in the front-end compilation. It&rsquo;s called front-end because it basically is an interface between the source code written by a developer, and the transformation that this code will go through in order to become executable.
+In different words, front-end is the stage of the compilation where the source code is checked for errors. There can be lots of different error types, as you certainly know if you&rsquo;ve written code in any programming language.">
+<meta property="og:url" content="http://example.org/page/what-is-semantic-analysis-in-compilers/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="What Is Semantic Analysis in a Compiler?" />
+  <meta name="twitter:description" content="Semantic Analysis is the last step in the front-end compilation. It&rsquo;s called front-end because it basically is an interface between the source code written by a developer, and the transformation …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>What Is Semantic Analysis in a Compiler?</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  October 3, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>Semantic Analysis is <strong>the last step in the front-end compilation</strong>. It&rsquo;s called front-end because it basically is an interface between the source code written by a developer, and the transformation that this code will go through in order to become executable.</p>
+
+<p>In different words, <strong>front-end is the stage of the compilation where the source code is checked for errors</strong>. There can be lots of different error types, as you certainly know if you&rsquo;ve written code in any programming language.</p>
+
+<p>Let&rsquo;s briefly review what happens during the previous parts of the front-end, in order to better understand what semantic analysis is about. If you have read my previous articles about these subjects, then you can skip the next few paragraphs.</p>
+
+<p>First, the source code is given to the Lexical Analysis module. What&rsquo;s the objective here? The Lexical Analyzer is often implemented as a Tokenizer and its goal is to <strong>read the source code character by character</strong>, groups characters that are part of the same Token, and reject characters that are not allowed in the language.</p>
+
+<p>For example, if the source code contains the following sequence of characters</p>
+<div class="highlight"><pre class="chroma">&#39;w&#39; &#39;h&#39; &#39;i&#39; &#39;l&#39; &#39;e&#39;</pre></div>
+<p>the Tokenizer will group them in a unique token <code>while</code>, which is very likely to be the beginning of a loop.</p>
+
+<p>On the other hand, if the Tokenizer sees the following sequence</p>
+<div class="highlight"><pre class="chroma">&#39;?&#39; &#39;=&#39; &#39;!&#39;</pre></div>
+<p>it&rsquo;s quite likely (although it depends on which language it&rsquo;s being analyzed) that it will reject the whole source code because that sequence is not allowed. As a more meaningful example, <strong>in the programming language I created</strong>, underscores are not part of the Alphabet. So, if the Tokenizer ever reads an underscore it will reject the source code (that&rsquo;s a compilation error).</p>
+
+<p>I believe full understanding of this point is crucial. In some sense, <strong>the primary objective of the whole front-end is to reject ill-written source codes</strong>. Each level of the front-end takes care of some types of error. Lexical Analysis is just the first of three steps, and it checks correctness at the character level.</p>
+
+<p>The second step is Parsing. More precisely, the output of the Lexical Analysis is a sequence of Tokens (not single characters anymore), and the Parser has to evaluate whether this sequence of Token makes sense or not.</p>
+
+<p>What does it mean for a sequence of Tokens to &ldquo;make sense&rdquo;? It has to do with the Grammar, that is the syntactic rules the entire language is built on.</p>
+
+<p>For example, one rule in the Grammar may say that a Token &ldquo;while&rdquo; must be followed by an open parenthesis <code>(</code>. This is probably because the boolean condition of the while loop must be enclosed into a pair of parentheses, a common scenario in many languages.</p>
+
+<p>Continuing with this simple example, if the sequence of Tokens does not contain an open parenthesis after the <code>while</code> Token, then <strong>the Parser will reject the source code</strong> (again, this is shown as a compilation error).</p>
+
+<p>An easier way to think about what the Parser does (easier for me at least) is to compare it with your native language and its grammatical rules. Let&rsquo;s say it&rsquo;s English. Imagine that a sentence is a sequence of Tokens. It really just is a sequence of words, but let&rsquo;s call each word a Token. And let&rsquo;s say, while you read the sentence you see a token &lsquo;I&rsquo;, and right after that another token &lsquo;I&rsquo;. Now, there&rsquo;s no possible sentence in English where you would repeat twice consecutively the pronoun &lsquo;I&rsquo;. Therefore, you should &ldquo;reject&rdquo; this sentence and declare that it&rsquo;s wrongly typed. That&rsquo;s a compilation error!</p>
+
+<p>So, to recap:</p>
+
+<ul>
+<li>Lexical Analysis catches errors at the character (alphabetic) level.</li>
+<li>Parsing catches errors at the token (grammatical) level.</li>
+</ul>
+
+<p>What&rsquo;s the matter with Semantical Analysis then? Apart from the fancy name, it&rsquo;s simply another module of the front-end. And it&rsquo;s also the last one. This means that <strong>the goal of Semantic Analysis is to catch all possible errors that went unnoticed through Lexical Analysis and Parsing</strong>.</p>
+
+<p>If the overall objective of the front-end is to reject ill-typed codes, then Semantic Analysis is the last soldier standing before the code is given to the back-end part. It&rsquo;s the last guard against dumb errors.</p>
+
+<p>What these errors are, then? What could be possibly missed by the first two steps, Lexical Analysis and Parsing? Let&rsquo;s take a look.</p>
+
+<h2 id="an-ocean-of-errors">An Ocean of Errors</h2>
+
+<p>The first point I want to make is that writing one single giant software module that takes care of all types of error, thus merging in one single step the entire front-end compilation, is possible. However, <strong>this is not how quality software engineering works</strong>.</p>
+
+<p>Not that it hasn&rsquo;t been tried. Each compiler is a unique system, and there have been many experiments on how to organize the several steps required by a Compiler. Nonetheless, the three front-end steps are to be separated, in order to have a <strong>clean and well-designed system</strong>.</p>
+
+<p>To discuss why Semantic Analysis is necessary at all, I want to start with an example. Let&rsquo;s say we are given a piece of C (or Java) code, where a line is</p>
+<div class="highlight"><pre class="chroma">int x y = 0;</pre></div>
+<p>Now, let&rsquo;s put ourselves in the Lexical Analyzer shoes. We must read this line character after character, from left to right, and tokenize it in meaningful pieces. Meaningful according to the language specification.</p>
+
+<p>In this example, we should be able to create a Tokens sequence such as</p>
+<div class="highlight"><pre class="chroma">&lt;&#34;int&#34;, type&gt;
+&lt;&#34; &#34;, whitespace&gt;
+&lt;&#34;x&#34;, identifier&gt;
+&lt;&#34; &#34;, whitespace&gt;
+&lt;&#34;y&#34;, identifier&gt;
+&lt;&#34; &#34;, whitespace&gt;
+&lt;&#34;=&#34;, operator&gt;
+&lt;&#34; &#34;, whitespace&gt;
+&lt;&#34;0&#34;, digit&gt;
+&lt;&#34;;&#34;, semicolon&gt;</pre></div>
+<p>Each Token is a pair made by the lexeme (the actual character sequence), and a logical type assigned by the Lexical Analysis. These types are usually members of an <code>enum structure</code> (or <code>Enum</code> class, in Java).</p>
+
+<p>For sure you&rsquo;ve noticed that something was wrong with that line of code. It should not compile. In fact, a comma is missing between the <code>x</code> and <code>y</code> identifiers.</p>
+
+<p>We could possibly modify the Tokenizer and make it much more complex, so that it would also be able to spot errors like the one mentioned above. However, this approach doesn&rsquo;t make sense. <strong>Modularity is a pillar of good software engineering</strong>.</p>
+
+<p>Let the Tokenizer tokenize, and let the Parser parse. To tokenize is &ldquo;just&rdquo; about splitting a stream of characters in groups, and output a sequence of Tokens. To parse is &ldquo;just&rdquo; about understanding if the sequence of Tokens is in the right order, and accept or reject it.</p>
+
+<p>Thus, after the previous Tokens sequence is given to the Parser, the latter would understand that a comma is missing and reject the source code. How can it understand that? Because there must be a syntactic rule in the Grammar definition that clarify how as assignment statement (such as the one in the example) must be made in terms of Tokens.</p>
+
+<p>Such a rule may be similar to the following:</p>
+<div class="highlight"><pre class="chroma">assignment  : type identifier (&#39;,&#39; identifier)* &#39;=&#39; value &#39;;&#39;</pre></div>
+<p>Which you can read as:</p>
+
+<p><em>A valid assignment is composed by a &ldquo;type&rdquo; (such as &ldquo;int&rdquo;, in the example), then the identifier name (&ldquo;x&rdquo;), then one can optionally add more identifiers separated by a comma (the &ldquo;*&rdquo; symbol means zero or more, and it refers to the subgroup in the parentheses), then an equal sign (&ldquo;=&rdquo;), then the &ldquo;value&rdquo; to assign and finally a semicolon.</em></p>
+
+<p>The Parser is a complex software module that understands such type of Grammars, and check that every rule is respected using advanced algorithms and data structures. Parsing is a theory in itself, in fact. I can&rsquo;t help but suggest to read more about it, including my previous articles.</p>
+
+<p>Thus, the code in the example would pass the Lexical Analysis, but then would be rejected by the Parser. Which is the correct behavior.</p>
+
+<p>Now let&rsquo;s consider a different example, this time in Java.</p>
+<div class="highlight"><pre class="chroma">int x = 0;
+Object y = null;
+String z = x + y;</pre></div>
+<p>What about this three lines of code? When they are given to the Lexical Analysis module, it would be transformed in a long list of Tokens. No errors would be reported in this step, simply because all characters are valid, as well as all subgroups of them (e.g., <code>Object</code>, <code>int</code>, etc.).</p>
+
+<p>Then the list of Tokens is given to the Parser. In this case, and you&rsquo;ve got to trust me on this, a standard Parser would accept the list of Tokens, without reporting any error. The reason is that all three lines are <strong>grammatically well-typed</strong>.</p>
+
+<p>What about the third line then? It must be wrong! We can&rsquo;t possibly add an integer to an Object, which is initialized as NULL!</p>
+
+<p>That&rsquo;s right, we can&rsquo;t. And indeed this source code should result in a compilation error. However, while it&rsquo;s possible to expand the Parser so that it also check errors like this one (whose name, by the way, is &ldquo;typing error&rdquo;), this approach does not make sense. <strong>Let the Parse parse only</strong>.</p>
+
+<p>The take-home message here is that <strong>it&rsquo;s a good idea to divide a complex task such as source code compilation in multiple, well-defined steps</strong>, rather than doing too many things at once.</p>
+
+<p>If you try to compile that boilerplate code (you need to enclose it in a class definition, as per Java&rsquo;s requirement), here&rsquo;s the error you would get.</p>
+<div class="highlight"><pre class="chroma">error: bad operand types for binary operator &#39;+&#39;
+	String z = x + y;
+	             ^
+  first type:  int
+  second type: Object</pre></div>
+<p>This type of errors are called <strong>typing errors</strong>.</p>
+
+<p>Typing errors is just one example of things that neither the Lexical Analysis nor the Parser would catch. They must be caught by the Semantic Analysis. What else is there?</p>
+
+<h2 id="semantic-analysis-catch-them-all">Semantic Analysis: Catch Them All!</h2>
+
+<p>We have so far understood that the developer who wrote the source code to be compiled may have made a lot of different errors:</p>
+
+<ul>
+<li>Typos on the keyboard.</li>
+<li>Forgotten symbols, such as comma, semicolon, dot, parentheses, etc.</li>
+<li>&hellip;, and many more!</li>
+</ul>
+
+<p>While (1) is a typical example of errors caught by the Lexical Analysis, (2) is more often found by the Parser. The question I want to answer now is, what type of flaws in the source code are found in Semantic Analysis?</p>
+
+<p>In fact, there&rsquo;s no definite answer to this question. Things can vary quite a lot based on the particular language specification. In other words, the Semantic Analysis module for a C compiler is definitely different from one made for a C++ compiler!</p>
+
+<p>That said, there are some common patterns across many languages. For instance, Semantic Analysis pretty much always takes care of the following.</p>
+
+<ul>
+<li>Check that identifiers are declared before to be used in computations.</li>
+<li>Check that reserved keywords are not misused.</li>
+<li>Check that types are correctly declared, if the language is explicitly typed.</li>
+<li>Check that computations are type-consistent, wherever possible.</li>
+</ul>
+
+<p>These are all good examples of nasty errors that would be very difficult to spot during Lexical Analysis or Parsing.</p>
+
+<p>In addition to that, the most sophisticated programming languages support a handful of non-LL(1) constructs. But the Parser in their Compilers is almost always based on LL(1) algorithms. Therefore the task to analyze these more complex construct is delegated to Semantic Analysis.</p>
+
+<p>The first two points above sound somewhat easy, don&rsquo;t they?</p>
+
+<p>To check that variables and identifiers are well defined we can simply keep track of them in a table:</p>
+
+<ul>
+<li>We would add each of them into the table the first time we find it in the source code (which is read from top to bottom).</li>
+<li>Then, when an identifier is used, we first check that is already in the table. If not, then&hellip; compilation error!</li>
+</ul>
+
+<p>Things are not so simple, actually. But let&rsquo;s assume they are, just for a little while still. I will clarify this another article.</p>
+
+<p>To check that reserved keywords are not misused seems like a fairly easy task, too. For example, the keyword <code>break</code> should only be used in a loop or in a if-else branch. How difficult can it be?</p>
+
+<p>In fact, it&rsquo;s not too difficult as long as you make <strong>clever choices in terms of data structure</strong>. To decide, and to design the right data structure for your algorithms is a very important step. We are going to discuss about it in a minute.</p>
+
+<p>The last two points in the list above deal with the subject of typing. This is a very important and complex topic, therefore I am going to dedicate to it an entire section in this article. Also, a subject that must be really studied, is <strong>what data structure are to be used in Semantic Analysis</strong>, in order to write good algorithms. I will also discuss this in a future article!</p>
+
+<h2 id="references">References</h2>
+
+<p>Language Implementation Patterns. A book by <a href="https://parrt.cs.usfca.edu/">Prof. Terrence Parr</a>.</p>
+
+<p>My article <a href="http://example.org/page/why-so-many-programming-languages/">Why There Are So Many Programming Languages?</a> (Talks about front-end, back-end compilation).</p>
+
+<p>My article <a href="http://example.org/page/what-is-a-programming-language-parser/">What is a Programming Language Parser?</a> (If you don&rsquo;t know yet what a Parse Tree is).</p>
+
+<p>Alex Aiken&rsquo;s class Compilers at Stanford University. Available as <a href="https://lagunita.stanford.edu/courses/Engineering/Compilers/Fall2014/course/">free MOOC online</a>.</p>
+
+<p>Wikipedia page about the <a href="https://en.wikipedia.org/wiki/Builder_pattern">Builder Software Design Pattern</a>.</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fwhat-is-semantic-analysis-in-compilers%2f&amp;text=What%20Is%20Semantic%20Analysis%20in%20a%20Compiler%3f&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fwhat-is-semantic-analysis-in-compilers%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fwhat-is-semantic-analysis-in-compilers%2f&amp;title=What%20Is%20Semantic%20Analysis%20in%20a%20Compiler%3f" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fwhat-is-semantic-analysis-in-compilers%2f&amp;title=What%20Is%20Semantic%20Analysis%20in%20a%20Compiler%3f" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fwhat-is-semantic-analysis-in-compilers%2f&amp;title=What%20Is%20Semantic%20Analysis%20in%20a%20Compiler%3f" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fwhat-is-semantic-analysis-in-compilers%2f&amp;description=What%20Is%20Semantic%20Analysis%20in%20a%20Compiler%3f" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

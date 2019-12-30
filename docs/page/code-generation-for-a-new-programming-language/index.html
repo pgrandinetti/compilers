@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>Code Generation for a New Programming Language | Compilers</title>
+  <meta name="description" content="Code Generation is the final step of the journey through Grammars, Parsers, Semantics and Compilers.
+In this article, I will discuss with you the implementation I made of a Code Generation module, as part of the Compiler I wrote for a new programming language that I designed.
+Let&rsquo;s also briefly review what we&rsquo;ve learnt so far in this course about Compilers and Programming Languages. We went into the details of many central subjects as well as some side-topics that are useful to understand the whole picture.">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/code-generation-for-a-new-programming-language\/",
+          "name": "Code generation for a new programming language"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "Code Generation for a New Programming Language",
+  "description" : "Code Generation is the final step of the journey through Grammars, Parsers, Semantics and Compilers.\nIn this article, I will discuss with you the implementation I made of a Code Generation module, as part of the Compiler I wrote for a new programming language that I designed.\nLet\x26rsquo;s also briefly review what we\x26rsquo;ve learnt so far in this course about Compilers and Programming Languages. We went into the details of many central subjects as well as some side-topics that are useful to understand the whole picture.",
+  "inLanguage" : "en",
+  "wordCount":  5344 ,
+  "datePublished" : "2019-10-14T00:00:00",
+  "dateModified" : "2019-10-14T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/code-generation-for-a-new-programming-language\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="Code Generation for a New Programming Language" />
+<meta property="og:description" content="Code Generation is the final step of the journey through Grammars, Parsers, Semantics and Compilers.
+In this article, I will discuss with you the implementation I made of a Code Generation module, as part of the Compiler I wrote for a new programming language that I designed.
+Let&rsquo;s also briefly review what we&rsquo;ve learnt so far in this course about Compilers and Programming Languages. We went into the details of many central subjects as well as some side-topics that are useful to understand the whole picture.">
+<meta property="og:url" content="http://example.org/page/code-generation-for-a-new-programming-language/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="Code Generation for a New Programming Language" />
+  <meta name="twitter:description" content="Code Generation is the final step of the journey through Grammars, Parsers, Semantics and Compilers.
+In this article, I will discuss with you the implementation I made of a Code Generation module, as …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>Code Generation for a New Programming Language</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  October 14, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>Code Generation is the final step of the journey through Grammars, Parsers, Semantics and Compilers.</p>
+
+<p>In this article, I will discuss with you the implementation I made of a Code Generation module, as part of the Compiler I wrote for a new programming language that I designed.</p>
+
+<p>Let&rsquo;s also briefly review what we&rsquo;ve learnt so far in this course about Compilers and Programming Languages. We went into the details of many central subjects as well as some side-topics that are useful to understand the whole picture. Here&rsquo;s a partial, but well representative list:</p>
+
+<ol>
+<li>What is a Compiler.</li>
+<li>What stages make the whole compilation process.</li>
+<li>What is a Formal Grammar, and several existing types of Grammars.</li>
+<li>A real design example of a new Context-Free Grammar, for a new Turing-complete programming language (that I often refer to as &ldquo;my language&rdquo;).</li>
+<li>What is Parsing, the second stage of compilation.</li>
+<li>A real implementation of a LL(1) Recursive Descent Parser, made for the new programming language mentioned above.</li>
+<li>What is Semantic Analysis, the third stage of compilation.</li>
+<li>A real implementation of Semantic Analysis, for my language.</li>
+<li>How the computer actually runs code, and how the internal memory of the machine is organized when someone wants to run a program.</li>
+<li>How to generate code that can be run by a very low level architecture, such as a stack machine (ideal) or a MIPS processor (a real one!).</li>
+</ol>
+
+<h2 id="motivations">Motivations</h2>
+
+<p>Code Generation is the most important part of the <strong>back-end compilation</strong>. While front-end takes care of ensuring a source code is well-written, the back-end is all about making that source code runnable in the computer.</p>
+
+<p>What does well-written mean? The front-end modules (Lexical Analysis, Parsing and Semantic Analysis) perform a lot of &ldquo;security&rdquo; checks, for example:</p>
+
+<ul>
+<li>Lexical Analysis checks that all characters in the source code are allowed in the Language&rsquo;s Alphabet. For example, in my language, you cannot use the character <code>@</code>.</li>
+<li>Parser checks that all sequence of tokens satisfy at least one rule in the Formal Grammar. For example, in my language, if you type <code>if</code> then you must also type a parenthesis <code>(</code>, then you must type a boolean expression, then a parenthesis <code>)</code>, and so on.</li>
+<li>Semantic Analysis try to catch all errors that were uncaught so far. Most of the checks it does are about typing. For example, in my language, you cannot mix types in a list: the declaration <code>a = [1, 2, &quot;x&quot;, 5]</code> is illegal and Semantic Analysis will stop the compilation with an error message.</li>
+</ul>
+
+<p>This is just a small subset of what front-end really does. I can&rsquo;t help but suggest to check the references at the end for further insights!</p>
+
+<p>At this point, it&rsquo;s hard to believe Code Generation needs to be motivated in itself. It&rsquo;s quite obvious that just passing all checks made by the front-end is not enough to actually run the code!</p>
+
+<p>The front-end giving its &ldquo;OK&rdquo; just means that the code may be run.</p>
+
+<p>Let&rsquo;s look at it from a different angle. If you design a new Programming Language, you specify all rules that people must follow in order to write a correct source code. Then, when you implement each front-end module, you are just making sure people followed all grammatical rules. But now, there&rsquo;s nothing that actually runs that source code in the machine, because it&rsquo;s a new programming language!</p>
+
+<p>Here&rsquo;s where Code Generator enters the play.</p>
+
+<p>Quite simply, Code Generator takes whatever was produced by the front-end, such as Parse-Tree and Symbol Table, and produce some other code that can actually be run in the machine, based on the fact that the front-end already verified the source code&rsquo;s soundness.</p>
+
+<p>Let me repeat it. Within a Compiler, <strong>Code Generator&rsquo;s output is a string</strong>. This string is in fact a source code in a language different from the original source code, one that can be executed.</p>
+
+<p>So far, so good. The real question, in my opinion, is: <strong>what is the language used as output of the Code Generator?</strong></p>
+
+<p>In a previous article we learned how to get down to actual CPU level, and we saw in detail how to build a Code Generator module that generates code for the MIPS architecture, or for a stack machine (which is an abstraction). Obviously, I like the MIPS better, for the simple reason that is a real one! The stack machine, however, brings a lot of learning experiences on the table too. Either case, Code Generator produces something <strong>very similar to Assembly code</strong>.</p>
+
+<p>That&rsquo;s one of the best options we have. If you are building up a strong team because you want to create a super strong Programming Language, then you definitely should consider to <strong>generate machine-code as your first option</strong>.</p>
+
+<p>That&rsquo;s not my case, clearly. My objective in this course is to learn the concepts in real depth, and to work on a project hard enough to enhance my learning experience. To produce Assembly code would be, in my opinion, a large deviation from such a goal, for little gain.</p>
+
+<p>The other available option is to generate code in a language that can already be compiled/interpreted. This is the option I chose.</p>
+
+<p>Why? The motivation is that working on a Code Generation module for me is simply the &ldquo;excuse&rdquo; to learn more about what we saw in a previous article, mainly <strong>Code Templates</strong>. <em>To learn by doing</em>, as they say. From this point of view, it doesn&rsquo;t really matter whether the final code is in Assembly, C, Java or Python.</p>
+
+<p>And in fact, <strong>I chose Python as output language</strong>. Why that one? The reason is that the Compiler I am building for my language is written entirely in C, so I didn&rsquo;t want to generate C code again.</p>
+
+<p>Other languages made little sense to me. Python, on the other hand, is a very intuitive language exactly like mine. Of course, my language is much simpler than Python, but in both cases you should be able to look at the source code and &ldquo;read&rdquo; it.</p>
+
+<p>The other big advantage is that some parts of my language&rsquo;s Grammar are very similar to Python&rsquo;s Grammar. Thanks to this, while working on Code Generation <strong>I can focus my attention on what really matters and on the learning experience</strong>, instead of spending time in literal, boring translation of single pieces of the Grammar.</p>
+
+<h2 id="code-organization">Code Organization</h2>
+
+<p>To organize the implementation of the Code Generation was a tricky affair. The main problem is that <strong>the whole module must handle, create and modify a lot of strings</strong>.</p>
+
+<p>And as we all know, the C language isn&rsquo;t too user-friendly when it comes down to strings. On the other hand, I wouldn&rsquo;t accept any other language to write my Compiler with!</p>
+
+<h3 id="a-step-in-the-wrong-direction">A step in the wrong direction</h3>
+
+<p>I knew since the beginning that the overall implementation strategy would resemble a recursive descent. How did I know that? It&rsquo;s written in my previous article!</p>
+
+<p>So, one thing was clear from the start. The input of the Code Generator must be the Parse Tree. Or, to be precise, at least one of the input arguments.</p>
+
+<p>At the beginning, though, I thought I would propagate a double pointer (a char pointer) across all recursive calls, so that once the execution would get at the bottom of the recursion (for <strong>a leaf node</strong>) there would be a function taking care of that node, and it would modify the current pointer by inserting the code for that leaf. As we all know, to modify the content of a pointer within a C function, we need a double pointer as argument to that function.</p>
+
+<p>Note what I just said: <strong>inserting the code</strong>. Here&rsquo;s what Code Template enters the play. The idea is that the boilerplate code would be prepared by some of the high-level functions, for example the one taking care of an Assignment Line. Then, this function would start invoking other functions, possibly in a recursive way. And those functions would fill the spaces in the boilerplate template.</p>
+
+<p>I even prepared a nice utility function that inserts a sequence of characters inside a string, at a given position. Here it is.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">str_insert</span> <span class="p">(</span><span class="kt">char</span><span class="o">**</span> <span class="n">s1</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">s2</span><span class="p">,</span> <span class="kt">int</span> <span class="n">pos</span><span class="p">)</span> <span class="p">{</span>
+    <span class="cm">/*
+</span><span class="cm">        Insert a sequence of characters into a string, starting from a given index.
+</span><span class="cm">        The old string is moved to a new memory location, and the old memory is freed.
+</span><span class="cm">
+</span><span class="cm">        - **s1: The string to modify.
+</span><span class="cm">        - *s2: The sequence of characters to insert into s1.
+</span><span class="cm">        - pos: The starting index.
+</span><span class="cm">    */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="n">s2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+
+    <span class="kt">char</span><span class="o">*</span> <span class="n">new</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">;</span>
+
+    <span class="n">l1</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="o">*</span><span class="n">s1</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">pos</span> <span class="o">&gt;</span> <span class="n">l1</span> <span class="o">||</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+
+    <span class="n">l2</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">s2</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">l2</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="n">new</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="n">l1</span> <span class="o">+</span> <span class="n">l2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="n">new</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+
+    <span class="n">memcpy</span><span class="p">(</span><span class="n">new</span> <span class="o">+</span> <span class="n">pos</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">l2</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+    <span class="n">memcpy</span><span class="p">(</span><span class="n">new</span> <span class="o">+</span> <span class="n">pos</span> <span class="o">+</span> <span class="n">l2</span><span class="p">,</span> <span class="o">*</span><span class="n">s1</span> <span class="o">+</span> <span class="n">pos</span><span class="p">,</span> <span class="p">(</span><span class="n">l1</span> <span class="o">-</span> <span class="n">pos</span><span class="p">)</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+    <span class="n">memcpy</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="o">*</span><span class="n">s1</span><span class="p">,</span> <span class="n">pos</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+
+    <span class="n">free</span><span class="p">(</span><span class="o">*</span><span class="n">s1</span><span class="p">);</span>
+    <span class="o">*</span><span class="n">s1</span> <span class="o">=</span> <span class="n">new</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+<p>However, as I started designing the module, I understood things would get too messy in this way.</p>
+
+<p>To start with, each function should not only receive the string template (the double pointer), but also the position where to fill space in the template.</p>
+
+<p>To make things worse, when filling some space in the template, this would shift in space all the other slots to be filled, according to the length of the inserted string.</p>
+
+<p>So, to summarize:</p>
+
+<ul>
+<li>The function that actually inserts a string into the template would need to know the position where to insert, and how much space is available. - If the space is not sufficient, then it has to reallocate the template, shift a bit to create more space where the new string has to be inserted, and finally insert it.</li>
+<li>The caller function, the one that created the template, will have to know the length of the inserted string, and recompute the positions for all the other &ldquo;empty slots&rdquo; in the template. Possibly, a new reallocation of the string must be done.</li>
+<li>All this, for every blank space in the template. Believe me, there are a lot of them!</li>
+</ul>
+
+<p>I am not saying it can&rsquo;t be done this way. It can, obviously. However, I have the impression the implementation would be very awkward and inefficient. I might be wrong though, since I didn&rsquo;t go down this road at all!</p>
+
+<h3 id="back-to-business">Back to business</h3>
+
+<p>After I excluded the option to create a big boilerplate template and propagate it down to the Parse Tree&rsquo;s leafs, finding an alternative was not too difficult.</p>
+
+<p>I needed to design <strong>each of the functions</strong> that handle nodes in the tree in a way that they can <strong>build the string that only concerns that node</strong>. Then, such string will be returned to the caller of the function, and <strong>the caller will take care of inserting it into the Code Template</strong>.</p>
+
+<p>So, to start with, this approach solves one problem. The caller gets the string to be inserted as a result, and can easily compute the length of it, for example with <code>strlen(char *str)</code> in C.</p>
+
+<p>However, it doesn&rsquo;t seem to solve the reallocation problem at all. In fact, there&rsquo;s an obvious solution to it.</p>
+
+<p>Instead of allocating the Code Template, then calling the nested functions (without passing the template to them), grab the results and plug them into the template, <strong>I executed the same steps in a different order</strong>!</p>
+
+<p>First, I&rsquo;d call the functions created for the lower levels of the Parse Tree, and grab the results. Then, and only then, I would allocate the Code Template based on the length of those results! Simple, and it works.</p>
+
+<p>Let&rsquo;s take a look at a (partial) example, to understand better.</p>
+
+<p>Consider the assignment Line in my programming language, defined in the Grammar as it follows:</p>
+<div class="highlight"><pre class="chroma">assign      :   var &#39;=&#39; expr</pre></div>
+<p>As you know by my previous articles about Parsing, there will be a node in the Parse Tree for each Assign Line in the source code. Each of these nodes will have three children, one for the <code>var</code> Token, one for the <code>=</code> Token, and a third one for the <code>expr</code> Token.</p>
+
+<p>The whole idea is to prepare a function with the following signature:</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">char</span><span class="o">*</span> <span class="n">cgen_Assign</span> <span class="p">(</span><span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">assign_node</span><span class="p">)</span></code></pre></div>
+<p>and make sure it returns the string that corresponds to the code generated for the entire <code>assign</code> Line.</p>
+
+<p>Here&rsquo;s how such function works:</p>
+
+<ol>
+<li>To start with, it invokes another function, <code>cgen_Var (struct ParseTree *var_node)</code>, with argument the first child of <code>assign_node</code> (because that&rsquo;s the <code>var</code> Token!). The result will be stored in a <code>char *var</code>.</li>
+<li>Then, it will invoke a function, <code>cgen_Expr (struct ParseTree *expr_node)</code>, giving the third child of <code>assign_node</code> as argument. The result will be saved into <code>char *expr</code>.</li>
+
+<li><p>It will now compute the length of the two results. This is as simple as</p>
+<div class="highlight"><pre class="chroma">int l1 = strlen(var)
+int l2 = strlen(expr)</pre></div></li>
+
+<li><p>Now, and only now, it will create the Code Template. This will be a string, and it will be allocated directly with length equal to <code>l1 + l2 + 1</code> (for the <code>=</code> character) <code>+ 1</code> (for the last null-character, in C-strings) <code>+ padding_space</code>, if you want to use some padding around the <code>=</code> sign.</p></li>
+
+<li><p>The two previous results will be copied into the new template, and their memory released.</p></li>
+
+<li><p>Finally, the template will be returned as result to whoever invoked the function <code>cgen_Assign</code>.</p></li>
+</ol>
+
+<p>If you are now wondering how the other functions, such as <code>cgen_Var</code> and <code>cgen_Expr</code>, work, the answer is: quite similarly to <code>cgen_Assign</code>!</p>
+
+<p>The logic is exactly the same. Each function needs to invoke the functions built for sub-token, according to the Grammar, and then paste together these results in a bigger string, release the memory when needed, and finally return the whole string.</p>
+
+<p>In my opinion this approach offers many advantages:</p>
+
+<ul>
+<li>To start with, it&rsquo;s extremely clear, which makes the code more easily understandable and maintainable.</li>
+<li>It&rsquo;s more efficient, at least intuitively, than the other approach I discussed before.</li>
+<li>It closely follow the Grammar, which is always a good thing to do when implementing any Compiler&rsquo;s module.</li>
+</ul>
+
+<h3 id="entry-point">Entry Point</h3>
+
+<p>The Code Generator needs an entry point that can be invoked from outside. An API, if you will.</p>
+
+<p>I kept it simple, and simply provided the following function in a header file named <em>cgen.h</em>.</p>
+<div class="highlight"><pre class="chroma">char* code_gen (struct ParseTree *root)</pre></div>
+<h3 id="a-python-specialty">A Python Specialty</h3>
+
+<p>You probably already know that Python has a very unique feature, among famous languages: good indentation is required.</p>
+
+<p>In Python, if blocks, loop blocks, functions definitions, classes, every kind of block actually, are delimited by indentation. Not by curly brackets as in many other languages (C and Java, for example).</p>
+
+<p>Therefore, my Code Generation module needs to put the right indentation in the output code.</p>
+
+<p>I solved this problem by adding one argument in most of the functions&rsquo; signatures. For example, the function we saw in the earlier example is actually defined as</p>
+<div class="highlight"><pre class="chroma">char* cgen_Assign (struct ParseTree *node, int indent)</pre></div>
+<p>What does it do, in truth, is just to allocate the final template with indent more slots of memory, and add indent blank spaces at the beginning of the string.</p>
+
+<p>How&rsquo;s the indent argument calculated? It&rsquo;s not. It starts from a fixed value, zero, and it&rsquo;s increased in some of the recursive calls, not in all of them.</p>
+
+<p>For example, the function cgen_IfLine receives the indentation integer as second argument. The body of the <code>ifLine</code> in my Grammar is made by a sequence of Lines. Remember that a <code>line</code> can be really anything:</p>
+<div class="highlight"><pre class="chroma">line        :   assign
+            |   input
+            |   output
+            |   ifLine
+            |   loopLine
+            |   breakLine
+            |   contLine</pre></div>
+<p>Therefore, each Line that is met within the body of the <code>ifLine</code>, will generate a call to a function <code>cgen_Line</code>. The arguments for this nested call will be a pointer to the node for that <code>line</code> in the Parse Tree, and a new indentation level.</p>
+
+<p>Let me clarify the whole strategy with more details. First of all, I defined a constant</p>
+<div class="highlight"><pre class="chroma">#define INDENT_LEV 4</pre></div>
+<p>Which simply represents how many spaces each indentation level should add in the final Python code.</p>
+
+<p>Then, I defined a function that takes care of the Line Tokens in the Parse Tree:</p>
+<div class="highlight"><pre class="chroma">char* cgen_Line (struct ParseTree *node, int indent)</pre></div>
+<p>As you can see, this function has the same signature as the others. All this function does is to check what&rsquo;s the Token Type of its child and call the related function. For example, if the child is a <code>ifLine</code>, then it will invoke the function <code>cgen_IfLine</code>.</p>
+
+<p>On its part, the function <code>cgen_IfLine</code> will need to call many other functions:</p>
+
+<ul>
+<li>It will call <code>cgen_Expr</code>, to generate code for the <code>ifCond</code> Token (the boolean expression that determines whether to enter or not the if).</li>
+<li>It will have to call <code>cgen_Line</code> for each line that it&rsquo;s inside the body of the if block.</li>
+</ul>
+
+<p>Here comes the trick. When the nested <code>cgen_Line</code> is called from within the <code>cgen_IfLine</code>, it will be invoked in the following way.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// This is inside the cgen_IfLine function
+</span><span class="c1">// where next_node is the next Line, and indent is the current argument.
+</span><span class="c1"></span><span class="kt">char</span><span class="o">*</span> <span class="n">line</span><span class="p">;</span>
+<span class="n">line</span> <span class="o">=</span> <span class="n">cgen_Line</span> <span class="p">(</span><span class="n">next_code</span><span class="p">,</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">INDENT_LEV</span><span class="p">);</span></code></pre></div>
+<p>This way the nested <code>cgen_Line</code> will receive the indentation increased, and will apply the right number of blank spaces.</p>
+
+<p>If there are more nested calls, such as an <code>ifLine</code> inside another <code>ifLine</code>, maybe inside a <code>loopLine</code>, the <code>+ INDENT_LEV</code> part will always make the argument to the nested function larger. The more nested are the functions calls, the greater the value for the indent argument will be. Exactly as it should in Python code!</p>
+
+<p>Now that you understood all of this, it&rsquo;s easy to see why the main entry point has actually a very simple implementation.</p>
+<div class="highlight"><pre class="chroma">char* code_gen (struct ParseTree *root) {
+    return cgen_Program(root, 0); // start with indent = 0
+}</pre></div>
+<h2 id="examples-basic-grammar-blocks">Examples - Basic Grammar Blocks</h2>
+
+<p>After clarifying (and, in fact, understanding) a lot of concepts, it&rsquo;s time to code!</p>
+
+<p>To start off, let me recall the two main data structures I used in the previous modules. The first one is called <code>Token</code>:</p>
+<div class="highlight"><pre class="chroma">struct Token{
+    char* lexeme;
+    enum TokenType type;
+};</pre></div>
+<p>The field <code>lexeme</code> is simply the sequence of characters that make that Token. And the field <code>type</code> is one among a-priori defined types, such as Int, Var, Assign, Line, etc.</p>
+
+<p>For example when the Lexical Analysis module finds the following sequence of characters</p>
+<div class="highlight"><pre class="chroma">x = 5;</pre></div>
+<p>Will creates many Tokens:</p>
+<div class="highlight"><pre class="chroma">{lexeme = &#34;x&#34;, type = Var}
+{lexeme = &#34; &#34;, type = Whitespace}
+{lexeme = &#34;=&#34;, type = Equal}
+... </pre></div>
+<p>The other key data structure is the Parse Tree. Here&rsquo;s how I defined it</p>
+<div class="highlight"><pre class="chroma">struct ParseTree {
+    struct Token* data;
+    struct ParseTree* child;
+    struct ParseTree* sibling;
+};</pre></div>
+<p>As I explained thoroughly in a previous article, each node of the Tree has a pointer to the first child and the first sibling. This allows an easier navigation of the Tree, in my opinion.</p>
+
+<p>The first example I want to discuss with you is perhaps the easiest case in the entire Code Generation module.</p>
+
+<p>Suppose that the Code Generator is walking up and down the Parse Tree and it finds a subtree that it&rsquo;s a <code>continue</code> type of Line. That&rsquo;s basically just one line</p>
+<div class="highlight"><pre class="chroma">continue;</pre></div>
+<p>How should it generate code for it? Here&rsquo;s what I did.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">char</span><span class="o">*</span> <span class="nf">cgen_Continue</span> <span class="p">(</span><span class="k">struct</span> <span class="n">ParseTree</span><span class="o">*</span> <span class="n">tree</span><span class="p">,</span> <span class="kt">int</span> <span class="n">indent</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="n">tree</span> <span class="o">||</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">!=</span> <span class="n">Continue</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+
+    <span class="kt">char</span> <span class="o">*</span><span class="n">result</span><span class="p">;</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="mi">9</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">indent</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">memset</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="sc">&#39; &#39;</span><span class="p">,</span> <span class="n">indent</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+    <span class="n">memcpy</span><span class="p">(</span><span class="n">result</span> <span class="o">+</span> <span class="n">indent</span><span class="p">,</span> <span class="s">&#34;continue&#34;</span><span class="p">,</span> <span class="mi">8</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+<p>In the output language (Python) the equivalent of a <code>continue</code> instruction of my Language is &hellip; <code>continue</code>. The same string.</p>
+
+<p>Therefore I generate code in this case by doing the following:</p>
+
+<ol>
+<li>Check whether the function was invoked with the correct subtree. If not, return a <code>NULL</code> pointer.</li>
+<li>Allocate a string in memory that will contain the result. Reserve 9 slots of memory, one for each character of the word <code>continue</code>, and one for the terminating character <code>/0</code> (this is C-specific). Also add as many slots as the indent argument requires. Keep in mind that the C function <code>calloc</code> allocates all requested memory to <code>/0</code>, so we will not need to touch the last character.</li>
+<li>Set the first indent characters to blank.</li>
+<li>Set the remaining 8 characters to &lsquo;c&rsquo;, &lsquo;o&rsquo;, &lsquo;n&rsquo;, &rsquo;t&rsquo;, &lsquo;i&rsquo;, &lsquo;n&rsquo;, &lsquo;u&rsquo;, &lsquo;e&rsquo;.</li>
+<li>Return the pointer to the new string.</li>
+</ol>
+
+<p>That was very easy, wasn&rsquo;t it?</p>
+
+<p>Another easy case is when subtree for which we must generate code is nothing more than an <code>int</code>. Here&rsquo;s how I addressed this case.</p>
+<div class="highlight"><pre class="chroma">char* cgen_Int (struct ParseTree* tree) {
+    if (! tree|| tree-&gt;data-&gt;type != Int)
+        return NULL;
+
+    char* integer;
+    int len;
+
+    len = strlen(tree-&gt;data-&gt;lexeme);
+    integer = calloc(len + 1, sizeof(char));
+    memcpy(integer, tree-&gt;data-&gt;lexeme, len * sizeof(char));
+    return integer;
+}</pre></div>
+<p>Again, very simple. The <code>lexeme</code> field for a Token whose type is <code>int</code> will contain exactly the string representation of that integer number.</p>
+
+<p>What I am saying is that if source code contains the line <code>x = 234;</code> then in the Parse Tree there will be a Token <code>{type = Int, lexeme = &quot;234&quot;}</code>. Hence:</p>
+
+<ol>
+<li>Get the length of the lexeme string (using C function <code>strlen</code>).</li>
+<li>Allocate a new string with the same length plus 1, for the terminating null character.</li>
+<li>Copy the content of <code>lexeme</code> into the new string and return it.</li>
+</ol>
+
+<p>Why did I copy the content of lexeme, instead of just returning its pointer? Because that object in memory can be erased or modified if any change is made to the Parse Tree. Thus, it&rsquo;s better to allocate a separate space of memory. It&rsquo;s easy to understand this stuff after having studied Compilers!</p>
+
+<p>Many other parts are as simple as the two functions we&rsquo;ve already seen: the <code>break</code> subtree, the <code>var</code> subtree, the <code>bool</code> and <code>Null</code> subtrees. These are all examples of subtrees that are very simple to handle in terms of code generation.</p>
+
+<p>Let&rsquo;s look at a slightly more complex case. I believe looking at the function that generates code for the <code>float</code> Token will be really helpful.</p>
+
+<p>First of all, we have to look at the Grammar definition for the Float Token. Here it is.</p>
+<div class="highlight"><pre class="chroma">float       :   (frac exp?) | (int frac? exp?)</pre></div>
+<p>Knowing that, here what we need to do:</p>
+
+<ol>
+<li>Determine whether the first child in the subtree is an <code>int</code> or a <code>frac</code> TokenType. The rule in the Grammar says that these two are the only options.</li>
+<li>If it&rsquo;s an <code>int</code>, then invoke the <code>cgen_Int</code> function giving to it the subtree whose root is the first child of the <code>float</code> subtree.</li>
+<li>Then, invoke the functions <code>cgen_Frac</code> and <code>cgen_Expr</code> (that we haven&rsquo;t seen yet), with the remaining children of the root node.</li>
+<li>Paste all results into a unique string, newly allocated.</li>
+<li>Free the memory used for the intermediate results and return the main result.</li>
+</ol>
+
+<p>The logic is still quite simple. The implementation is slightly more involved, simply because of C&rsquo;s syntax. Here it is.</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">char</span><span class="o">*</span> <span class="nf">cgen_Float</span> <span class="p">(</span><span class="k">struct</span> <span class="n">ParseTree</span><span class="o">*</span> <span class="n">tree</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="n">tree</span> <span class="o">||</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">!=</span> <span class="n">Float</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+
+    <span class="kt">char</span> <span class="o">*</span><span class="n">integer</span><span class="p">,</span> <span class="o">*</span><span class="n">frac</span><span class="p">,</span> <span class="o">*</span><span class="n">pow</span><span class="p">,</span> <span class="o">*</span><span class="n">result</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">l_int</span><span class="p">,</span> <span class="n">l_frac</span><span class="p">,</span> <span class="n">l_pow</span><span class="p">;</span>
+
+    <span class="n">integer</span> <span class="o">=</span> <span class="n">frac</span> <span class="o">=</span> <span class="n">pow</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">l_int</span> <span class="o">=</span> <span class="n">l_frac</span> <span class="o">=</span> <span class="n">l_pow</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">child</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">tree</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">Int</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">integer</span> <span class="o">=</span> <span class="n">cgen_Int</span><span class="p">(</span><span class="n">tree</span><span class="p">);</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">tree</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="o">&amp;&amp;</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">Frac</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">frac</span> <span class="o">=</span> <span class="n">cgen_Frac</span><span class="p">(</span><span class="n">tree</span><span class="p">);</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">tree</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="o">&amp;&amp;</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">Pow</span><span class="p">)</span>
+        <span class="n">pow</span> <span class="o">=</span> <span class="n">cgen_Pow</span><span class="p">(</span><span class="n">tree</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">integer</span><span class="p">)</span>
+        <span class="n">l_int</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">integer</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">frac</span><span class="p">)</span>
+        <span class="n">l_frac</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">frac</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">pow</span><span class="p">)</span>
+        <span class="n">l_pow</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">pow</span><span class="p">);</span> <span class="c1">// pow contains the &#39;e&#39; too
+</span><span class="c1"></span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="n">l_int</span> <span class="o">+</span> <span class="n">l_frac</span> <span class="o">+</span> <span class="n">l_pow</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">integer</span><span class="p">)</span>
+        <span class="n">memcpy</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">integer</span><span class="p">,</span> <span class="n">l_int</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">frac</span><span class="p">)</span>
+        <span class="n">memcpy</span><span class="p">(</span><span class="n">result</span> <span class="o">+</span> <span class="n">l_int</span><span class="p">,</span> <span class="n">frac</span><span class="p">,</span> <span class="n">l_frac</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">pow</span><span class="p">)</span>
+        <span class="n">memcpy</span><span class="p">(</span><span class="n">result</span> <span class="o">+</span> <span class="n">l_int</span> <span class="o">+</span> <span class="n">l_frac</span><span class="p">,</span> <span class="n">pow</span><span class="p">,</span> <span class="n">l_pow</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+
+    <span class="n">free</span><span class="p">(</span><span class="n">integer</span><span class="p">);</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">frac</span><span class="p">);</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">pow</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+<p>The only trick you&rsquo;ll need to look up is the correct usage of the C&rsquo;s function <code>memcpy</code>. As for the functions <code>cgen_Frac</code> and <code>cgen_Pow</code>, I can&rsquo;t but recommend to check out my GitHub project!</p>
+
+<h2 id="examples-higher-level-tokens">Examples - Higher Level Tokens</h2>
+
+<p>To generate code for the higher-level Tokens is a more complex task. In particular, the trickiest ones are the Tokens with a variable size definition in the Grammar.</p>
+
+<p>What am I talking about? For instance, Tokens such as the <code>quotedStr</code>, whose definition is</p>
+<div class="highlight"><pre class="chroma">quotedStr   :   &#39;&#34;&#39; (char)* &#39;&#34;&#39; (&#39;,&#39; obj)*</pre></div>
+<p>The main difficulty with this Token (and similar ones) lies in the final part. After a sequence of characters (that&rsquo;s not difficult to get), there&rsquo;s a repeated pair of Tokens <code>(Comma, obj)</code>.</p>
+
+<p>The number of times such a pair is repeated depends on the special characters <code>&quot;%s&quot;</code> inside the previous sequence. Therefore, it&rsquo;s not known a priori how many of them there will be. Especially in C, this makes it tricky in terms of memory allocation.</p>
+
+<p>There&rsquo;s one good news, at last: the Parser already checked that the number of pairs and the number of <code>&quot;%s&quot;</code> characters are the same, so Code Generator does not need to take care of it.</p>
+
+<p>Here&rsquo;s how I organized the function <code>cgen_QuotedStr(struct ParseTree* tree)</code>:</p>
+
+<ol>
+<li>Get the node that contains the sequence of characters (first part of the definition in the Grammar), and keep a pointer to it <code>*q</code>. Also, save the length of this sequence, <code>int len_q = strlen(q)</code>.</li>
+<li>Walk down the tree once, just to count how many pairs <code>(Comma, Obj)</code> there are. Don&rsquo;t do anything, just count them and save it in a variable <code>count</code>.</li>
+<li>Initialize an array of pointers to string with the right length: <code>char* objs [count]</code>.</li>
+<li>Set <code>objs[0] = q</code>.</li>
+<li>Set a variable <code>int total = len_q</code>.</li>
+<li>Walk again down the parse tree. This time, for each <code>obj</code> node found invoke the function <code>cgen_Obj</code> and save the results inside the array objs (use a counter as index, starting from location 1). Also, for each of these calls to <code>cgen_Obj</code> increase the integer total with the length of the result.</li>
+<li>Allocate a new string <code>result</code> with size given by <code>total + 1 + padding</code> (for the terminating null character), where padding takes into account all additional characters we need in Python. These are the <code>&quot;%(&quot;</code> and <code>&quot;)&quot;</code> that you must use in Python&rsquo;s string interpolation, like in <code>&quot;this are two numbers %s, %s&quot; %(5, 6)</code>.</li>
+<li>Finally, loop over the array <code>objs</code> and, for each string in it, copy its content into <code>result</code>. Mind the initial index to copy into! Also add the characters required by Python at the right spots.</li>
+<li>Free the memory occupied by every string in <code>objs</code>, then return result.</li>
+</ol>
+
+<p>And here&rsquo;s the code (although I guess looking at it in GitHub is better).</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">char</span><span class="o">*</span> <span class="nf">cgen_QuotedStr</span> <span class="p">(</span><span class="k">struct</span> <span class="n">ParseTree</span><span class="o">*</span> <span class="n">tree</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="n">tree</span> <span class="o">||</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">!=</span> <span class="n">QuotedStr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+
+    <span class="kt">char</span> <span class="o">*</span><span class="n">result</span><span class="p">,</span> <span class="o">*</span><span class="n">obj</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">total</span><span class="p">,</span> <span class="n">last</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">l_str</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">tmp</span><span class="p">;</span>
+
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">child</span><span class="p">;</span> <span class="c1">// actual quoted string node
+</span><span class="c1"></span>
+    <span class="n">total</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">tmp</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">lexeme</span><span class="p">);</span>
+    <span class="n">last</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// counting the first quoted string too
+</span><span class="c1"></span>    <span class="n">obj</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+
+    <span class="c1">// Count total Obj
+</span><span class="c1"></span>    <span class="k">while</span> <span class="p">(</span><span class="n">tmp</span><span class="o">-&gt;</span><span class="n">sibling</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">count</span> <span class="o">++</span><span class="p">;</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="p">;</span> <span class="c1">// skip Comma
+</span><span class="c1"></span>    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">+=</span> <span class="mi">4</span><span class="p">;</span> <span class="c1">// the padding &#34; %(&#34; ... &#34;)&#34;
+</span><span class="c1"></span>
+
+    <span class="c1">// To avoid triple pass store computed Obj(s)
+</span><span class="c1"></span>    <span class="kt">char</span><span class="o">*</span> <span class="n">objs</span><span class="p">[</span><span class="n">count</span><span class="p">];</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">child</span><span class="p">;</span> <span class="c1">// start over
+</span><span class="c1"></span>
+    <span class="n">l_str</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">tmp</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">lexeme</span><span class="p">);</span>
+    <span class="n">objs</span><span class="p">[</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="n">l_str</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">objs</span><span class="p">[</span><span class="n">count</span><span class="p">]</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="c1">// copy the first part of QuotedStr in objs[0]
+</span><span class="c1"></span>    <span class="n">memcpy</span><span class="p">(</span><span class="n">objs</span><span class="p">[</span><span class="n">count</span><span class="p">],</span> <span class="n">tmp</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">lexeme</span><span class="p">,</span> <span class="n">l_str</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+    <span class="n">count</span> <span class="o">++</span><span class="p">;</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="n">tmp</span><span class="o">-&gt;</span><span class="n">sibling</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="p">;</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">cgen_Obj</span><span class="p">(</span><span class="n">tmp</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">obj</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="c1">// _bail_out_Str is an internal function that cleans
+</span><span class="c1"></span>            <span class="c1">// memory and returns an error code
+</span><span class="c1"></span>            <span class="k">return</span> <span class="n">_bail_out_Str</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="n">count</span><span class="p">);</span>
+        <span class="n">objs</span><span class="p">[</span><span class="n">count</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span><span class="p">;</span>
+        <span class="n">total</span> <span class="o">+=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// + 1 for the &#34;,&#34;
+</span><span class="c1"></span>    <span class="p">}</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="n">total</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_bail_out_Str</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="n">count</span><span class="p">);</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">count</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">l_str</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">objs</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+        <span class="n">memcpy</span><span class="p">(</span><span class="n">result</span> <span class="o">+</span> <span class="n">last</span><span class="p">,</span> <span class="n">objs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">l_str</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+        <span class="n">last</span> <span class="o">+=</span> <span class="n">l_str</span><span class="p">;</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">objs</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">last</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39; &#39;</span><span class="p">;</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">last</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;%&#39;</span><span class="p">;</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">last</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;(&#39;</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">last</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;,&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">last</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;)&#39;</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+<p>The other very interesting part of Code Generator is about the <code>expr</code> Token and its recursive definition. Do you remember the chain of Tokens Expr - Pred - Term - BaseExpr, that I spent so many words on in a previous article? I hope you do!</p>
+
+<p>Here&rsquo;s how the Expr Token is defined in the Grammar.</p>
+<div class="highlight"><pre class="chroma">expr        :   pred (condOp expr)?
+pred        :   term ( (&#39;+&#39; | &#39;-&#39;) pred)?
+term        :   baseExpr ( (&#39;*&#39; | &#39;/&#39; | &#39;/.&#39; | &#39;%&#39;) term)?
+baseExpr    :   obj
+            |   &#39;(&#39; expr &#39;)&#39;</pre></div>
+<p>Let&rsquo;s just look at the Code Generator function for the <code>expr</code> Token, because that alone will clarify a lot also for the others.</p>
+
+<p>The steps to take are actually pretty obvious once we look at the Grammar.</p>
+
+<ol>
+<li>Call the function <code>cgen_Pred</code> and save both results and the length of it.</li>
+<li>Check if there are more nodes in the subtree.</li>
+<li>If there isn&rsquo;t any then go to step 4. If there are, then they must be a <code>condOp</code> and another <code>expr</code>. So, quite simply, invoke the two related functions <code>cgen_Op</code> and <code>cgen_Expr</code>. Note that the latter is a recursive call. Save those results and their length.</li>
+<li>Compute the total length (summing up the partial ones).</li>
+<li>Allocate space for the final results.</li>
+<li>Copy the previous results&rsquo; content into the newly allocated space. Plus any padding space.</li>
+<li>Free memory for partial result and return the final one.</li>
+</ol>
+
+<p>And here&rsquo;s the code. Have fun reading it!</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">char</span><span class="o">*</span> <span class="nf">cgen_Expr</span> <span class="p">(</span><span class="k">struct</span> <span class="n">ParseTree</span><span class="o">*</span> <span class="n">tree</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="n">tree</span> <span class="o">||</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">!=</span> <span class="n">Expr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+
+    <span class="kt">char</span> <span class="o">*</span><span class="n">pred</span><span class="p">,</span> <span class="o">*</span><span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="n">expr</span><span class="p">,</span> <span class="o">*</span><span class="n">result</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">l_pred</span><span class="p">,</span> <span class="n">l_op</span><span class="p">,</span> <span class="n">l_expr</span><span class="p">;</span>
+
+    <span class="n">pred</span> <span class="o">=</span> <span class="n">op</span> <span class="o">=</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">result</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">l_pred</span> <span class="o">=</span> <span class="n">l_op</span> <span class="o">=</span> <span class="n">l_expr</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">child</span><span class="p">;</span> <span class="c1">// must be Pred
+</span><span class="c1"></span>
+    <span class="n">pred</span> <span class="o">=</span> <span class="n">cgen_Pred</span><span class="p">(</span><span class="n">tree</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">pred</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">l_pred</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">pred</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">tree</span><span class="o">-&gt;</span><span class="n">sibling</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="p">;</span> <span class="c1">// the Op
+</span><span class="c1"></span>        <span class="n">op</span> <span class="o">=</span> <span class="n">cgen_Op</span><span class="p">(</span><span class="n">tree</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">op</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">free</span><span class="p">(</span><span class="n">pred</span><span class="p">);</span>
+            <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">l_op</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">tree</span><span class="o">-&gt;</span><span class="n">sibling</span><span class="p">;</span> <span class="c1">// the other Expr
+</span><span class="c1"></span>        <span class="n">expr</span> <span class="o">=</span> <span class="n">cgen_Expr</span><span class="p">(</span><span class="n">tree</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">expr</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">free</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
+            <span class="n">free</span><span class="p">(</span><span class="n">pred</span><span class="p">);</span>
+            <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">l_expr</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">expr</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">l_op</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="n">l_pred</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">l_op</span> <span class="o">+</span> <span class="n">l_expr</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+    <span class="k">else</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="n">l_pred</span> <span class="o">+</span> <span class="n">l_op</span> <span class="o">+</span> <span class="n">l_expr</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="n">result</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">pred</span><span class="p">);</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">expr</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">memcpy</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">pred</span><span class="p">,</span> <span class="n">l_pred</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">l_op</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">l_pred</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39; &#39;</span><span class="p">;</span>
+        <span class="n">memcpy</span><span class="p">(</span><span class="n">result</span> <span class="o">+</span> <span class="n">l_pred</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">l_op</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">l_pred</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">l_op</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39; &#39;</span><span class="p">;</span>
+        <span class="n">memcpy</span><span class="p">(</span><span class="n">result</span> <span class="o">+</span> <span class="n">l_pred</span> <span class="o">+</span> <span class="n">l_op</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">expr</span><span class="p">,</span> <span class="n">l_expr</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+    <span class="p">}</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">pred</span><span class="p">);</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">expr</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+<p>Again, other pieces of the Code Generator may seem complex, but in general they just follow the Grammar&rsquo;s definitions. For example, here&rsquo;s what the function <code>cgen_List</code> will do:</p>
+
+<ol>
+<li>Generate a <code>[</code> character, because in Python lists start with that too.</li>
+<li>Invoke the function <code>cgen_ListExpr</code>, and add its result after the initial square bracket.</li>
+<li>Generate the closing bracket <code>]</code>.</li>
+</ol>
+
+<p>And so on, all the other functions. As for this article, I will stop here, and for further analysis of the code I recommend you to reach out on GitHub!</p>
+
+<h2 id="summary-and-outlook">Summary and Outlook</h2>
+
+<p>We&rsquo;ve just learnt a lot about how to generate executable code in a Compiler. Remember: a Compiler starts from a source code written in some high-level language (grammar), and produces a lower-level code that can be run into a computer.</p>
+
+<p>This task is not done casually: rather, it&rsquo;s driven by well-established theoretical concepts. The most important one being Code Template. We explored that one in detail too.</p>
+
+<p>As this if the final article in this course, you have all instruments you would need to create a simple programming language. More importantly, in my opinion, you have acquired a great deal of knowledge that will give you a competitive edge in your future projects as scientist and engineer. Good luck!</p>
+
+<h2 id="references">References</h2>
+
+<p>My <a href="https://github.com/pgrandinetti/compilers">GitHub repository</a> for this course.</p>
+
+<p><a href="http://example.org/">Table of contents</a> for this course.</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fcode-generation-for-a-new-programming-language%2f&amp;text=Code%20Generation%20for%20a%20New%20Programming%20Language&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fcode-generation-for-a-new-programming-language%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fcode-generation-for-a-new-programming-language%2f&amp;title=Code%20Generation%20for%20a%20New%20Programming%20Language" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fcode-generation-for-a-new-programming-language%2f&amp;title=Code%20Generation%20for%20a%20New%20Programming%20Language" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fcode-generation-for-a-new-programming-language%2f&amp;title=Code%20Generation%20for%20a%20New%20Programming%20Language" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fcode-generation-for-a-new-programming-language%2f&amp;description=Code%20Generation%20for%20a%20New%20Programming%20Language" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

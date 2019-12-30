@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>How Compilers Optimize the Source Code (Part I) | Compilers</title>
+  <meta name="description" content="A previous aricle of this course was entirely devoted to an overview of Optimization in Compilers. Reading that article is a clear prerequisite for this one (see the references at the end).
+We did study the following concepts:
+ What Compilers optimize. When Compilers optimize, that is, at which point in the compilation process. Where they optimize, that is, what parts of the code.  In this article I want to study How Compilers Optimize source code.">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/how-compilers-optimize-code-1\/",
+          "name": "How compilers optimize the source code ( part i)"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "How Compilers Optimize the Source Code (Part I)",
+  "description" : "A previous aricle of this course was entirely devoted to an overview of Optimization in Compilers. Reading that article is a clear prerequisite for this one (see the references at the end).\nWe did study the following concepts:\n What Compilers optimize. When Compilers optimize, that is, at which point in the compilation process. Where they optimize, that is, what parts of the code.  In this article I want to study How Compilers Optimize source code.",
+  "inLanguage" : "en",
+  "wordCount":  1821 ,
+  "datePublished" : "2019-10-13T00:00:00",
+  "dateModified" : "2019-10-13T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/how-compilers-optimize-code-1\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="How Compilers Optimize the Source Code (Part I)" />
+<meta property="og:description" content="A previous aricle of this course was entirely devoted to an overview of Optimization in Compilers. Reading that article is a clear prerequisite for this one (see the references at the end).
+We did study the following concepts:
+ What Compilers optimize. When Compilers optimize, that is, at which point in the compilation process. Where they optimize, that is, what parts of the code.  In this article I want to study How Compilers Optimize source code.">
+<meta property="og:url" content="http://example.org/page/how-compilers-optimize-code-1/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="How Compilers Optimize the Source Code (Part I)" />
+  <meta name="twitter:description" content="A previous aricle of this course was entirely devoted to an overview of Optimization in Compilers. Reading that article is a clear prerequisite for this one (see the references at the end).
+We did …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>How Compilers Optimize the Source Code (Part I)</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  October 13, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>A previous aricle of this course was entirely devoted to an overview of Optimization in Compilers. Reading that article is a clear prerequisite for this one (see the references at the end).</p>
+
+<p>We did study the following concepts:</p>
+
+<ul>
+<li><strong>What</strong> Compilers optimize.</li>
+<li><strong>When</strong> Compilers optimize, that is, at which point in the compilation process.</li>
+<li><strong>Where</strong> they optimize, that is, what parts of the code.</li>
+</ul>
+
+<p>In this article I want to study <strong>How</strong> Compilers Optimize source code. Let me start with an overview and the whole concept, and then go into many practical examples.</p>
+
+<h2 id="a-bag-of-tricks">A Bag of Tricks</h2>
+
+<p>The first thing to know about Optimization in Compilers is that the whole module is like <strong>a bag full of tricks</strong>.</p>
+
+<p>What does that mean? Basically, the Compilers will take repeated looks at the code and do the following:</p>
+
+<ol>
+<li>Search in the bag any trick that can be applied.</li>
+<li>If applied at least one trick, start over from step 1.</li>
+<li>Otherwise exit.</li>
+</ol>
+
+<p>The other point worth remembering is that the code the Compilers is looking at while doing Optimization is very likely an <strong>Intermediate Code</strong> as you know from my past articles. To the best of my knowledge, there&rsquo;s no Compiler that does that directly on the original source code.</p>
+
+<p>On the one hand, I am going to illustrate and discuss with you many examples drawn from this bag of tricks.</p>
+
+<p>On the other hand, it&rsquo;s not possible to explore all tricks in the bag, because there&rsquo;s no limit to them. In fact, <strong>Optimization is a very active research field</strong>, and new advanced techniques are discovered every now and again.</p>
+
+<p>Now let&rsquo;s begin exploring some Optimization technique, starting from Local Optimization.</p>
+
+<h2 id="local-optimization">Local Optimization</h2>
+
+<p>Techniques that belong to the Local Optimization &ldquo;bag&rdquo; focus on optimizing one single basic block. Citing from my previous article:</p>
+
+<p><em>A basic block of code is a sequence of instructions without any label, except possibly for the first line, and without any jump, except possibly for the last line.</em></p>
+
+<p><em>The idea is that a basic block is a piece of code whose execution is completely predictable. There&rsquo;s no entry point for other parts of the code (except for the first line, maybe), and there&rsquo;s no exit point (except maybe for a final jump). Therefore, we know what&rsquo;s going to happen there, and we can optimize its behavior.</em></p>
+
+<p>Let&rsquo;s start with some simple cases.</p>
+
+<h3 id="remove-statements">Remove statements</h3>
+
+<p>Sometime we can delete an entire statement. For instance in the following code</p>
+<div class="highlight"><pre class="chroma">x := x + 0
+x := x * 1</pre></div>
+<p>the two statements above can simply be removed. Removing one statement is one of the best optimization you can do, in terms of performances.</p>
+
+<p>If you think this is a very unlikely case, or an odd example, you are wrong!</p>
+
+<p>The reason is that, even though nobody would explicitly write <code>x + 0</code>, sometimes you have an expression such as <code>x + y</code> and the Compiler is able to infer that <code>y</code> will always be zero at that point in the program.</p>
+
+<p>Consider that <code>y</code> may actually be a complex nested expression, and the Compiler is smarter than the programmer in figuring out this sort of things.</p>
+
+<h3 id="simplify-statement">Simplify statement</h3>
+
+<p>A basic example is the following line</p>
+<div class="highlight"><pre class="chroma">x := x*0</pre></div>
+<p>that can be simplified into</p>
+<div class="highlight"><pre class="chroma">x := 0</pre></div>
+<p>which is obviously more efficient. Another example:</p>
+<div class="highlight"><pre class="chroma">y := y^2</pre></div>
+<p>can be simplified into</p>
+<div class="highlight"><pre class="chroma">y := y*y</pre></div>
+<p>This is always a good optimization to do, because in 99% of the machines, the power operator is not built-in the CPU capabilities, so its implementation would go down to a series of complex operation, maybe with an external library.</p>
+
+<p>Another case is</p>
+<div class="highlight"><pre class="chroma">z := z * 8</pre></div>
+<p>Which can be simplified into</p>
+<div class="highlight"><pre class="chroma">z := z &lt;&lt; 3 (bitwise shift)</pre></div>
+<p>This last example is likely to be more efficient, even though in modern machines the multiplication is as fast as the other operations, bitwise shift included.</p>
+
+<h2 id="constant-folding">Constant Folding</h2>
+
+<p>This is a very important technique. It&rsquo;s absolutely worth knowing it.</p>
+
+<p>The main point is that one of the most powerful optimizations we can perform is to compute the result of some operations at compile time. This is often possible when the operands are constant. For example, if we have</p>
+<div class="highlight"><pre class="chroma">x := y op z</pre></div>
+<p>And <code>y</code>, <code>z</code> are both constant (immediate values), then we can compute the result at compile time and replace the instruction with an assignment to constant:</p>
+<div class="highlight"><pre class="chroma">x := 2 + 3 ⇒ x := 5</pre></div>
+<p>The same concept applies to the predicate of a conditional statement. When we have</p>
+<div class="highlight"><pre class="chroma">if (x &lt; 2) jump L</pre></div>
+<p>and we are actually able to say that <code>x</code> will always evaluate to some constant, then the entire if block can be:</p>
+
+<ul>
+<li>Deleted, if the condition always evaluates to false.</li>
+<li>Replaced with an unconditional jump, if the predicate is always true.</li>
+</ul>
+
+<h3 id="danger">Danger!</h3>
+
+<p>There&rsquo;s one uncommon case when constant folding is dangerous. Even though it&rsquo;s unlikely, it&rsquo;s very instructive.</p>
+
+<p>Suppose we have two machines, X and Y, and we want to compile some code on machine X and then run the generated code in machine Y.</p>
+
+<p>This scenario could happen when Y is a weak machine, for example some embedded system, and therefore is not suitable to develop code.</p>
+
+<p>Now let&rsquo;s assume that we have the operation <code>a := 1.5 + 3.2</code> in the code and we want to constant fold it down to <code>a := 4.7</code>.</p>
+
+<p>When we do that at compile time, and we generate a code that contains the folded constant, we are actually taking a big risk, because the two architecture X and Y can be very different and can implement different ways to represent floating point numbers.</p>
+
+<p><code>4.7</code> in the first machine can be <code>4.6999</code> in the second, and this approximation can propagate down to other operation and lead to inconsistent behaviors.</p>
+
+<p>Cross-Compilers (Compilers designed to work in similar scenarios) take these situations very seriously and use instead the string representation of the number, and then perform all &ldquo;constant folding&rdquo; that are possible directly on that string. Eventually, they will let the specific architecture to translate that string into a number.</p>
+
+<h3 id="eliminate-unreachable-basic-blocks">Eliminate Unreachable Basic Blocks</h3>
+
+<p>If there&rsquo;s a basic block that can never be reached by the control flow then we can just delete it from the program.</p>
+
+<p>This will not make the code faster (because that code will never be executed!), but it will make the program smaller, which can in turn make it faster because of some cache effect in the machine.</p>
+
+<p>Even though this can seem like a weird case, it&rsquo;s in fact quite common. Consider the snippet of C code</p>
+<div class="highlight"><pre class="chroma">#define DEBUG 1
+...
+if (DEBUG) {
+...
+}</pre></div>
+<p>This sort of blocks is useful to have during the development of the program. Then, when we compile it for a release, we would change the definition to</p>
+<div class="highlight"><pre class="chroma">#define DEBUG 0</pre></div>
+<p>The C-compiler would then automatically delete all if-blocks like that one, making the program smaller, and hence very likely more efficient.</p>
+
+<h3 id="single-assignment-form">Single-Assignment Form</h3>
+
+<p>Many optimizations strategies are easier to apply if the code is in single-assignment form. This means that each register is assigned only once. For example, the following code is not in single-assignment form</p>
+<div class="highlight"><pre class="chroma">x := z+y
+a := x
+x := 2*x
+``
+
+because the register `x` is assigned twice. However, the code can be written in the following, equivalen, form</pre></div>
+<p>b := z+y
+a := b
+x := b*2</p>
+<div class="highlight"><pre class="chroma">That&#39;s in single-assignment form.
+
+In particular, we can make two more assumptions that can potentially lead to many more optimizations. Given a basic block, if
+
+1. It&#39;s in single assignment form, and
+2. A definition `x := ...` is the first use of `x` in the block,
+
+then when two assignments have the same RHS (right-hand side), they must compute the same value.
+
+Looking at an example will show the real power of these assumptions. Consider the code</pre></div>
+<p>x := y + z
+&hellip;
+w := y + z</p>
+<div class="highlight"><pre class="chroma">In the &#34;...&#34; part of the code, the register x cannot be assigned, because the block is in single-assignment form (assumption 1). Furthermore, the registers `y`, `z` cannot change either, because they are used to define `x` and that means they must have been defined before (assumption 2).
+
+Therefore, we can rewrite the code as it follows:</pre></div>
+<p>x := y + z
+&hellip;
+w := x</p>
+<div class="highlight"><pre class="chroma">This optimization is called **common sub-expression elimination**.
+
+It&#39;s very important to understand the implication of the two assumptions we made about single-assignment form.
+
+Consider that&#39;s very unlikely, if not impossible at all, that the original source code be in such a form. So, what&#39;s the point of assuming we have a code in that form?
+
+The answer is, again, Intermediate Language. The Intermediate Language must be generated so that the two assumptions are fulfilled. This is always possible since we assume that the registers are infinite in the IL.
+
+Another use of the single-assignment form is that everytime we see in a block the assignment `w := x`, then we can replace all subsequent usages of the register w with the register `x`. For example</pre></div>
+<p>b := z+y
+a := b
+x := a*2</p>
+<div class="highlight"><pre class="chroma">Can be written as</pre></div>
+<p>b := z+y
+a := b
+x := b*2
+```</p>
+
+<p>This optimization technique is called <strong>copy propagation</strong>.</p>
+
+<h2 id="the-power-of-local-optimization">The power of Local Optimization</h2>
+
+<p>Until now we have studied a few local optimization techniques that don&rsquo;t seem very powerful.</p>
+
+<p>Indeed, each of these tricks will not change dramatically the efficiency of a program, when is considered standalone.</p>
+
+<p>The real power of Local Optimization lies in the combination of all these techniques. As explained in a previous section, the main idea of the whole Optimization module is to apply tricks in an iterative fashion, until no more tricks can be applied.</p>
+
+<p>The key point of such a strategy, is that <strong>the successful application of one optimization tricks unblocks more tricks that couldn&rsquo;t be applied before</strong>.</p>
+
+<p>Thus, Local Optimization is like a waterfall that grows while it descends. At the beginning, a very few optimization techniques can be applied. But their application unblocks many more optimization opportunities that eventually lead to great performance improvement.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>In this article we started studying more in depth how Compilers optimize the source code.</p>
+
+<p>More specifically, we went into the nuts and bolts of Local Optimization, that is a set of optimization techniques meant to improve performance of a basic block of code.</p>
+
+<p>Even though most local optimization techniques are simple tricks, their real power lies in their iterative application, that can unlock a great deal of improvement in the overall code. Every time even a single trick is applied, it can unblock many others that weren&rsquo;t possible to apply before. This waterfall-effect produces great results.</p>
+
+<p>At this point, is time to switch over to the next article, where we will be studying Optimization Part II.</p>
+
+<h2 id="references">References</h2>
+
+<p>My article <a href="http://example.org/page/source-code-optimization-in-compilers/">Source Code Optimization in Compilers</a>.</p>
+
+<p>Alex Aiken&rsquo;s class Compilers at Stanford University. Available as <a href="https://lagunita.stanford.edu/courses/Engineering/Compilers/Fall2014/course/">free MOOC online</a>.</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fhow-compilers-optimize-code-1%2f&amp;text=How%20Compilers%20Optimize%20the%20Source%20Code%20%28Part%20I%29&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fhow-compilers-optimize-code-1%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fhow-compilers-optimize-code-1%2f&amp;title=How%20Compilers%20Optimize%20the%20Source%20Code%20%28Part%20I%29" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fhow-compilers-optimize-code-1%2f&amp;title=How%20Compilers%20Optimize%20the%20Source%20Code%20%28Part%20I%29" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fhow-compilers-optimize-code-1%2f&amp;title=How%20Compilers%20Optimize%20the%20Source%20Code%20%28Part%20I%29" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fhow-compilers-optimize-code-1%2f&amp;description=How%20Compilers%20Optimize%20the%20Source%20Code%20%28Part%20I%29" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

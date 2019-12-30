@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>How to Design A Programming Language Parser | Compilers</title>
+  <meta name="description" content="In a previous article of this series we&rsquo;ve studied Programming Language Parsers and answered the basic question: what are they?
+We learnt that:
+ Parsers are algorithms that decide whether or not a source code is correct with respect to the rules of a Grammar. Parsers get in input the list of Tokens produced by the Lexical Analysis, and output the yes/no decision, while building in memory a Parse-Tree.  And we also learnt what are the main features that distinguish parsers:">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/how-to-design-a-parser\/",
+          "name": "How to design a programming language parser"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "How to Design A Programming Language Parser",
+  "description" : "In a previous article of this series we\x26rsquo;ve studied Programming Language Parsers and answered the basic question: what are they?\nWe learnt that:\n Parsers are algorithms that decide whether or not a source code is correct with respect to the rules of a Grammar. Parsers get in input the list of Tokens produced by the Lexical Analysis, and output the yes\/no decision, while building in memory a Parse-Tree.  And we also learnt what are the main features that distinguish parsers:",
+  "inLanguage" : "en",
+  "wordCount":  2871 ,
+  "datePublished" : "2019-10-11T00:00:00",
+  "dateModified" : "2019-10-11T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/how-to-design-a-parser\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="How to Design A Programming Language Parser" />
+<meta property="og:description" content="In a previous article of this series we&rsquo;ve studied Programming Language Parsers and answered the basic question: what are they?
+We learnt that:
+ Parsers are algorithms that decide whether or not a source code is correct with respect to the rules of a Grammar. Parsers get in input the list of Tokens produced by the Lexical Analysis, and output the yes/no decision, while building in memory a Parse-Tree.  And we also learnt what are the main features that distinguish parsers:">
+<meta property="og:url" content="http://example.org/page/how-to-design-a-parser/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="How to Design A Programming Language Parser" />
+  <meta name="twitter:description" content="In a previous article of this series we&rsquo;ve studied Programming Language Parsers and answered the basic question: what are they?
+We learnt that:
+ Parsers are algorithms that decide whether or not …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>How to Design A Programming Language Parser</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  October 11, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>In a previous article of this series we&rsquo;ve studied Programming Language Parsers and answered the basic question: what are they?</p>
+
+<p>We learnt that:</p>
+
+<ul>
+<li>Parsers are algorithms that decide whether or not a source code is correct with respect to the rules of a Grammar.</li>
+<li>Parsers get in input the list of Tokens produced by the Lexical Analysis, and output the yes/no decision, while building in memory a Parse-Tree.</li>
+</ul>
+
+<p>And we also learnt what are the main features that distinguish parsers:</p>
+
+<ul>
+<li>Top-down or Bottom-up.</li>
+<li>Leftmost vs Rightmost.</li>
+<li>With or without backtracking.</li>
+<li>With or without recursion.</li>
+</ul>
+
+<p>In order to successfully build a Parser, it&rsquo;s worth taking as much time as we need for the design part, all while keeping the previous information on the top of our heads.</p>
+
+<p>The goal is to make <strong>informed decisions</strong> about each of the above features. So, let&rsquo;s see how to design a Parser.</p>
+
+<h2 id="choosing-the-parsing-algorithm">Choosing The Parsing Algorithm</h2>
+
+<p>Before to start, remember that my ultimate objective is to learn so much about this subject that I can confidently build my own Programming Language, with its Compiler and hence its Parser.</p>
+
+<p>In fact, <strong>I want to guide you through the decisional process I went through myself</strong> when I designed the Parser for my language.</p>
+
+<p>Let me start with a bold sentence: <em>writing a parser is a scientific task as much as a coding task; therefore, unless you&rsquo;re exploring new research horizons, stick to the state of the art algorithms and don&rsquo;t make a home-made design.</em></p>
+
+<p>I am not saying that you should dry out the creative effort, not at all. What I am saying is: <em>let scientific theory guide your efforts</em>. Let me give you a few concrete examples.</p>
+
+<p>To start the design of my parser, I could jump straight into writing utterly complex regular expressions and a gigantic loop that reads the source code, until it reaches the End Of File, and works on a case by case design, like in a huge if-then-else. And, maybe, it will work. Maybe it won&rsquo;t.</p>
+
+<p>Instead, I am going to stop for a second and ask myself: What kind of parser do I want to build, top-down or bottom-up?</p>
+
+<p>I know that bottom-up parsers are a bit more powerful, but they also are much more complex. My objective is to fully understand a parsing algorithm in order to make my own, and then integrate it into my own compiler. Therefore <strong>I am going to choose a top-down design</strong>.</p>
+
+<p>Then, I could open my text editor and start typing some code and&hellip; see what comes out of it. Instead, I am going to think for one more second and ask myself: Do I want to build a parser based on backtracking, or on lookahead?</p>
+
+<p>Backtracking is a very interesting approach, but I am already familiar with it, since I studied it in the past in reasonable depth. Moreover, as I told you, backtracking parsers are a less common choice because their runtime can be very high. Therefore, <strong>I am going to design a LL(1) parser</strong>. Make no mistake about it: this choice implies that the parser will only work with LL(1) grammars.</p>
+
+<p>I also decided to take a leftmost approach, as this is the most common choice.</p>
+
+<p>Finally, there is the question about recursion. This is another question you should ask yourself at the start, because it influences all the upcoming development.</p>
+
+<p>In fact, this was the toughest choice for me, because my objective was to learn as much as I could and both approaches (recursive and iterative) are really worth exploring. Thus, I chose both! <strong>I am going to start with a recursive design</strong>, and later learn how to implement the iterative equivalent of it.</p>
+
+<p>Let&rsquo;s recap. My choice is to build a top-down, recursive, LL(1) parser that uses leftmost derivations.</p>
+
+<h2 id="a-short-tour-in-the-definitions">A Short Tour In The Definitions</h2>
+
+<p>Remember that <em>the parser parses the grammar</em>. NOT the language. This means that you must look for the grammar definition and analyze it in quite some depth, in order to build your parser.</p>
+
+<p>Since I want a LL(1) parser, we can start reasoning about how to implement the lookahead. Theoreticians like to define two sets, called <strong>First</strong> and <strong>Follow</strong>. For a given symbol (or a sequence of symbols) $X$, here&rsquo;s the definition of First set:</p>
+
+<p>$$
+\text{First}(X) = \{ t\, |\, t\, \text{is terminal}, X \rightarrow^* ta\} \bigcup \{ \epsilon | X \rightarrow^* \epsilon \}
+$$</p>
+
+<p>Quick bit of notation: the symbol $\rightarrow^*$ means that what&rsquo;s on right side of it can be achieved from what&rsquo;s on the left, in any number of derivations. &ldquo;Derivation&rdquo; is to apply one production rule of the Grammar.</p>
+
+<p>What does the definition say? It says that $\text{First}(X)$ is the set of all terminal symbols that appear at the beginning of the string after an arbitrary number of derivation. Also $\epsilon$ belongs to $\text{First}(X)$ if $X$ derives the null string.</p>
+
+<p>The Follow set is defined only for a terminal symbol. So, here&rsquo;s the definition for a terminal $A$:</p>
+
+<p>$$
+\text{Follow}(A) = \{\, t\, |\, t\, \text{is terminal}, S \rightarrow^+ bAtd \} \bigcup \{t\, |\, t=EOF, S\rightarrow^* aA \}
+$$</p>
+
+<p>It says that Follow($A$) is the set of terminals that can appear immediately to the right of $A$ in some partial derivation (with at least one derivation step - that&rsquo;s what $\rightarrow^+$ means). Furthermore, if $A$ can be the rightmost symbol in a derivation, then EOF is in Follow($A$).</p>
+
+<p>Now that we have seen these definitions, I can also give you a <strong>more concrete view</strong> about why LL(1) grammars are a restricted subset of all grammars. In fact, a Grammar is LL(1) if, for every production rule <code>A : p | g</code>, the following three conditions hold true:</p>
+
+<ol>
+<li>There isn&rsquo;t any terminal symbol a such that both <code>p</code> and <code>g</code> derive strings starting with <code>A</code>.</li>
+<li>At most one between <code>p</code> and <code>g</code> can derive the empty string $\epsilon$.</li>
+<li>If <code>g</code> derives $\epsilon$, then <code>p</code> does not derive any string that starts with a terminal in Follow($A$). Likewise, if <code>p</code> derives $\epsilon$, then <code>g</code> does not derive any string that starts with a terminal in Follow($A$).</li>
+</ol>
+
+<p>I hope you made it till this paragraph, despite the odd-looking definitions above!</p>
+
+<p>The truth is that those definitions are really important from a conceptual point of view, but here is what I think:</p>
+
+<p><em>In practice, though, it&rsquo;s easier to simply ask ourselves, What tokens can possibly start phrases beginning at this alternative? The exact definition of FIRST is a bit much to chew on for our purposes here[&hellip;]</em> (cit. Prof. Terrence Parr in his book about language implementation, see the references at the end).</p>
+
+<h2 id="prototyping-the-parser">Prototyping The Parser</h2>
+
+<p>Finally, we are going to see how to implement a parser algorithm!</p>
+
+<p>Bear in mind that I am only going to discuss the strategic, high-level aspects of the implementation. Basically, the implementation design.</p>
+
+<p>Regarding the actual code, it will have its space in the D section of my Compiler&rsquo;s class: <strong>Do it</strong>.</p>
+
+<p>To start off, remember that we are going to build a top-down, LL(1) (thus, with lookahead and without backtracking), recursive Parser.</p>
+
+<p>Also, I think that it is worth looking at one example that clarifies the concept of LL(1), versus LL(k). In practice, LL(1) parser are those that can always take deterministic decision by just looking ahead one single token.</p>
+
+<p>This feature, clearly depends on the grammar. So here&rsquo;s an example of LL(1) grammar:</p>
+<div class="highlight"><pre class="chroma">exp : ID
+    | &#39;-&#39; ID
+    | &#39;+&#39; ID</pre></div>
+<p>This grammar can easily be parsed by a LL(1) parser, because when the parser needs to decide what to do with an <code>expr</code> (expression) token, it can look ahead one token: if it&rsquo;s <code>ID</code> then only the first production rule can be right; if it&rsquo;s <code>-</code> then only the second choice is valid; and if it&rsquo;s <code>+</code> then only the third one makes sense. If the lookahead token is none of the three, then a parsing error will be returned.</p>
+
+<p>Let&rsquo;s consider instead the following grammar:</p>
+<div class="highlight"><pre class="chroma">expr : ID &#39;++&#39;
+     | ID &#39;--&#39;</pre></div>
+<p>A LL(1) will not be able to parse strings in this grammar, because knowing that the next token is <code>ID</code> simply does not suffice to the goal. The parser would need to know also the token after that one. In fact, this is an example of LL(2) grammar.</p>
+
+<p>Notice, however, that the grammar in the example could be left-factored and made LL(1), by rewriting it as:</p>
+<div class="highlight"><pre class="chroma">expr : ID ( &#39;++&#39; | &#39;--&#39; )</pre></div>
+<p>Left-factoring Grammars is not something I am going to talk about in this article, therefore we can assume that we want to build a LL(1) parser because <em>we know that the grammar is LL(1)</em>.</p>
+
+<p>At this point, all information are in your brain, hopefully in your working memory, and we can get started.</p>
+
+<p>The first thing to know, which helped me a lot, it to understand the overall structure of the software that we are going to write. In fact, a parser like the one we want to build should respect a very well known structure, that is basically a <strong>software design pattern</strong>. Let me give more details.</p>
+
+<p>As we know, all types of Tokens in a Grammar can be classified into two sets: terminal tokens and nonterminal tokens. The key concepts to know are the following ones:</p>
+
+<ul>
+<li>For each Token we are going to call a procedure (call it &ldquo;function&rdquo;, or &ldquo;method&rdquo;, if you like).</li>
+<li>Procedures for the nonterminal tokens simply call the procedures for the tokens in the production rule to be applied.</li>
+<li>There is only one procedure for all terminal tokens, that simply matches the current input character(s) with the token type.</li>
+</ul>
+
+<p>An example will make everything easier to figure out. Let&rsquo;s consider this grammar:</p>
+<div class="highlight"><pre class="chroma">expr : ID (&#39;=&#39; rhs)?
+     | NUM
+rhs : ID | NUM | expr</pre></div>
+<p>It says that an expression can either be a <code>NUM</code> (a number), or it can be an <code>ID</code> (identifier) optionally followed by a <code>=</code> symbol and a <code>rhs</code> (right-hand side of the expression). Such <code>rhs</code> token must be one between <code>ID</code>, <code>NUM</code> and <code>expr</code>.</p>
+
+<p>For instance the following strings are all valid expressions in this grammar.</p>
+<div class="highlight"><pre class="chroma">5 // a single NUM is an expression
+var1 // a single ID is also a valid expression
+var = 5
+var1 = var2</pre></div>
+<p>Due to the recursive nature of the definition, even the following string is valid</p>
+<div class="highlight"><pre class="chroma">var1 = var2 = var3 = var4 = 5</pre></div>
+<p>Here&rsquo;s an example of non-valid string, that must be rejected:</p>
+<div class="highlight"><pre class="chroma">var1 = var2 =</pre></div>
+<p>That one is non-valid because the <code>=</code> symbol MUST be followed by a <code>rhs</code>.</p>
+
+<p>The grammar is clearly LL(1), because when we are parsing an <code>expr</code> token, knowing whether the next token is <code>ID</code> or <code>NUM</code> is enough knowledge to pick the correct production rule.</p>
+
+<p>So, let&rsquo;s start by considering the terminal tokens. As I said, there&rsquo;s only one procedure for them; let&rsquo;s call this procedure <code>match</code></p>
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="kt">void</span> <span class="nf">match</span><span class="p">(</span><span class="kt">int</span> <span class="n">type_enum</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="p">...</span>
+<span class="p">}</span></code></pre></div>
+<p>What is the argument <code>type_enum</code>? It&rsquo;s an integer, that in a Object-Oriented Language like Java would be instance of <code>Enum</code>. Basically, a finite set of integers is used to identify one-to-one all terminal token types.</p>
+
+<p>In the current example, we would have that</p>
+
+<ul>
+<li><code>int 0</code> matches the token type <code>ID</code></li>
+<li><code>int 1</code> matches the token type <code>NUM</code></li>
+<li><code>int 2</code> matches the symbol <code>=</code>. Let&rsquo;s call it <code>EQUAL</code></li>
+</ul>
+
+<p>and these are the only terminal tokens that we have.</p>
+
+<p>The procedure match is really simple. Let&rsquo;s assume that we have a global pointer to the next token in the input sequence, call it <code>lookahead</code>. Let&rsquo;s also say that the sequence of tokens is an array of pairs (<code>token_type</code>, <code>token_chars</code>), so that we can access the two elements of the pairs for each token in the array.</p>
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="kt">void</span> <span class="nf">match</span><span class="p">(</span><span class="kt">int</span> <span class="n">type_enum</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">input_sequence</span><span class="p">[</span><span class="n">lookahead</span><span class="p">].</span><span class="n">token_type</span> <span class="o">==</span> <span class="n">type_enum</span><span class="p">)</span>
+        <span class="n">consume</span><span class="p">();</span>
+    <span class="k">else</span> <span class="n">throw_error</span><span class="p">(</span><span class="s">&#34;Some message&#34;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">consume</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">lookahead</span><span class="o">++</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">lookahead</span> <span class="o">&gt;=</span> <span class="n">input_sequence</span><span class="p">.</span><span class="n">length</span><span class="p">)</span>
+        <span class="n">accept</span><span class="p">();</span> <span class="c1">// input sequence is accepted
+</span><span class="c1"></span><span class="p">}</span></code></pre></div>
+<p>What happens in the code above? When <code>match</code> is called, it checks that the next token is indeed of the type that we expect to see. If it&rsquo;s not, then a parsing error is generated (with a meaningful message, hopefully). If it is, then we call the <code>consume</code> procedure, that just advances the global pointer to the next location.</p>
+
+<p>Keep in mind that <strong>in addition to advancing the pointer you may also want to build the parse tree in memory</strong>. This is why I suggest to have a separate procedure, <code>consume</code>, so that you can change its behavior without touching ever again the <code>match</code> procedure. For the time being, let&rsquo;s keep consume very simple and just incrementing the pointer.</p>
+
+<p>What about nonterminal token types? As I said, for each of these types we are going to have a separate procedure. In the example, the only nonterminal is <code>expr</code>, so we only need to write one function.</p>
+
+<p>How do procedures for nonterminals work? For LL(1) parsers this is going to be a piece of cake:</p>
+
+<ul>
+<li>Write a long <code>if-else</code> for each of the possible lookahead tokens that&rsquo;s possible to have, or a <code>case-switch</code>, if you prefer.</li>
+<li>Each of these cases corresponds to a production rule. So, for each of them recursively call the procedures defined for the single pieces of that production rule. This will be clear with the example below.</li>
+<li>As &ldquo;default&rdquo; case in the <code>if-else</code>, generate an error, because it means the lookahead token is not valid in the grammar.</li>
+</ul>
+
+<p>Alright, now let&rsquo;s see the procedure for the <code>expr</code> token type. As a convention, it makes sense to call the procedures for the nonterminals with the same name of the token type.</p>
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="kt">void</span> <span class="nf">expr</span><span class="p">(){</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">input_sequence</span><span class="p">[</span><span class="n">lookahead</span><span class="p">].</span><span class="n">token_type</span> <span class="o">==</span> <span class="n">NUM</span><span class="p">)</span>
+        <span class="n">match</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// 1 is the integer for NUM
+</span><span class="c1"></span>    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">input_sequence</span><span class="p">[</span><span class="n">lookahead</span><span class="p">].</span><span class="n">token_type</span> <span class="o">==</span> <span class="n">ID</span><span class="p">){</span>
+        <span class="n">match</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="c1">// 0 is the integer for ID
+</span><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="n">input_sequence</span><span class="p">[</span><span class="n">lookahead</span><span class="p">].</span><span class="n">token_type</span> <span class="o">==</span> <span class="n">EQUAL</span><span class="p">){</span>
+            <span class="c1">// now call procedures for each piece
+</span><span class="c1"></span>            <span class="c1">// of this production rule: expr ← ID &#39;=&#39; rhs
+</span><span class="c1"></span>            <span class="n">match</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span> <span class="c1">// 2 is the integer for EQUAL
+</span><span class="c1"></span>            <span class="n">rhs</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="n">generate_error</span><span class="p">(</span><span class="s">&#34;Helpful message&#34;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">rhs</span><span class="p">(){</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">input_sequence</span><span class="p">[</span><span class="n">lookahead</span><span class="p">].</span><span class="n">token_type</span> <span class="o">==</span> <span class="n">NUM</span><span class="p">)</span>
+        <span class="n">match</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">input_sequence</span><span class="p">[</span><span class="n">lookahead</span><span class="p">].</span><span class="n">token_type</span> <span class="o">==</span> <span class="n">ID</span><span class="p">)</span>
+        <span class="n">match</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">input_sequence</span><span class="p">[</span><span class="n">lookahead</span><span class="p">].</span><span class="n">token_type</span> <span class="o">==</span> <span class="n">expr</span><span class="p">)</span>
+        <span class="n">expr</span><span class="p">();</span>
+    <span class="k">else</span>
+        <span class="n">generate_error</span><span class="p">(</span><span class="s">&#34;Message&#34;</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
+<p>There is one crucial factor into play: <strong>the lookahead point is a global variable</strong> that is updated (globally) each time <code>match</code>, and therefore <code>consume</code>, is called. This is extremely important for the overall strategy to work. Even if you don&rsquo;t like global variables (I don&rsquo;t either), all serious programming languages have constructs that allow this behavior.</p>
+
+<p>To see why this is so important, just take a look at the nested if in the <code>expr</code> procedure, the one that checks</p>
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="n">input_sequence</span><span class="p">[</span><span class="n">lookahead</span><span class="p">].</span><span class="n">token_type</span> <span class="o">==</span> <span class="n">EQUAL</span></code></pre></div>
+<p>This <code>if</code> instruction is called right after we called <code>match(0)</code>, that did update the <code>lookahead</code> pointer. As I said, it&rsquo;s crucially important.</p>
+
+<p>The second most important thing to notice is that the procedures for nonterminals invoke each other. So, the <code>expr</code> procedure might call the <code>rhs</code> procedure, if it matches successfully an <code>ID</code> token first, and an <code>EQUAL</code> token in second place. And the <code>rhs</code> procedure might even call again <code>expr</code>, if that&rsquo;s what the lookahead suggests.</p>
+
+<p>How can this work? How do we make sure that we are advancing in the input sequence while doing all these recursive calls?</p>
+
+<p>Again, it&rsquo;s because before calling any nonterminal procedure we always first consume the current token by invoking match, which advances the global lookahead pointer. Did I say that it is very important?</p>
+
+<p>With some adjustment to this boilerplate code, and some more code to handle global pointers, input sequence and error messages, you&rsquo;d have a pretty much complete parser for the grammar I wrote as an example!</p>
+
+<p>Obviously, for any real grammar, one that makes sense, there would be many more procedures to create for nonterminal, and many more if-else to write.</p>
+
+<p>As you can imagine, this task can be quite tedious and error-prone. Nonetheless, I believe this is the type of task that one has to do &ldquo;once in a lifetime&rdquo;, to understand the concepts in the deepest possible details. After that unique time, it makes sense to use tools that automate it (such as ANTLR).</p>
+
+<h2 id="what-s-next">What&rsquo;s next</h2>
+
+<p>A Parser is the second step in the process of compiling a source code. It comes after the Lexical Analysis, and before the Semantic Analysis.</p>
+
+<p>Building parsers is a complex task, that has been heavily studied from theoretical point of view, along with Formal Grammars.</p>
+
+<p>In this article I showed you how to design a parser, and, perhaps more importantly, what are the strategic decisions that must be taken before going into the coding effort. In particular, we also saw the template code for a LL(1), top-down, recursive-descent parser.</p>
+
+<p>The other top-down, LL(1) alternative is an iterative approach, that uses a &ldquo;parsing table&rdquo; and a stack-like data structure to imitate recursion. Such alternative approach is more involved but can have some advantages in terms of memory management, and I will talk about it in a companion article.</p>
+
+<p>If you&rsquo;re not too interested in the theoretical details of parsing algorithms, then the choice is clear: jump onto the next step &ndash; Semantic Analysis!</p>
+
+<h2 id="resources">Resources</h2>
+
+<p>My article <a href="http://example.org/page/what-is-a-programming-language-grammar/">What is a Programming Language Grammar?</a>.</p>
+
+<p>Language Implementation Patterns. A book by Prof. <a href="https://parrt.cs.usfca.edu/">Terrence Parr</a>.</p>
+
+<p>The Dragon Book. Compilers: Principles, Techniques and Tools. <a href="https://en.wikipedia.org/wiki/Compilers:_Principles,_Techniques,_and_Tools">Wikipedia page</a> (of the book).</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-design-a-parser%2f&amp;text=How%20to%20Design%20A%20Programming%20Language%20Parser&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fhow-to-design-a-parser%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-design-a-parser%2f&amp;title=How%20to%20Design%20A%20Programming%20Language%20Parser" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-design-a-parser%2f&amp;title=How%20to%20Design%20A%20Programming%20Language%20Parser" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-design-a-parser%2f&amp;title=How%20to%20Design%20A%20Programming%20Language%20Parser" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fhow-to-design-a-parser%2f&amp;description=How%20to%20Design%20A%20Programming%20Language%20Parser" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

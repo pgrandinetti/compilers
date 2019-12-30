@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>Do Compilers Depend on the Computer Architecture? | Compilers</title>
+  <meta name="description" content="In all previous articles in this course, I tried to emphasize equally all steps in the compilation:
+ Lexical Analysis Parsing Semantic Analysis Optimization Code Generation  For some reason, though, I noticed that the first three steps receive a lot of attention, usually much more than the last two.
+Moreover, the first three steps form what’s usually called front-end compilation, as opposed to the back-end compilation that if formed by the last two.">
+  <meta name="author" content="Pietro"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Compilers",
+    
+    "url": "http:\/\/example.org\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "http:\/\/example.org\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "http:\/\/example.org\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "http:\/\/example.org\/page\/do-compilers-depend-on-the-architecture\/",
+          "name": "Do compilers depend on the computer architecture?"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Pietro"
+  },
+  "headline": "Do Compilers Depend on the Computer Architecture?",
+  "description" : "In all previous articles in this course, I tried to emphasize equally all steps in the compilation:\n Lexical Analysis Parsing Semantic Analysis Optimization Code Generation  For some reason, though, I noticed that the first three steps receive a lot of attention, usually much more than the last two.\nMoreover, the first three steps form what’s usually called front-end compilation, as opposed to the back-end compilation that if formed by the last two.",
+  "inLanguage" : "en",
+  "wordCount":  752 ,
+  "datePublished" : "2019-10-13T00:00:00",
+  "dateModified" : "2019-10-13T00:00:00",
+  "image" : "http:\/\/example.org\/",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "http:\/\/example.org\/page\/do-compilers-depend-on-the-architecture\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "http:\/\/example.org\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "http:\/\/example.org\/",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="Do Compilers Depend on the Computer Architecture?" />
+<meta property="og:description" content="In all previous articles in this course, I tried to emphasize equally all steps in the compilation:
+ Lexical Analysis Parsing Semantic Analysis Optimization Code Generation  For some reason, though, I noticed that the first three steps receive a lot of attention, usually much more than the last two.
+Moreover, the first three steps form what’s usually called front-end compilation, as opposed to the back-end compilation that if formed by the last two.">
+<meta property="og:url" content="http://example.org/page/do-compilers-depend-on-the-architecture/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Compilers" />
+
+  <meta name="twitter:title" content="Do Compilers Depend on the Computer Architecture?" />
+  <meta name="twitter:description" content="In all previous articles in this course, I tried to emphasize equally all steps in the compilation:
+ Lexical Analysis Parsing Semantic Analysis Optimization Code Generation  For some reason, though, I …">
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="alternate" href="http://example.org/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="http://example.org/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="http://example.org/css/syntax.css" /><link rel="stylesheet" href="http://example.org/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://example.org/">Compilers</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Contents" href="/">Contents</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="About" href="/page/introduction">About</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Code" href="https://github.com/pgrandinetti/compilers">Code</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="page-heading">
+              
+                <h1>Do Compilers Depend on the Computer Architecture?</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+                
+                  <div class="page-meta">
+  
+  
+  
+  October 13, 2019
+</div>
+
+
+                
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+
+<p>In all previous articles in this course, I tried to emphasize equally all steps in the compilation:</p>
+
+<ol>
+<li>Lexical Analysis</li>
+<li>Parsing</li>
+<li>Semantic Analysis</li>
+<li>Optimization</li>
+<li>Code Generation</li>
+</ol>
+
+<p>For some reason, though, I noticed that the first three steps receive a lot of attention, usually much more than the last two.</p>
+
+<p>Moreover, the first three steps form what’s usually called front-end compilation, as opposed to the back-end compilation that if formed by the last two.</p>
+
+<p>The goal of the front-end is to make sure the source code is well-written, as well as to produce some data structure that will be useful for the back-end.</p>
+
+<p>The key point I want to make is that front-end is indeed an abstract process. It’s about algorithms, formal grammars, regular expressions and finite automata. In other words, <strong>front-end is independent from the computer architecture</strong>.</p>
+
+<p>However, front-end is just one part of the Compiler. The back-end strongly depends on the computer architecture.</p>
+
+<p>Therefore, <strong>it’s correct to say that Compilers do depend on computers architecture</strong>.</p>
+
+<p>Let’s get now deeper into the why.</p>
+
+<h2 id="procedures-and-activations">Procedures and Activations</h2>
+
+<p>Let’s start with a fair approximation: <strong>a Program is made of Procedures</strong>.</p>
+
+<p>We are used to thinking about Procedures as pieces of reusable code (that is, functions). That’s true at all levels of coding, including machine-level such as Assembly code.</p>
+
+<p>In Assembly code, for example, we can think of procedure like pieces of code delimited by the labels and the jump instructions. And if there isn’t any such block, then we can think of the whole program as a procedure.</p>
+
+<p>In either case, the activation of a procedure needs to be handled with care by the executing environment.</p>
+
+<p>Let’s think about the trickiest points with procedures:</p>
+
+<ul>
+<li>Input data and variables names must be confined to that procedure’s execution (this happens in all languages of practical relevance).</li>
+<li>There needs to be a link to the caller, that’s the piece of code that invoked the procedure.</li>
+<li>Storing the return value.</li>
+<li>The return address, that’s the line of code, in the whole program, that must be executed after the procedure has finished.</li>
+</ul>
+
+<p>To complicate things further, consider that even though the various blocks are logically separated, the entire storage is really just one gigantic array in memory. And the fact that elements in the array are contiguous plays an important role.</p>
+
+<p>All considered, we should imagine the activation record of a procedure like a block of memory that stores the information needed to correctly execute that procedure within the program.</p>
+
+<h2 id="enters-compiler">Enters Compiler</h2>
+
+<p>Why and how does a Compiler gets to play with the activation record?</p>
+
+<p>The answer is relatively easy: <strong>the activation record is designed at compile time</strong>.</p>
+
+<p>It couldn’t be in a different way, because it’s absolutely necessary to know each word of memory within the record, in order to correctly execute the program at a later stage.</p>
+
+<p>In other words, the compiler must be able to determine the layout of the activation records, and generate code that can access any sub-block in any of such records. This means, <strong>Activation Record layout and Code Generation must be designed together</strong>.</p>
+
+<p>Think about in this way. If the first word of memory in the activation record is reserved for the return value of the procedure, then the Compiler must know it, because it’s a key information for executing the program.</p>
+
+<p>And what’s the only way to know that with absolute certainty? Well, the Compiler must be the designer of the activation record.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>To summarize the content of this article, remember: <strong>a well-designed Compiler knows, depends on and takes advantage of the underlying computer’s architecture</strong>.</p>
+
+<p>This is evident in particular in the stage called Runtime Organization.</p>
+
+<p>There, the Compiler literally design how to organize the memory (and sometimes the storage too) of the machine, in order to build the best execution environment for the program.</p>
+
+<p>Activation records for procedures, also called activation frames, are the key elements that allow the correct management of procedures within the program. They are meant to store information such as the return address and value, arguments to the procedures itself and a link to the caller. Furthermore, <strong>the Compiler is in charge to design the layout of the activation frames</strong>.</p>
+
+<p>Finally, it’s worth mentioning that these are fairly advanced subjects. Strong Compilers out there definitely take them into account and do an excellent job with it. But if you want to experiment and build a smaller Compiler, then you can take these concepts a bit less strictly.</p>
+
+<h2 id="references">References</h2>
+
+<p>My article <a href="http://example.org/page/how-computer-runs-code/">How does the Computer Run Code?</a>.</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=http%3a%2f%2fexample.org%2fpage%2fdo-compilers-depend-on-the-architecture%2f&amp;text=Do%20Compilers%20Depend%20on%20the%20Computer%20Architecture%3f&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fexample.org%2fpage%2fdo-compilers-depend-on-the-architecture%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fdo-compilers-depend-on-the-architecture%2f&amp;title=Do%20Compilers%20Depend%20on%20the%20Computer%20Architecture%3f" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=http%3a%2f%2fexample.org%2fpage%2fdo-compilers-depend-on-the-architecture%2f&amp;title=Do%20Compilers%20Depend%20on%20the%20Computer%20Architecture%3f" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=http%3a%2f%2fexample.org%2fpage%2fdo-compilers-depend-on-the-architecture%2f&amp;title=Do%20Compilers%20Depend%20on%20the%20Computer%20Architecture%3f" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=http%3a%2f%2fexample.org%2fpage%2fdo-compilers-depend-on-the-architecture%2f&amp;description=Do%20Compilers%20Depend%20on%20the%20Computer%20Architecture%3f" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+
+
+      
+
+    </div>
+  </div>
+</div>
+
+    
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="https://github.com/pgrandinetti" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/grandinettipietro" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        
+        <p class="credits theme-by text-muted">
+          Built with <a href="https://gohugo.io">Hugo</a> &nbsp;&bull;&nbsp; Theme <a href="https://github.com/pgrandinetti/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://github.com/halogenica/beautifulhugo">these</a> <a href="https://deanattali.com/beautiful-jekyll/">themes</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function render_fn(){
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "$$", right: "$$", display: true},
+    {left: "$", right: "$", display: false},
+  ],
+  ignoredTags: [
+    "script", "noscript", "style", "textarea", "pre", "code",
+    
+    "nokatex"
+  ]
+});
+};
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="render_fn()">
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="http://example.org/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="http://example.org/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+
