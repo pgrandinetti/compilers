@@ -17,14 +17,14 @@ Here&rsquo;s what I am going to discuss:
     "@type": "WebSite",
     "name": "Compilers",
     
-    "url": "\/"
+    "url": "https:\/\/pgrandinetti.github.io\/"
 }
 </script><script type="application/ld+json">
 {
   "@context": "http://schema.org",
   "@type": "Organization",
   "name": "",
-  "url": "\/"
+  "url": "https:\/\/pgrandinetti.github.io\/"
   
   
   
@@ -39,14 +39,14 @@ Here&rsquo;s what I am going to discuss:
         "@type": "ListItem",
         "position": 1,
         "item": {
-          "@id": "\/",
+          "@id": "https:\/\/pgrandinetti.github.io\/",
           "name": "home"
         }
     },{
         "@type": "ListItem",
         "position": 3,
         "item": {
-          "@id": "\/page\/how-computer-runs-code\/",
+          "@id": "https:\/\/pgrandinetti.github.io\/page\/how-computer-runs-code\/",
           "name": "How does the computer run code?"
         }
     }]
@@ -64,15 +64,15 @@ Here&rsquo;s what I am going to discuss:
   "wordCount":  3719 ,
   "datePublished" : "2019-10-08T00:00:00",
   "dateModified" : "2019-10-08T00:00:00",
-  "image" : "\/",
+  "image" : "https:\/\/pgrandinetti.github.io\/",
   "keywords" : [ "" ],
-  "mainEntityOfPage" : "\/page\/how-computer-runs-code\/",
+  "mainEntityOfPage" : "https:\/\/pgrandinetti.github.io\/page\/how-computer-runs-code\/",
   "publisher" : {
     "@type": "Organization",
-    "name" : "\/",
+    "name" : "https:\/\/pgrandinetti.github.io\/",
     "logo" : {
         "@type" : "ImageObject",
-        "url" : "\/",
+        "url" : "https:\/\/pgrandinetti.github.io\/",
         "height" :  60 ,
         "width" :  60
     }
@@ -84,7 +84,7 @@ Here&rsquo;s what I am going to discuss:
 <meta property="og:description" content="This article is positioned between the front-end compilation (to decide whether a source code is correct or not) and the back-end compilation (to generate machine-runnable code and optimization). Before taking the leap, I want to understand the machine&rsquo;s internal organization, in order to truly grasp what to run code means.
 Here&rsquo;s what I am going to discuss:
  Memory organization. Word Alignment. Activation and lifetime of procedures.  Understanding Static vs Dynamic A key distinction, that one should really understand deeply, exists between what happens during compilation time, and what happens at runtime.">
-<meta property="og:url" content="/page/how-computer-runs-code/" />
+<meta property="og:url" content="https://pgrandinetti.github.io/page/how-computer-runs-code/" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Compilers" />
 
@@ -92,10 +92,10 @@ Here&rsquo;s what I am going to discuss:
   <meta name="twitter:description" content="This article is positioned between the front-end compilation (to decide whether a source code is correct or not) and the back-end compilation (to generate machine-runnable code and optimization). …">
   <meta name="twitter:card" content="summary" />
   <meta name="generator" content="Hugo 0.58.3" />
-  <link rel="alternate" href="/index.xml" type="application/rss+xml" title="Compilers">
+  <link rel="alternate" href="https://pgrandinetti.github.io/index.xml" type="application/rss+xml" title="Compilers">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="/css/syntax.css" /><link rel="stylesheet" href="/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="https://pgrandinetti.github.io/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="https://pgrandinetti.github.io/css/syntax.css" /><link rel="stylesheet" href="https://pgrandinetti.github.io/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
 
 
@@ -111,7 +111,7 @@ Here&rsquo;s what I am going to discuss:
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="/">Compilers</a>
+      <a class="navbar-brand" href="https://pgrandinetti.github.io/">Compilers</a>
     </div>
 
     <div class="collapse navbar-collapse" id="main-navbar">
@@ -548,7 +548,7 @@ Here&rsquo;s what I am going to discuss:
 
 <p>Alex Aiken&rsquo;s class Compilers at Stanford University. Available as <a href="https://lagunita.stanford.edu/courses/Engineering/Compilers/Fall2014/course/">free MOOC online</a>.</p>
 
-<p>My article <a href="/page/why-so-many-programming-languages/">Why There Are So Many Programming Languages</a> (Talks about front-end, back-end compilation).</p>
+<p>My article <a href="https://pgrandinetti.github.io/page/why-so-many-programming-languages/">Why There Are So Many Programming Languages</a> (Talks about front-end, back-end compilation).</p>
 
 
         
@@ -563,42 +563,42 @@ Here&rsquo;s what I am going to discuss:
     <ul class="share">
       
       <li>
-        <a href="//twitter.com/share?url=%2fpage%2fhow-computer-runs-code%2f&amp;text=How%20Does%20the%20Computer%20Run%20Code%3f&amp;via=" target="_blank" title="Share on Twitter">
+        <a href="//twitter.com/share?url=https%3a%2f%2fpgrandinetti.github.io%2fpage%2fhow-computer-runs-code%2f&amp;text=How%20Does%20the%20Computer%20Run%20Code%3f&amp;via=" target="_blank" title="Share on Twitter">
           <i class="fab fa-twitter"></i>
         </a>
       </li>
   
       
       <li>
-        <a href="//www.facebook.com/sharer/sharer.php?u=%2fpage%2fhow-computer-runs-code%2f" target="_blank" title="Share on Facebook">
+        <a href="//www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fpgrandinetti.github.io%2fpage%2fhow-computer-runs-code%2f" target="_blank" title="Share on Facebook">
           <i class="fab fa-facebook"></i>
         </a>
       </li>
   
       
       <li>
-        <a href="//reddit.com/submit?url=%2fpage%2fhow-computer-runs-code%2f&amp;title=How%20Does%20the%20Computer%20Run%20Code%3f" target="_blank" title="Share on Reddit">
+        <a href="//reddit.com/submit?url=https%3a%2f%2fpgrandinetti.github.io%2fpage%2fhow-computer-runs-code%2f&amp;title=How%20Does%20the%20Computer%20Run%20Code%3f" target="_blank" title="Share on Reddit">
           <i class="fab fa-reddit"></i>
         </a>
       </li>
   
       
       <li>
-        <a href="//www.linkedin.com/shareArticle?url=%2fpage%2fhow-computer-runs-code%2f&amp;title=How%20Does%20the%20Computer%20Run%20Code%3f" target="_blank" title="Share on LinkedIn">
+        <a href="//www.linkedin.com/shareArticle?url=https%3a%2f%2fpgrandinetti.github.io%2fpage%2fhow-computer-runs-code%2f&amp;title=How%20Does%20the%20Computer%20Run%20Code%3f" target="_blank" title="Share on LinkedIn">
           <i class="fab fa-linkedin"></i>
         </a>
       </li>
   
       
       <li>
-        <a href="//www.stumbleupon.com/submit?url=%2fpage%2fhow-computer-runs-code%2f&amp;title=How%20Does%20the%20Computer%20Run%20Code%3f" target="_blank" title="Share on StumbleUpon">
+        <a href="//www.stumbleupon.com/submit?url=https%3a%2f%2fpgrandinetti.github.io%2fpage%2fhow-computer-runs-code%2f&amp;title=How%20Does%20the%20Computer%20Run%20Code%3f" target="_blank" title="Share on StumbleUpon">
           <i class="fab fa-stumbleupon"></i>
         </a>
       </li>
   
       
       <li>
-        <a href="//www.pinterest.com/pin/create/button/?url=%2fpage%2fhow-computer-runs-code%2f&amp;description=How%20Does%20the%20Computer%20Run%20Code%3f" target="_blank" title="Share on Pinterest">
+        <a href="//www.pinterest.com/pin/create/button/?url=https%3a%2f%2fpgrandinetti.github.io%2fpage%2fhow-computer-runs-code%2f&amp;description=How%20Does%20the%20Computer%20Run%20Code%3f" target="_blank" title="Share on Pinterest">
           <i class="fab fa-pinterest"></i>
         </a>
       </li>
@@ -697,8 +697,8 @@ renderMathInElement(document.body, {
 <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
-<script src="/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="/js/load-photoswipe.js"></script>
+<script src="https://pgrandinetti.github.io/js/main.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="https://pgrandinetti.github.io/js/load-photoswipe.js"></script>
 
 
 
