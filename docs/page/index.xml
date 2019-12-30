@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Pages on Compilers</title>
-    <link>https://pgrandinetti.github.io/page/</link>
+    <link>https://pgrandinetti.github.io/compilers/page/</link>
     <description>Recent content in Pages on Compilers</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Mon, 14 Oct 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://pgrandinetti.github.io/page/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://pgrandinetti.github.io/compilers/page/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Code Generation for a New Programming Language</title>
-      <link>https://pgrandinetti.github.io/page/code-generation-for-a-new-programming-language/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/code-generation-for-a-new-programming-language/</link>
       <pubDate>Mon, 14 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/code-generation-for-a-new-programming-language/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/code-generation-for-a-new-programming-language/</guid>
       <description>Code Generation is the final step of the journey through Grammars, Parsers, Semantics and Compilers.
 In this article, I will discuss with you the implementation I made of a Code Generation module, as part of the Compiler I wrote for a new programming language that I designed.
 Let&amp;rsquo;s also briefly review what we&amp;rsquo;ve learnt so far in this course about Compilers and Programming Languages. We went into the details of many central subjects as well as some side-topics that are useful to understand the whole picture.</description>
@@ -24,20 +24,20 @@ Let&amp;rsquo;s also briefly review what we&amp;rsquo;ve learnt so far in this c
     
     <item>
       <title>Design of a New Context-Free Grammar</title>
-      <link>https://pgrandinetti.github.io/page/design-a-new-formal-grammar/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/design-a-new-formal-grammar/</link>
       <pubDate>Sun, 13 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/design-a-new-formal-grammar/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/design-a-new-formal-grammar/</guid>
       <description>We studied Formal Grammars in some of the previous articles in this course, What is a Grammar in programming languages and How to design formal Grammars. The most important concepts we learned are:
  There are 4 types of Grammar in the Chomsky hierarchy. Type-2 Grammars, also said Context-Free Grammars, are the ones used to design new programming languages. One must avoid many pitfalls while creating a new Grammar, for example left-recursion and ambiguity.</description>
     </item>
     
     <item>
       <title>Do Compilers Depend on the Computer Architecture?</title>
-      <link>https://pgrandinetti.github.io/page/do-compilers-depend-on-the-architecture/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/do-compilers-depend-on-the-architecture/</link>
       <pubDate>Sun, 13 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/do-compilers-depend-on-the-architecture/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/do-compilers-depend-on-the-architecture/</guid>
       <description>In all previous articles in this course, I tried to emphasize equally all steps in the compilation:
  Lexical Analysis Parsing Semantic Analysis Optimization Code Generation  For some reason, though, I noticed that the first three steps receive a lot of attention, usually much more than the last two.
 Moreover, the first three steps form what’s usually called front-end compilation, as opposed to the back-end compilation that if formed by the last two.</description>
@@ -45,10 +45,10 @@ Moreover, the first three steps form what’s usually called front-end compilati
     
     <item>
       <title>How Compilers Optimize the Source Code (Part I)</title>
-      <link>https://pgrandinetti.github.io/page/how-compilers-optimize-code-1/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/how-compilers-optimize-code-1/</link>
       <pubDate>Sun, 13 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/how-compilers-optimize-code-1/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/how-compilers-optimize-code-1/</guid>
       <description>A previous aricle of this course was entirely devoted to an overview of Optimization in Compilers. Reading that article is a clear prerequisite for this one (see the references at the end).
 We did study the following concepts:
  What Compilers optimize. When Compilers optimize, that is, at which point in the compilation process. Where they optimize, that is, what parts of the code.  In this article I want to study How Compilers Optimize source code.</description>
@@ -56,10 +56,10 @@ We did study the following concepts:
     
     <item>
       <title>How Compilers Optimize the Source Code (Part II)</title>
-      <link>https://pgrandinetti.github.io/page/how-compilers-optimize-code-2/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/how-compilers-optimize-code-2/</link>
       <pubDate>Sun, 13 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/how-compilers-optimize-code-2/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/how-compilers-optimize-code-2/</guid>
       <description>In Part I of this class we learned a great deal about how Compilers do Local Optimization.
 Local Optimization is the process of improving the performance of each basic block of code, isolated from the rest of the code. A basic block is a subset of the program that doesn&amp;rsquo;t contain label, except possibly in the first instruction, and doesn&amp;rsquo;t contain jump, except possibly in the last instruction.
 In Part II of the class on How Compilers Optimize the Source code, we will be studying Global Optimization and Data-Flow Analysis.</description>
@@ -67,10 +67,10 @@ In Part II of the class on How Compilers Optimize the Source code, we will be st
     
     <item>
       <title>Implementation of a Recursive Descent Parser</title>
-      <link>https://pgrandinetti.github.io/page/implementation-recursive-descent-parser/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/implementation-recursive-descent-parser/</link>
       <pubDate>Sun, 13 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/implementation-recursive-descent-parser/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/implementation-recursive-descent-parser/</guid>
       <description>We learned a great deal about Parsing algorithms in previous articles of this course. In one sentence, a Parser is a software that receives a list of Token objects and decide whether such a list fulfills the constraints given by a Formal Grammar.
 In other words, within a Compiler, the Parser is the element that makes sure the grammatical rules are respected.
 At the organization level, the Parser is the second step in front-end compilation, after Lexical Analysis, but before Semantic Analysis.</description>
@@ -78,20 +78,20 @@ At the organization level, the Parser is the second step in front-end compilatio
     
     <item>
       <title>Implementation of Semantic Analysis</title>
-      <link>https://pgrandinetti.github.io/page/implementation-semantic-analysis/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/implementation-semantic-analysis/</link>
       <pubDate>Sun, 13 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/implementation-semantic-analysis/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/implementation-semantic-analysis/</guid>
       <description>This article is part of my course on Compilers, Formal Grammars and Programming Languages. Up to this point we have studied:
  What is a Compiler. What are the several stages of the compilation process. What is a Formal Grammar, and several existing types of Grammars. A real design example of a new Context-Free Grammar, for a new Turing-complete programming language. What is Parsing, the second stage of compilation. A real implementation of a Recursive Descent Parser, made for the new programming language mentioned above.</description>
     </item>
     
     <item>
       <title>How do Compilers Manage Garbage Collection?</title>
-      <link>https://pgrandinetti.github.io/page/how-compilers-manage-garbage-collection/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/how-compilers-manage-garbage-collection/</link>
       <pubDate>Sat, 12 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/how-compilers-manage-garbage-collection/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/how-compilers-manage-garbage-collection/</guid>
       <description>A Garbage Collector is the module of a programming language that takes care of cleaning the memory during the program&amp;rsquo;s execution.
 Even though we are used to it, Garbage Collection (also called Automatic Memory Management) is a relatively recent innovation in programming languages.
 In the good old days, programming languages such as C and C++ asked the developer to take care of every bit of memory. For example, in C the developer should:</description>
@@ -99,10 +99,10 @@ In the good old days, programming languages such as C and C++ asked the develope
     
     <item>
       <title>Source Code Optimization in Compilers</title>
-      <link>https://pgrandinetti.github.io/page/source-code-optimization-in-compilers/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/source-code-optimization-in-compilers/</link>
       <pubDate>Sat, 12 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/source-code-optimization-in-compilers/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/source-code-optimization-in-compilers/</guid>
       <description>The strongest Compilers out there do not limit their work to direct compilation of the source code.
 They also modify the original source code in order to optimize performances.
 The first concepts we must study are:
@@ -111,10 +111,10 @@ The first concepts we must study are:
     
     <item>
       <title>Why Are Some Programming Languages Faster?</title>
-      <link>https://pgrandinetti.github.io/page/why-some-programming-language-is-faster/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/why-some-programming-language-is-faster/</link>
       <pubDate>Sat, 12 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/why-some-programming-language-is-faster/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/why-some-programming-language-is-faster/</guid>
       <description>Thanks to &amp;ldquo;Compilers&amp;rdquo; being the main keyword for this course, we also learned a great deal about Programming Language.
 In a previous article I described what features can differentiate a programming language from the others. In particular:
  General Purpose vs Domain Specific Language. High vs Low Level Language. Interpreted vs Compiled Language. Procedural vs Functional vs Object Oriented Language. Typed vs Untyped Language. Statically vs Dynamically Typed Language. Static vs Dynamic Scope.</description>
@@ -122,10 +122,10 @@ In a previous article I described what features can differentiate a programming 
     
     <item>
       <title>How to Design A Programming Language Parser</title>
-      <link>https://pgrandinetti.github.io/page/how-to-design-a-parser/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/how-to-design-a-parser/</link>
       <pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/how-to-design-a-parser/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/how-to-design-a-parser/</guid>
       <description>In a previous article of this series we&amp;rsquo;ve studied Programming Language Parsers and answered the basic question: what are they?
 We learnt that:
  Parsers are algorithms that decide whether or not a source code is correct with respect to the rules of a Grammar. Parsers get in input the list of Tokens produced by the Lexical Analysis, and output the yes/no decision, while building in memory a Parse-Tree.  And we also learnt what are the main features that distinguish parsers:</description>
@@ -133,10 +133,10 @@ We learnt that:
     
     <item>
       <title>How to Design Semantic Analysis</title>
-      <link>https://pgrandinetti.github.io/page/how-to-design-semantic-analysis/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/how-to-design-semantic-analysis/</link>
       <pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/how-to-design-semantic-analysis/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/how-to-design-semantic-analysis/</guid>
       <description>In a previous article in this series, we learnt what is the Semantic Analysis module of a Compiler.
 The key points to remember are:
  Semantic Analysis is the third step in front-end compilation (after Lexical Analysis and Parsing). It&amp;rsquo;s meant to catch all errors that weren&amp;rsquo;t caught by the first two steps. It&amp;rsquo;s the last step in front-end compilation, so it&amp;rsquo;s also the last point where a source code can be rejected.</description>
@@ -144,10 +144,10 @@ The key points to remember are:
     
     <item>
       <title>Where Do Compilers Use Finite Automata?</title>
-      <link>https://pgrandinetti.github.io/page/where-compilers-use-finite-automata/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/where-compilers-use-finite-automata/</link>
       <pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/where-compilers-use-finite-automata/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/where-compilers-use-finite-automata/</guid>
       <description>Finite Automata&amp;hellip; What a fancy name!
 Formally, they are computational machines with a finite number of states.
 For instance, a digital watch counting only hours and minutes is a finite state machine, because it can only in one out of 1440 states (24 &amp;ldquo;hour state&amp;rdquo; times 60 &amp;ldquo;minute state&amp;rdquo; for each hour).
@@ -156,10 +156,10 @@ A washing machine can be seen as a finite state machine too. It starts in the &a
     
     <item>
       <title>Where Do Compilers Use Regular Expressions?</title>
-      <link>https://pgrandinetti.github.io/page/where-compilers-use-regular-expressions/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/where-compilers-use-regular-expressions/</link>
       <pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/where-compilers-use-regular-expressions/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/where-compilers-use-regular-expressions/</guid>
       <description>The first step in a modern compiler is the so-called Lexical Analysis. This is a piece of software that takes the source code in input (i.e., the code that must be compiled) and generates a list of tokens.
 The Lexical Analyzer in a Compiler performs two tasks:
  Divide the input string (that&amp;rsquo;s the source code) into its units, such as variables, operators, keywords, etc. These are called lexemes. Assign each lexeme to its actual class.</description>
@@ -167,10 +167,10 @@ The Lexical Analyzer in a Compiler performs two tasks:
     
     <item>
       <title>How to Design Formal Grammars</title>
-      <link>https://pgrandinetti.github.io/page/how-to-design-grammars/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/how-to-design-grammars/</link>
       <pubDate>Thu, 10 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/how-to-design-grammars/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/how-to-design-grammars/</guid>
       <description>In a previous article of this series we answered basic questions about Formal Grammars:
  What are they? How are they related to Programming Languages? What are they made of?  Then, we quickly got a glimpse of more profound questions, such as:
  Are all Grammars the same? What differentiates one Grammar from the others? How can we build a new Grammar?  I did answer them, but in a brief way.</description>
@@ -178,10 +178,10 @@ The Lexical Analyzer in a Compiler performs two tasks:
     
     <item>
       <title>How Does the Computer Run Code?</title>
-      <link>https://pgrandinetti.github.io/page/how-computer-runs-code/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/how-computer-runs-code/</link>
       <pubDate>Tue, 08 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/how-computer-runs-code/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/how-computer-runs-code/</guid>
       <description>This article is positioned between the front-end compilation (to decide whether a source code is correct or not) and the back-end compilation (to generate machine-runnable code and optimization). Before taking the leap, I want to understand the machine&amp;rsquo;s internal organization, in order to truly grasp what to run code means.
 Here&amp;rsquo;s what I am going to discuss:
  Memory organization. Word Alignment. Activation and lifetime of procedures.  Understanding Static vs Dynamic A key distinction, that one should really understand deeply, exists between what happens during compilation time, and what happens at runtime.</description>
@@ -189,10 +189,10 @@ Here&amp;rsquo;s what I am going to discuss:
     
     <item>
       <title>How To Generate Machine-Runnable Code?</title>
-      <link>https://pgrandinetti.github.io/page/how-to-generate-runnable-code/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/how-to-generate-runnable-code/</link>
       <pubDate>Tue, 08 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/how-to-generate-runnable-code/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/how-to-generate-runnable-code/</guid>
       <description>Software developers are usually interested in writing a few thousands lines of code, and then run that code. They rarely ask deeper questions.
 In this series of articles, I did ask many deep questions. My objective was to learn about Compilers, Programming Languages and also to create a new programming language, to get hands-on practice.
 To summarize, we’ve learnt about:
@@ -201,10 +201,10 @@ To summarize, we’ve learnt about:
     
     <item>
       <title>Introduction</title>
-      <link>https://pgrandinetti.github.io/page/introduction/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/introduction/</link>
       <pubDate>Sun, 06 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/introduction/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/introduction/</guid>
       <description>Wellcome to my self-inflicted course on Compilers, Formal Grammars and Programming Languages!
 This is a subject I had been wanting to explore for a long time. It wasn&amp;rsquo;t taught as part of my BSc in Software Engineering, and my other degrees were about Automation and Optimization, so it fell off the table.
 Yet, I felt I could not stand this large missing piece of knowledge for very long. Thus, I gathered the best MOOC and the 2 best books on the arguments and started studying.</description>
@@ -212,20 +212,20 @@ Yet, I felt I could not stand this large missing piece of knowledge for very lon
     
     <item>
       <title>What Is Semantic Analysis in a Compiler?</title>
-      <link>https://pgrandinetti.github.io/page/what-is-semantic-analysis-in-compilers/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/what-is-semantic-analysis-in-compilers/</link>
       <pubDate>Thu, 03 Oct 2019 14:41:56 +0200</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/what-is-semantic-analysis-in-compilers/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/what-is-semantic-analysis-in-compilers/</guid>
       <description>Semantic Analysis is the last step in the front-end compilation. It&amp;rsquo;s called front-end because it basically is an interface between the source code written by a developer, and the transformation that this code will go through in order to become executable.
 In different words, front-end is the stage of the compilation where the source code is checked for errors. There can be lots of different error types, as you certainly know if you&amp;rsquo;ve written code in any programming language.</description>
     </item>
     
     <item>
       <title>What Is a Programming Language Parser?</title>
-      <link>https://pgrandinetti.github.io/page/what-is-a-programming-language-parser/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/what-is-a-programming-language-parser/</link>
       <pubDate>Wed, 02 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/what-is-a-programming-language-parser/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/what-is-a-programming-language-parser/</guid>
       <description>First of all, a correction:
 Parsing algorithms are not made for programming languages; they are made for language Grammars.
 A Grammar is a set of rules that specify how you can write characters one after the other in order to form valid sentences (that is, valid for that grammar).
@@ -234,10 +234,10 @@ For example, the English grammar tells us that you can put the characters &amp;l
     
     <item>
       <title>How to Build a New Programming Language</title>
-      <link>https://pgrandinetti.github.io/page/how-to-build-a-new-programming-language/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/how-to-build-a-new-programming-language/</link>
       <pubDate>Tue, 01 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/how-to-build-a-new-programming-language/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/how-to-build-a-new-programming-language/</guid>
       <description>Are you tired of just using programming languages for work, without knowing how it works? Do you want to know what&amp;rsquo;s happening inside the machine, after you&amp;rsquo;ve finished writing your code?
 Well, you are not the only one. And you will know everything about it after reading this article.
 As it turns out, there are three concepts, each extremely close to the others:
@@ -246,10 +246,10 @@ As it turns out, there are three concepts, each extremely close to the others:
     
     <item>
       <title>What Is A Programming Language Grammar?</title>
-      <link>https://pgrandinetti.github.io/page/what-is-a-programming-language-grammar/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/what-is-a-programming-language-grammar/</link>
       <pubDate>Mon, 30 Sep 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/what-is-a-programming-language-grammar/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/what-is-a-programming-language-grammar/</guid>
       <description>If you study, or work on a subject that is IT-related, then you&amp;rsquo;ve heard of Programming Languages. And, as you know for sure, that&amp;rsquo;s all about this series of articles is.
 I bet every now and again you&amp;rsquo;ve heard or read the expression the Language&amp;rsquo;s Grammar. What does it mean?
 In this article, we are going to learn what a Formal Grammar is, in the context of programming languages and compiler&amp;rsquo;s theory.</description>
@@ -257,20 +257,20 @@ In this article, we are going to learn what a Formal Grammar is, in the context 
     
     <item>
       <title>What Are the Differences Between Programming Languages</title>
-      <link>https://pgrandinetti.github.io/page/what-are-the-differences-in-programming-languages/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/what-are-the-differences-in-programming-languages/</link>
       <pubDate>Sun, 29 Sep 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/what-are-the-differences-in-programming-languages/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/what-are-the-differences-in-programming-languages/</guid>
       <description>Whether you want to design a new programming language, or you want to study Compilers theory, or you just want to learn a new language, the first and perhaps most important thing to do is to understand the whole picture.
 Programming Languages are very complex systems, where many features interact and provide a (hopefully) consistent result. This why we use many words to describe a single language. For example, Java is a general-purpose, high-level, statically typed, object-oriented, compiled to bytecode, programming language.</description>
     </item>
     
     <item>
       <title>Why There Are So Many Programming Languages?</title>
-      <link>https://pgrandinetti.github.io/page/why-so-many-programming-languages/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/why-so-many-programming-languages/</link>
       <pubDate>Sat, 28 Sep 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/why-so-many-programming-languages/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/why-so-many-programming-languages/</guid>
       <description>Why hasn&amp;rsquo;t anyone invented yet a Programming Language that would catch them all?
 Such question has stuck in my brain for quite some time, and none of the answers I found online were convincing. Then, I found an essay/video by Prof. Aiken, who teaches a class on Compilers at Stanford&amp;rsquo;s Computer Science faculty.
 His point was so interesting that I want to elaborate it further.
@@ -279,10 +279,10 @@ The &amp;ldquo;cost&amp;rdquo; of a Programming Language Let&amp;rsquo;s start w
     
     <item>
       <title>Can I Get a Job After I Study Compilers?</title>
-      <link>https://pgrandinetti.github.io/page/can-i-get-a-job-in-compilers/</link>
+      <link>https://pgrandinetti.github.io/compilers/page/can-i-get-a-job-in-compilers/</link>
       <pubDate>Fri, 27 Sep 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://pgrandinetti.github.io/page/can-i-get-a-job-in-compilers/</guid>
+      <guid>https://pgrandinetti.github.io/compilers/page/can-i-get-a-job-in-compilers/</guid>
       <description>The answer is a resounding absolutely yes, even though it will depend on the type of job you&amp;rsquo;re looking for, of course.
 Funnily enough, if you are a scientist and specialize in some niche topic, you might find that there are a lot of jobs available to those who are fluent in Compilers, Parsers and general Programming Language theory.
 But… Why? And How? The reason is that basic Parsing and Grammar theory is ubiquitous, and it&amp;rsquo;s hidden in places you would never imagine.</description>
