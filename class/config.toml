@@ -15,6 +15,8 @@ pygmentsCodefencesGuessSyntax = true
 #disqusShortname = "XXX"
 #googleAnalytics = "XXX"
 
+relativeURLs=true
+
 math = true
 
 [Params]

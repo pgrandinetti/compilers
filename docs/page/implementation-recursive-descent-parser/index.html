@@ -119,13 +119,13 @@ At the organization level, the Parser is the second step in front-end compilatio
         
           
             <li>
-              <a title="Contents" href="/compilers/compilers/">Contents</a>
+              <a title="Contents" href="../../compilers/compilers/">Contents</a>
             </li>
           
         
           
             <li>
-              <a title="About" href="/compilers/page/introduction">About</a>
+              <a title="About" href="../../compilers/page/introduction">About</a>
             </li>
           
         
@@ -349,7 +349,7 @@ At the organization level, the Parser is the second step in front-end compilatio
 <div class="highlight"><pre class="chroma">z = x + y;</pre></div>
 <p>Referring to the Grammar I designed, the Parse-Tree of this 1-liner code should look like the following:</p>
 
-<p><img src="/images/parseTree2.png" alt="Example of Parse Tree" width="300px"></p>
+<p><img src="../../images/parseTree2.png" alt="Example of Parse Tree" width="300px"></p>
 
 <p>Quite a large stuff, for a 1-liner.</p>
 
@@ -396,7 +396,7 @@ At the organization level, the Parser is the second step in front-end compilatio
 <span class="p">};</span></code></pre></div>
 <p>If you should need a graphical visualization of this different representation, here it is! Compare it with the previous one, and highlight the differences.</p>
 
-<p><img src="/images/parseTree3.png" alt=Example of Parse Tree with sibling pointers" width="300px"></p>
+<p><img src="../../images/parseTree3.png" alt=Example of Parse Tree with sibling pointers" width="300px"></p>
 
 <p>It should also be clear now why I introduced the example about LinkedList: when you think about it, the &ldquo;sibling&rdquo; pointer is very much like a &ldquo;horizontal&rdquo; LinkedList in the parse-tree. You can navigate such a list of siblings with a code like the following.</p>
 <div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">ParseTree</span> <span class="o">*</span><span class="n">root</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// current node;

@@ -119,13 +119,13 @@ Here&rsquo;s what I am going to discuss:
         
           
             <li>
-              <a title="Contents" href="/compilers/compilers/">Contents</a>
+              <a title="Contents" href="../../compilers/compilers/">Contents</a>
             </li>
           
         
           
             <li>
-              <a title="About" href="/compilers/page/introduction">About</a>
+              <a title="About" href="../../compilers/page/introduction">About</a>
             </li>
           
         
@@ -335,7 +335,7 @@ Here&rsquo;s what I am going to discuss:
 
 <p>In truth, this is all about a convention that has traditionally been applied all over textbooks and papers: memory is depicted from the low addresses to the high ones.</p>
 
-<p><img src="/images/memory1.png" alt="Computer memory view" width="280px"></p>
+<p><img src="../../images/memory1.png" alt="Computer memory view" width="280px"></p>
 
 <p>Clearly, in a real machine it&rsquo;s not even guaranteed that these spaces of memory are contiguously allocated. This is why we use logical names for variables, instead of hexadecimal addresses!</p>
 
@@ -448,7 +448,7 @@ Here&rsquo;s what I am going to discuss:
 
 <p>Thus, <strong>the compiler creates a statically allocated memory</strong> that is devoted to store globals. By convention, this is said to be at the top of the Data part of the memory. Remember, though, that &ldquo;top&rdquo; means low-addresses. And below it there is the Activation Stack, with all Activation Frames for the currently active procedures. Here is how you can look at it.</p>
 
-<p><img src="/images/memory2.png" alt="Computer memory view" width="280px"></p>
+<p><img src="../../images/memory2.png" alt="Computer memory view" width="280px"></p>
 
 <p>In reality though, there is a bunch of other things that make sense to store in a &ldquo;global&rdquo; place, not just global variables. This is why compiler&rsquo;s people more frequently talk about <strong>static data</strong> part of the memory. What&rsquo;s in there vary from compiler to compiler, but the idea is that such part of the memory is right below the Code part, and contains all statically allocated data.</p>
 
@@ -479,7 +479,7 @@ Here&rsquo;s what I am going to discuss:
 
 <p>This is the final picture you should remember.</p>
 
-<p><img src="/images/memory3.png" alt="Computer memory view" width="280px"></p>
+<p><img src="../../images/memory3.png" alt="Computer memory view" width="280px"></p>
 
 <p>At any moment during the program&rsquo;s execution, if the pointer to the next space available for the Stack becomes equal to the pointer to the next space available for the Heap, then it really means <strong>the program has run out of memory</strong>. This is when you&rsquo;d see some Error or Exception such as Out-Of-Memory-Error, and the program would be aborted.</p>
 
