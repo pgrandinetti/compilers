@@ -6,6 +6,10 @@ draft: false
 
 # Contents
 
+
+[Introduction]({{< ref "/page/introduction" >}})
+
+
 ### Part A - Answer the Questions
 
 1. [Can I get a job after I study Compilers?]({{< ref "/page/can-i-get-a-job-in-compilers" >}})

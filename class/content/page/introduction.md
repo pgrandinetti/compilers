@@ -16,3 +16,11 @@ The overall learning experience has been fantastic, and its results are:
 
 - A [series of articles/classes]({{< ref "/" >}}) on the subject (start from here!).
 - A [GitHub repository](https://github.com/pgrandinetti/compilers) for a new programming language.
+
+
+### Get in touch
+
+MOOCs are only half-useful without other students' feedback. I warmly encourage you to get in touch for questions, comments and suggestions. You can:
+
+- Reach out via [my LinkedIn page](https://linkedin.com/in/grandinettipietro)
+- Open a [GitHub issue](https://github.com/pgrandinetti/compilers/issues)
