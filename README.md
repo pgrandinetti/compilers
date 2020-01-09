@@ -1,7 +1,7 @@
 # Compilers
 _My open course on Compilers, Grammars and Programming Languages_
 
-This repository contains the code I wrote for my _self-inflicted_ class about Compilers <https://plumebear.com/project/compilers/>.
+This repository contains the code I wrote for my _self-inflicted_ class about Compilers <https://pgrandinetti.github.io/compilers/>.
 
 **Use it at your risks**.
 
@@ -30,4 +30,4 @@ The result is a Python executable script, by default `./out.py`. You can optiona
 - What is _my language_?
 - How does the Compiler work?
 
-Answers: <https://plumebear.com/courses/compilers/>
+Answers: <https://pgrandinetti.github.io/compilers/>
