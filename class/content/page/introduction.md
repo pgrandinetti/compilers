@@ -4,7 +4,7 @@ description: Overview of the free course on Compilers, Programming Languages and
 date: "2019-10-06"
 ---
 
-Wellcome to my _self-inflicted_ **course on Compilers, Formal Grammars and Programming Languages!**
+Welcome to my _self-inflicted_ **course on Compilers, Formal Grammars and Programming Languages!**
 
 This is a subject I had been wanting to explore for a long time. It wasn't taught as part of my BSc in Software Engineering, and my other degrees were about Automation and Optimization, so it fell off the table.
 
