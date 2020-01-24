@@ -10,7 +10,7 @@ This is a subject I had been wanting to explore for a long time. It wasn't taugh
 
 Yet, I felt I could not stand this large missing piece of knowledge for very long. Thus, I gathered the best MOOC and the 2 best books on the arguments and started studying.
 
-True to [my own ideas on MOOCs](https://plumebear.com/post/make-the-most-out-of-moocs") I decided to self-assign to myself a complex project: **to build a new programming language**, without using any of the automated tools available out there, in order to practice and implement with my own hands all concepts.
+True to [my own ideas on MOOCs](https://medium.com/@pgrandinetti/make-the-most-out-of-your-mooc-97f806e6a70) I decided to self-assign to myself a complex project: **to build a new programming language**, without using any of the automated tools available out there, in order to practice and implement with my own hands all concepts.
 
 The overall learning experience has been fantastic, and its results are:
 
