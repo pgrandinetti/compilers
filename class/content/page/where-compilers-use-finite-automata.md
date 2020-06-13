@@ -67,7 +67,7 @@ A transition is a rule of the form "when in state s1, if you read character c1 m
 
 It's very common to use graphs like the one below to represent DFA.
 
-![Example of Deterministic Finite Automata](/img/courses/compilers/DFA.png)
+![Example of Deterministic Finite Automata](/images/DFA.png)
 
 The key element of this DFA are the following ones:
 
