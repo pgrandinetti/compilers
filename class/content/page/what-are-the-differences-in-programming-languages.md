@@ -50,7 +50,7 @@ This is why Assembly programs, as well as programs written in other low-level la
 ```
 load 1 r1;  // save the integer number 1 into register r1
 load 2 r2; // save the integer number 2 into register r2
-add r3 r2 r3; // add the content of registers r1 and r2 and put it into register r3.
+add r1 r2 r3; // add the content of registers r1 and r2 and put it into register r3.
 ```
 
 Keep in mind that, even though Assembly is considered low level, you can even go at a lower level. That's when you set **each bit of memory** into the machine.
@@ -345,7 +345,7 @@ This is the standard way, you should get used to it, if you aren't already.
 
 But, if the language you're using it's based on dynamic scoping, then:
 
-- Whether `f1`, `f2`, `f3` can see each other's scope depends on the invocation chain, that is known only at runtime.
+- Whether `f1`, `f2`, `foo` can see each other's scope depends on the invocation chain, that is known only at runtime.
 - So, when the `Main` function calls `f1`, this will set `x=1`, call `foo`, set `x=3`, print `3` and then call `f2`. But now, `f2` can see all the scopes in the invocation chain (that is, `foo`, `f1` and `Main`) and therefore it will bind `x=3`, because it finds it in `foo`'s scope.
 
 As you can easily imagine, **dynamic scoping can be very confusing**. That's why languages with dynamic scope lost the "historical war" against languages with static scope, and the former have practically disappeared.
