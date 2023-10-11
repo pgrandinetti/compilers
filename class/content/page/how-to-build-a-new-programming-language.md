@@ -46,7 +46,7 @@ From a very high perspective, creating a new programming language involves three
 - Build the front-end compiler for the source code.
 - Build the back-end code generator.
 
-So, **you start with a pen and a piece** of paper where you define the Grammar of your language. If you don't know what a Formal Grammar is, then just think about it as the grammar of a human language (and read my article about it).
+So, **you start with a pen and a piece of paper** where you define the Grammar of your language. If you don't know what a Formal Grammar is, then just think about it as the grammar of a human language (and read my article about it).
 
 For example, in a human language you might say "A sentence is made by an Article, a Noun, and a Verb". Then, the natural ambiguity of the language, mainly given by the spoken part and by human nature, throws this rule away.
 
